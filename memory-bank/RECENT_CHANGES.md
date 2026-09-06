@@ -15,6 +15,12 @@ Entry format:
 
 ---
 
+## 2026-09-07 — Project foundation published to GitHub
+- Module(s): project setup and deployment
+- Summary: Published the MBWays-branded DocumentCollector foundation to the private GitHub repository's `main` branch, including the Memory Bank, root agent guidance, project README, ignore rules, and canonical brand assets.
+- Files touched: `memory-bank/PHASE_1_FRONTEND.md`, `memory-bank/RECENT_CHANGES.md`
+- Follow-ups: Scaffold the Phase 1 Next.js application, configure GitHub Actions, and connect the private repository to Vercel.
+
 ## 2026-09-07 — Private GitHub repository connected
 - Module(s): project setup and deployment
 - Summary: Connected the local DocumentCollector workspace to the private `chaudharypooja12/DocumentCollector` GitHub repository, preserved its existing initialization commit, documented the repository as the source of truth, and added Next.js, Vercel, environment, test-output, log, editor, and operating-system ignore rules for the first project-content commit.

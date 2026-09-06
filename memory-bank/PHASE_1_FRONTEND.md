@@ -55,6 +55,7 @@ current page memory.
   - [ ] Content Security Policy compatible with local WASM
 - [x] Create the private GitHub repository with `main` as the production branch
 - [x] Configure the local repository to track the private GitHub origin
+- [x] Publish the project foundation to GitHub `main`
 - [ ] Configure GitHub Actions for lint, type-check, unit tests, and build
 - [ ] Import the GitHub repository into Vercel using the Next.js preset
 - [ ] Configure Vercel to run `npm ci` and `npm run build` on Node.js 22 LTS
