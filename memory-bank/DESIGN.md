@@ -1,0 +1,140 @@
+# Design Document — UI/UX & Visual System
+
+**Project:** DocumentCollector - Powered by MBWays
+**Related docs:** `COMPANY.md`, `PRD.md`, `TECH_STACK.md`, `PHASE_1_FRONTEND.md`
+
+---
+
+## 1. Design Principles
+
+1. **MBWays Orbital Glass** — dark-first glass cards, soft blur, orange accents, and layered depth.
+2. **Clarity over decoration** — the User side is a task (upload documents); it must never feel confusing.
+3. **Mobile-first** — most Users open the link on a phone camera; Admin panel is desktop-friendly but responsive.
+4. **No emojis** — all iconography via a proper icon library (`lucide-react`).
+5. **Immediate, unambiguous feedback** — every state (capturing, uploading, success, error, expired, locked) has a distinct visual treatment.
+6. **Visible ownership** — shared shells show the MBWays logo, the
+   DocumentCollector name, and `Powered by MBWays`.
+
+---
+
+## 2. Visual Language
+
+### 2.1 Glassmorphism Card Spec
+- Dark background: `rgba(255,255,255,.06)`.
+- Light background: `rgba(255,255,255,.78)`.
+- Backdrop filter: `blur(24px)`.
+- Dark border: `1px solid rgba(255,255,255,.08)`.
+- Border radius: `24px`.
+- Shadow: large, soft MBWays orange glow used sparingly.
+
+### 2.2 MBWays Color Palette
+| Token | Usage | Example |
+|---|---|---|
+| `--color-primary` | Primary actions, accents, glow | `#FF6B00` |
+| `--color-secondary` | Gradients and hover states | `#FF8F1F` |
+| `--color-accent` | Highlights | `#FFB347` |
+| `--color-background` | Dark app background | `#090B11` |
+| `--color-card` | Dark solid panels | `#10131D` |
+| `--glass-surface` | Dark glass cards | `rgba(255,255,255,.06)` |
+| `--glass-border` | Dark glass borders | `rgba(255,255,255,.08)` |
+| `--text-primary` | Dark-theme primary text | `#FFFFFF` |
+| `--text-secondary` | Dark-theme secondary text | `#A8B0BF` |
+| `--state-success` | Success, GREEN capture box | Green |
+| `--state-error` | Error, RED capture box, expired/locked banners | Red |
+| `--state-warning` | Expiry countdown warnings | Amber |
+
+### 2.3 Typography
+- Headings: Space Grotesk, weight 700.
+- Body: Inter, weight 400.
+- Buttons: Sora, weight 500–600.
+- Clear hierarchy: Page title → Section heading → Body → Caption.
+- Sufficient contrast maintained against blurred/translucent backgrounds (WCAG AA minimum).
+
+### 2.4 Iconography
+- Single consistent icon set (`lucide-react`).
+- Icons used for: capture, retake, upload, success, error/warning, expired, lock/reactivate, download, drag-handle, add-user, settings.
+
+### 2.5 Brand Lockup
+
+- Use `/brand/logo.svg` for theme-aware rendering. It depends on
+  `/brand/logo-neutral-mask.png` and `/brand/logo-orange-layer.png`.
+- Use `/brand/logo.png` when a standalone raster asset is required.
+- Display **DocumentCollector** with the supporting line **Powered by MBWays**.
+- Use the MBWays tagline only where additional corporate context is appropriate:
+  **Opening Pathways to Opportunities.**
+- Do not redraw, recolor, distort, crop, or replace the MBWays logo.
+- Keep generated document PDFs unbranded unless a separate approved requirement
+  introduces a cover or watermark.
+
+---
+
+## 3. Core Interaction States
+
+| State | Visual Treatment |
+|---|---|
+| Capture box — incorrect position | RED outline/box, subtle shake or pulsing hint |
+| Capture box — correct position | GREEN outline/box, capture button becomes active |
+| Processing locally | Progress indicator per document (glass progress bar) |
+| Documents ready | Success glass card + confirmation icon + Download/Share PDF actions |
+| Link expired | Full-screen glass card, neutral/error tone, contact-admin message, no upload UI |
+| Link already submitted (locked) | Full-screen glass card, info tone, "contact admin for changes" message |
+| Admin reactivated / edit mode | Pre-filled document thumbnails shown as "already uploaded", each individually replaceable |
+
+All state screens retain the shared DocumentCollector and MBWays brand lockup.
+
+---
+
+## 4. Screen Inventory
+
+### 4.1 Admin Panel (mobile-first and desktop-enhanced)
+- [ ] **Dashboard** — clearly labeled Phase 1 demonstration cards and activity fixtures.
+- [ ] **Users (list)** — responsive demonstration table/cards; no saved records in Phase 1.
+- [ ] **Create Request** — select document requirements and expiry without adding PII to the link.
+- [ ] **Document Templates** — select documents required for this user; drag-and-drop ordering; toggle Single vs Front+Back per document.
+- [ ] **Document Requests / Link Generation** — set expiry (max 6h), generate link, share options (Copy / WhatsApp / Email).
+- [ ] **Share Request** — copy link, QR code, native share, WhatsApp, and email.
+- [ ] **Submission Management** — complete demonstration UI; no real User captures are available to Admin in Phase 1.
+- [ ] **PDF Management** — complete demonstration UI using fixtures.
+- [ ] **Settings** — demonstration UI; values reset on refresh.
+
+### 4.2 User Upload Flow (simple, mobile-first)
+- [ ] **Link Landing / Loading** — decodes and validates the URL-fragment request, then opens the document checklist automatically.
+- [ ] **Document Upload List** — list of required documents with capture buttons (Front/Back where applicable), progress indicators.
+- [ ] **Camera Capture Screen** — live preview, positioning guide box (red/green), capture button, retake button.
+- [ ] **Review/Edit Screen** — thumbnail of captured image(s), retake/replace controls, per-document status.
+- [ ] **Generation Confirmation** — confirms local PDF generation and explains the current session will lock afterward.
+- [ ] **Success / Download Screen** — Documents Ready message + Download and supported Share actions.
+- [ ] **Expired Link Screen** — static message, no interactive upload elements.
+- [ ] **Locked/Already-Submitted Screen** — current-tab state only in Phase 1; preserve generated download actions while memory remains.
+
+---
+
+## 5. Responsive Behavior
+
+- [ ] Validate 320, 360, 375, 390, 412, 430, 768, 820, 1024, 1280, and 1440px widths.
+- [ ] Both Admin and User screens are mobile-first; desktop adds space and density.
+- [ ] Admin-side tables/lists collapse into stacked cards on mobile.
+- [ ] Drag-and-drop document ordering has a touch-friendly fallback (e.g., up/down reorder buttons on small screens).
+- [ ] Full-screen camera views use `dvh`/`svh`, safe-area padding, and portrait/landscape layouts.
+- [ ] No horizontal scrolling at 320px.
+
+---
+
+## 6. Accessibility Notes
+
+- [ ] All interactive elements reachable via keyboard on Admin panel.
+- [ ] Color is never the only indicator of state (icon + text label accompany red/green box, success/error banners).
+- [ ] Sufficient tap-target sizes (≥ 44px) on the mobile capture UI.
+- [ ] Alt text / ARIA labels for all icons and capture states.
+
+---
+
+## 7. Empty / Edge States
+
+- [ ] No users created yet — Admin dashboard shows onboarding empty state with "Create your first user" CTA.
+- [ ] No documents configured for a user — block link generation until at least one document is configured.
+- [ ] Camera permission denied — fallback to manual file picker with a short explanatory note.
+- [ ] Slow local processing — progress feedback, adaptive processing, and an actionable error state.
+- [ ] Refresh/close after capture — warn that unsaved captures will be lost.
+- [ ] Slow device — reduce detection sampling while keeping preview responsive.
+- [ ] Blur, glare, clipped corners, or low coverage — show a specific corrective hint.

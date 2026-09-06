@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 310" fill="none" role="img" aria-label="MBWays">
+  <style>
+    :root { --logo-neutral-static: #111318; }
+    @media (prefers-color-scheme: dark) { :root { --logo-neutral-static: #ffffff; } }
+  </style>
+  <defs>
+    <mask id="mb-neutral-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="500" height="310">
+      <image href="/brand/logo-neutral-mask.png" width="500" height="310"/>
+    </mask>
+  </defs>
+  <rect width="500" height="310" fill="var(--logo-neutral-static)" mask="url(#mb-neutral-mask)"/>
+  <image href="/brand/logo-orange-layer.png" width="500" height="310"/>
+</svg>
