@@ -2,7 +2,9 @@
 
 import { LockKeyhole, RotateCcw } from "lucide-react";
 import { useState } from "react";
-import { Badge, Button, Card } from "@/components/shared/ui";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 export function ReactivationDemo() {
   const [reactivated, setReactivated] = useState(false);
@@ -11,7 +13,7 @@ export function ReactivationDemo() {
     <Card className="mt-6">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
-          <span className="rounded-xl bg-orange-300/8 p-2.5 text-orange-200">
+          <span className="rounded-xl bg-primary/8 p-2.5 text-primary">
             {reactivated ? (
               <RotateCcw className="size-5" />
             ) : (
@@ -25,7 +27,7 @@ export function ReactivationDemo() {
                 {reactivated ? "Reactivated" : "Submitted / locked"}
               </Badge>
             </div>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/55">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
               Phase 2 will reactivate the existing token without generating a
               new link. This control changes only this demonstration card and
               resets on refresh.

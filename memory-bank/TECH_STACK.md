@@ -41,31 +41,32 @@ are approved.
 
 ## 2. Final Phase 1 Stack
 
-| Concern | Selected technology | Decision |
-|---|---|---|
-| Runtime | Node.js 22 LTS | Local tooling and CI |
-| Package manager | npm | Use the committed lockfile |
-| Web framework | Next.js 16, App Router | Static/client-first frontend with route-based code splitting |
-| UI runtime | React 19 | Client state and interactive camera/PDF workflows |
-| Language | TypeScript 5, strict mode | No `any`; shared schemas/types across Admin and User flows |
-| Styling | Tailwind CSS 4 | Mobile-first utilities and MBWays design tokens |
-| UI primitives | shadcn/ui with Base UI primitives | Accessible dialogs, sheets, fields, and menus |
-| Icons | `lucide-react` | No emoji-based controls |
-| Forms | React Hook Form + Zod | Typed Admin request builder and client validation |
-| Reordering | `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities` | Pointer, keyboard, and touch document ordering |
-| Camera | Native MediaDevices API (`getUserMedia`) | Rear-camera request with manual file-input fallback |
-| Image analysis | OpenCV.js WASM, pinned and lazy-loaded locally | Edge/corner detection and perspective correction |
-| Image rendering | Canvas API + `createImageBitmap` | Crop, resize, normalize, and JPEG encode |
-| PDF generation | `pdf-lib` | A4 combined and individual PDFs entirely on-device |
-| Link transport | Versioned Base64URL JSON in URL fragment | Cross-device request configuration without storage |
-| Link validation | Zod schema + strict limits | Reject malformed, oversized, unsupported, or expired payloads |
-| Link sharing | Clipboard API, Web Share API, `mailto:`, `wa.me`, `qrcode.react` | Easy transfer from Admin desktop or phone to User phone |
-| State | React Context + `useReducer` | In-memory only; no persistence middleware |
-| Unit/component tests | Vitest + React Testing Library + user-event | Fast logic and accessibility coverage |
-| Browser E2E | Playwright | Mobile viewport, camera fallback, link, and PDF workflows |
-| Lint/format | ESLint + Prettier | CI-enforced consistency |
-| Hosting | Vercel over HTTPS | Camera APIs require a secure context |
-| Source/CI | GitHub + GitHub Actions | Lint, type-check, test, and build on pull requests |
+| Concern              | Selected technology                                              | Decision                                                                                           |
+| -------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Runtime              | Node.js 22 LTS                                                   | Local tooling and CI                                                                               |
+| Package manager      | npm                                                              | Use the committed lockfile                                                                         |
+| Web framework        | Next.js 16, App Router                                           | Static/client-first frontend with route-based code splitting                                       |
+| UI runtime           | React 19                                                         | Client state and interactive camera/PDF workflows                                                  |
+| Language             | TypeScript 5, strict mode                                        | No `any`; shared schemas/types across Admin and User flows                                         |
+| Styling              | Tailwind CSS 4                                                   | Mobile-first utilities and MBWays design tokens                                                    |
+| UI primitives        | shadcn/ui with Radix UI primitives                               | Accessible buttons, cards, alerts, fields, selects, sheets, menus, progress, and responsive tables |
+| Icons                | `lucide-react`                                                   | No emoji-based controls                                                                            |
+| Forms                | React Hook Form + Zod                                            | Typed Admin request builder and client validation                                                  |
+| Reordering           | `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`       | Pointer, keyboard, and touch document ordering                                                     |
+| Camera               | Native MediaDevices API (`getUserMedia`)                         | Rear-camera request with manual file-input fallback                                                |
+| Image analysis       | OpenCV.js WASM, pinned and lazy-loaded locally                   | Edge/corner detection and perspective correction                                                   |
+| Image rendering      | Canvas API + `createImageBitmap`                                 | Crop, resize, normalize, and JPEG encode                                                           |
+| PDF generation       | `pdf-lib`                                                        | A4 combined and individual PDFs entirely on-device                                                 |
+| Link transport       | Versioned Base64URL JSON in URL fragment                         | Cross-device request configuration without storage                                                 |
+| Link validation      | Zod schema + strict limits                                       | Reject malformed, oversized, unsupported, or expired payloads                                      |
+| Link sharing         | Clipboard API, Web Share API, `mailto:`, `wa.me`, `qrcode.react` | Easy transfer from Admin desktop or phone to User phone                                            |
+| State                | React Context + `useReducer`                                     | In-memory only; no persistence middleware                                                          |
+| Theme                | Semantic CSS variables + React context                           | Light by default; in-memory Light/Dark switching without browser persistence                       |
+| Unit/component tests | Vitest + React Testing Library + user-event                      | Fast logic and accessibility coverage                                                              |
+| Browser E2E          | Playwright                                                       | Mobile viewport, camera fallback, link, and PDF workflows                                          |
+| Lint/format          | ESLint + Prettier                                                | CI-enforced consistency                                                                            |
+| Hosting              | Vercel over HTTPS                                                | Camera APIs require a secure context                                                               |
+| Source/CI            | GitHub + GitHub Actions                                          | Lint, type-check, test, and build on pull requests                                                 |
 
 ### Explicit Phase 1 exclusions
 
@@ -140,14 +141,14 @@ the baseline.
 
 ### 4.1 Required viewport coverage
 
-| Class | Validation widths |
-|---|---|
-| Small phone | 320px, 360px |
-| Standard phone | 375px, 390px |
-| Large phone | 412px, 430px |
-| Tablet | 768px, 820px |
-| Small desktop | 1024px, 1280px |
-| Large desktop | 1440px and above |
+| Class          | Validation widths |
+| -------------- | ----------------- |
+| Small phone    | 320px, 360px      |
+| Standard phone | 375px, 390px      |
+| Large phone    | 412px, 430px      |
+| Tablet         | 768px, 820px      |
+| Small desktop  | 1024px, 1280px    |
+| Large desktop  | 1440px and above  |
 
 Every screen must:
 
@@ -181,7 +182,7 @@ Every screen must:
 ## 5. Camera and Image Pipeline
 
 1. Confirm a secure context and request `video: { facingMode: { ideal:
-   "environment" } }`.
+"environment" } }`.
 2. If permission is denied, no rear camera exists, or capture fails, offer an
    `<input type="file" accept="image/*" capture="environment">` fallback.
 3. Lazy-load OpenCV.js and sample reduced-resolution frames.
@@ -300,11 +301,11 @@ Vercel team members.
 
 ### Branch and environment mapping
 
-| Git event | Vercel environment | Purpose |
-|---|---|---|
-| Pull request | Preview Deployment | Review responsive UI and test shareable links |
-| Push/merge to `main` | Production Deployment | Public DocumentCollector release |
-| Local branch | Local Next.js development | Development and automated tests |
+| Git event            | Vercel environment        | Purpose                                       |
+| -------------------- | ------------------------- | --------------------------------------------- |
+| Pull request         | Preview Deployment        | Review responsive UI and test shareable links |
+| Push/merge to `main` | Production Deployment     | Public DocumentCollector release              |
+| Local branch         | Local Next.js development | Development and automated tests               |
 
 ### Vercel project settings
 
@@ -354,14 +355,14 @@ Vercel team members.
 
 ## 11. Phase 2 and Phase 3 Stack
 
-| Layer | Phase 2 | Phase 3 |
-|---|---|---|
-| Backend | Supabase Postgres, Auth, Storage, Edge Functions | Existing backend plus billing domain |
-| Admin auth | Supabase Auth | Existing |
-| Public links | Opaque, random server-issued token | Existing |
-| Images/PDFs | Private buckets and signed URLs | Existing |
-| Server validation | Link expiry, state, upload, completeness, and lock | Plan/entitlement checks |
-| Payments | None | Selected hosted payment gateway + signed webhooks |
+| Layer             | Phase 2                                            | Phase 3                                           |
+| ----------------- | -------------------------------------------------- | ------------------------------------------------- |
+| Backend           | Supabase Postgres, Auth, Storage, Edge Functions   | Existing backend plus billing domain              |
+| Admin auth        | Supabase Auth                                      | Existing                                          |
+| Public links      | Opaque, random server-issued token                 | Existing                                          |
+| Images/PDFs       | Private buckets and signed URLs                    | Existing                                          |
+| Server validation | Link expiry, state, upload, completeness, and lock | Plan/entitlement checks                           |
+| Payments          | None                                               | Selected hosted payment gateway + signed webhooks |
 
 Phase 2 API details remain in `PHASE_2_BACKEND.md`. Phase 3 payment planning
 remains in `PHASE_3_PAYMENT_GATEWAY.md`.

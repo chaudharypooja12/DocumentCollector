@@ -7,7 +7,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { BrandLockup } from "@/components/shared/brand-lockup";
-import { Button, Card, Input } from "@/components/shared/ui";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { InlineAlert } from "@/components/ui/inline-alert";
+import { Input } from "@/components/ui/input";
 
 const loginSchema = z.object({
   email: z.email("Enter a valid email address"),
@@ -33,7 +37,10 @@ export function AdminLogin() {
   });
 
   return (
-    <div className="page-shell grid min-h-svh items-center gap-10 py-8 lg:grid-cols-2">
+    <div className="page-shell relative grid min-h-svh items-center gap-10 py-8 lg:grid-cols-2">
+      <div className="absolute top-4 right-0">
+        <ThemeToggle />
+      </div>
       <section className="hidden lg:block">
         <BrandLockup href="/" />
         <p className="mt-12 text-xs font-semibold tracking-[0.18em] text-primary uppercase">
@@ -42,7 +49,7 @@ export function AdminLogin() {
         <h1 className="text-balance mt-4 max-w-xl text-5xl font-bold tracking-[-0.04em]">
           Build clear document requests in minutes.
         </h1>
-        <p className="mt-5 max-w-lg text-base leading-7 text-white/60">
+        <p className="mt-5 max-w-lg text-base leading-7 text-muted-foreground">
           Configure the checklist, choose a short expiry, and move it to a phone
           through a link or QR code.
         </p>
@@ -52,31 +59,25 @@ export function AdminLogin() {
         <div className="mb-7 lg:hidden">
           <BrandLockup href="/" />
         </div>
-        <Card className="glass-card-strong">
-          <div className="flex size-12 items-center justify-center rounded-2xl bg-primary/12 text-orange-200">
+        <Card>
+          <div className="flex size-12 items-center justify-center rounded-2xl bg-primary/12 text-primary">
             <LockKeyhole className="size-6" />
           </div>
           <h2 className="mt-6 text-2xl font-bold">Admin sign in</h2>
-          <p className="mt-2 text-sm leading-6 text-white/55">
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
             Preview the Phase 1 Admin workspace.
           </p>
 
-          <div className="mt-5 flex items-start gap-3 rounded-xl border border-blue-300/15 bg-blue-300/7 p-3 text-xs leading-5 text-blue-100/75">
+          <InlineAlert className="mt-5 flex items-start gap-3 text-xs">
             <Info className="mt-0.5 size-4 shrink-0" />
             This is a UI demonstration only. Credentials are validated in this
             tab, never sent or saved. Secure authentication begins in Phase 2.
-          </div>
+          </InlineAlert>
 
-          <div
-            role="form"
+          <form
             aria-label="Admin sign in preview"
             className="mt-6 space-y-5"
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault();
-                void continueToWorkspace();
-              }
-            }}
+            onSubmit={continueToWorkspace}
           >
             <label className="block">
               <span className="mb-2 block text-sm font-semibold">Email</span>
@@ -88,7 +89,7 @@ export function AdminLogin() {
                 aria-invalid={Boolean(errors.email)}
               />
               {errors.email ? (
-                <span className="mt-1 block text-xs text-red-200">
+                <span className="mt-1 block text-xs text-destructive">
                   {errors.email.message}
                 </span>
               ) : null}
@@ -107,7 +108,7 @@ export function AdminLogin() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((value) => !value)}
-                  className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-white/50 hover:text-white"
+                  className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-muted-foreground hover:text-foreground"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -118,20 +119,15 @@ export function AdminLogin() {
                 </button>
               </span>
               {errors.password ? (
-                <span className="mt-1 block text-xs text-red-200">
+                <span className="mt-1 block text-xs text-destructive">
                   {errors.password.message}
                 </span>
               ) : null}
             </label>
-            <Button
-              type="button"
-              loading={isSubmitting}
-              className="w-full"
-              onClick={() => void continueToWorkspace()}
-            >
+            <Button type="submit" loading={isSubmitting} className="w-full">
               Continue to workspace <ArrowRight className="size-4" />
             </Button>
-          </div>
+          </form>
         </Card>
       </main>
     </div>

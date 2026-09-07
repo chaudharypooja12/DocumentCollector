@@ -6,13 +6,24 @@ import {
   FileStack,
   Files,
   LayoutDashboard,
+  LogOut,
   Menu,
   Settings,
   UserRound,
-  X,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { BrandLockup } from "@/components/shared/brand-lockup";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 const navigation = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -23,6 +34,14 @@ const navigation = [
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
+function getPageTitle(pathname: string) {
+  return (
+    navigation.find(({ href }) =>
+      href === "/admin" ? pathname === href : pathname.startsWith(href),
+    )?.label ?? "Admin workspace"
+  );
+}
+
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -32,7 +51,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   }
 
   const nav = (
-    <nav aria-label="Admin navigation" className="space-y-1">
+    <nav aria-label="Admin navigation" className="space-y-1.5">
       {navigation.map(({ href, label, icon: Icon }) => {
         const active =
           href === "/admin" ? pathname === href : pathname.startsWith(href);
@@ -41,11 +60,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
             key={href}
             href={href}
             onClick={() => setOpen(false)}
-            className={`flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition ${
+            className={cn(
+              "flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors",
               active
-                ? "bg-primary text-white shadow-lg shadow-orange-950/20"
-                : "text-white/65 hover:bg-white/7 hover:text-white"
-            }`}
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
           >
             <Icon className="size-[18px]" aria-hidden="true" />
             {label}
@@ -56,43 +76,71 @@ export function AdminShell({ children }: { children: ReactNode }) {
   );
 
   return (
-    <div className="min-h-svh">
-      <header className="sticky top-0 z-30 border-b border-white/8 bg-[#090b11]/85 backdrop-blur-2xl lg:hidden">
-        <div className="page-shell flex min-h-16 items-center justify-between">
-          <BrandLockup compact />
-          <button
-            type="button"
-            className="inline-flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/6"
-            onClick={() => setOpen((value) => !value)}
-            aria-expanded={open}
-            aria-controls="mobile-admin-navigation"
-            aria-label={open ? "Close navigation" : "Open navigation"}
-          >
-            {open ? <X className="size-5" /> : <Menu className="size-5" />}
-          </button>
-        </div>
-        {open ? (
-          <div id="mobile-admin-navigation" className="page-shell pb-4">
-            <div className="glass-card-strong p-3">{nav}</div>
-          </div>
-        ) : null}
-      </header>
-
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-white/8 bg-[#090b11]/75 p-5 backdrop-blur-2xl lg:block">
+    <div className="min-h-svh bg-content">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-border bg-sidebar px-5 py-4 lg:flex lg:flex-col">
         <BrandLockup />
-        <div className="mt-10">{nav}</div>
-        <div className="absolute right-5 bottom-5 left-5 rounded-2xl border border-orange-400/15 bg-orange-400/6 p-4">
-          <p className="text-xs font-semibold text-orange-100">
+        <div className="mt-8 flex-1">{nav}</div>
+        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+          <p className="text-xs font-semibold text-primary">
             Phase 1 workspace
           </p>
-          <p className="mt-1 text-xs leading-5 text-white/50">
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
             Demo data resets on refresh. No information is saved.
           </p>
         </div>
       </aside>
 
-      <main className="min-h-svh lg:pl-72">
-        <div className="page-shell py-7 sm:py-10">{children}</div>
+      <header className="sticky top-0 z-30 border-b border-border bg-header backdrop-blur-xl lg:ml-72">
+        <div className="flex min-h-16 items-center gap-3 px-4 sm:px-6 lg:px-8">
+          <div className="lg:hidden">
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  aria-label="Open navigation"
+                >
+                  <Menu aria-hidden="true" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent
+                side="left"
+                className="w-[min(88vw,20rem)] bg-sidebar"
+              >
+                <SheetHeader className="text-left">
+                  <BrandLockup />
+                  <SheetTitle className="sr-only">Admin navigation</SheetTitle>
+                  <SheetDescription className="sr-only">
+                    Navigate the DocumentCollector Admin workspace.
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="mt-7">{nav}</div>
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold">
+              {getPageTitle(pathname)}
+            </p>
+            <p className="hidden text-xs text-muted-foreground sm:block">
+              DocumentCollector · Powered by MBWays
+            </p>
+          </div>
+
+          <ThemeToggle />
+          <Button asChild variant="outline">
+            <Link href="/admin/login" aria-label="Logout">
+              <LogOut aria-hidden="true" />
+              <span className="hidden sm:inline">Logout</span>
+            </Link>
+          </Button>
+        </div>
+      </header>
+
+      <main className="min-h-[calc(100svh-4rem)] lg:pl-72">
+        <div className="page-shell py-7 sm:py-9">{children}</div>
       </main>
     </div>
   );

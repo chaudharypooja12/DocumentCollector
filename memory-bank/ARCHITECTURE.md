@@ -36,6 +36,7 @@ Storage, and Edge Functions. The target backend design is defined in Section 3.
 ## 2. Frontend Architecture (Next.js)
 
 ### 2.1 Routing
+
 - `src/app/page.tsx` - MBWays-branded public product landing page.
 - `src/app/(admin)/admin/login/page.tsx` - local-only Phase 1 sign-in UI preview;
   no authentication or route protection.
@@ -47,6 +48,7 @@ Storage, and Edge Functions. The target backend design is defined in Section 3.
   tokens while preserving the public no-login behavior.
 
 ### 2.2 Folder Structure
+
 ```
 project/
 ├── src/
@@ -64,23 +66,33 @@ project/
 │   │           └── page.tsx             (hash resolver + complete User flow)
 │
 │   ├── components/
+│   │   ├── admin/                     (shell, forms, fixture views)
+│   │   ├── brand/                     (deployment-safe inline MBWays logo)
 │   │   ├── capture/                   (camera view and capture controls)
-│   │   ├── admin/                     (tables, forms, drag-and-drop list)
-│   │   └── shared/                    (accessible primitives and brand shell)
+│   │   ├── shared/                    (brand lockup and theme control)
+│   │   └── ui/                        (reusable shadcn primitives)
 │
-│   ├── modules/
-│   │   ├── admin/                     (admin fixtures and domain logic)
-│   │   ├── user-upload/               (public-flow state)
-│   │   ├── document-capture/          (capture domain logic)
-│   │   ├── pdf-generation/            (PDF domain logic)
-│   │   └── link-management/           (request-link state)
+│   ├── data/
+│   │   └── admin-fixtures.ts          (typed Phase 1 demonstration data)
+│
+│   ├── features/
+│   │   └── user-upload/               (public-flow state and composed UI)
+│
+│   ├── providers/
+│   │   └── theme-provider.tsx         (in-memory Light/Dark state)
 │
 │   └── lib/
-│       ├── image-processing/          (detection, perspective hooks, normalization)
-│       ├── pdf/                       (pdf-lib helpers and A4 layout engine)
-│       ├── request-link/              (payload schema, encoder, decoder)
-│       └── validation/                (shared validators)
+│       ├── image-processing.ts        (detection, perspective, normalization)
+│       ├── pdf.ts                     (pdf-lib helpers and A4 layout engine)
+│       ├── request-link.ts            (payload schema, encoder, decoder)
+│       └── utils.ts                   (shared class composition)
 │
+├── tests/
+│   ├── component/
+│   ├── e2e/
+│   ├── privacy/
+│   └── unit/
+├── .artifacts/                     (ignored generated reports and metadata)
 ├── public/
 │   └── brand/                      (canonical MBWays logo assets)
 ├── memory-bank/
@@ -89,7 +101,11 @@ project/
 ```
 
 ### 2.3 State Management
+
 - Phase 1 uses React Context + `useReducer` only.
+- Light/Dark UI state uses a root React context, defaults to Light, survives
+  client navigation, and intentionally resets on refresh instead of using
+  browser persistence.
 - State is current-page memory and is never persisted to browser storage.
 - Captures are `Blob` objects with revocable object URLs.
 - Static fixture files may populate demonstration Admin screens but never accept
@@ -101,6 +117,7 @@ project/
 ## 3. Backend Architecture (Phase 2 — Supabase)
 
 ### 3.1 Components
+
 - **Postgres Database** - core entities (see `MODELS.md`): `admins`, `users`,
   `document_template_items`, `links`, `document_captures`, `submissions`, and
   `generated_pdfs`.
@@ -114,11 +131,13 @@ project/
   - PDF generation (authoritative), triggered on submission and on re-submission after reactivation.
 
 ### 3.2 Row Level Security (RLS)
+
 - [ ] Admin-authenticated tables (`admins`, admin-side views) restricted to the authenticated admin's own session.
 - [ ] Public token-based access does **not** use end-user auth; instead, all public endpoints run through Edge Functions / server routes that validate the token server-side and use a service role internally (never expose service role key to the client).
 - [ ] Storage objects are never publicly listable; access via signed URLs with short expiry.
 
 ### 3.3 API Style
+
 - REST-like via Supabase client (`select`/`insert`/`update`) for straightforward CRUD from the authenticated Admin context.
 - Edge Functions (HTTPS endpoints) for anything requiring token validation, expiry enforcement, or PDF generation — see `TECH_STACK.md` §7 for the endpoint list.
 
@@ -127,6 +146,7 @@ project/
 ## 4. Data Flow — Key Scenarios
 
 ### 4.1 Phase 1 Link Generation
+
 ```
 Admin selects document requirements and expiry (1-6h)
    -> Browser validates configuration
@@ -136,6 +156,7 @@ Admin selects document requirements and expiry (1-6h)
 ```
 
 ### 4.2 Phase 1 User Capture and Local PDF
+
 ```
 User opens /u#request=<payload>
    -> Browser decodes and validates schema + client-side expiry
@@ -207,12 +228,12 @@ Admin creates request -> server stores request and issues token
 
 ## 8. Third-Party Integrations
 
-| Integration | Phase | Purpose |
-|---|---|---|
-| WhatsApp share (`wa.me` link) | 1 | Manual link sharing |
-| Email share (`mailto:` or transactional email) | 1–2 | Manual/automated link sharing |
-| Supabase | 2 | DB, Auth, Storage, Edge Functions |
-| Payment Gateway (TBD — e.g., Razorpay/Stripe) | 3 | Paid feature billing |
+| Integration                                    | Phase | Purpose                           |
+| ---------------------------------------------- | ----- | --------------------------------- |
+| WhatsApp share (`wa.me` link)                  | 1     | Manual link sharing               |
+| Email share (`mailto:` or transactional email) | 1–2   | Manual/automated link sharing     |
+| Supabase                                       | 2     | DB, Auth, Storage, Edge Functions |
+| Payment Gateway (TBD — e.g., Razorpay/Stripe)  | 3     | Paid feature billing              |
 
 ---
 
@@ -220,16 +241,16 @@ Admin creates request -> server stores request and issues token
 
 > Add new entries here whenever an architectural decision is made or changed. Also mirror significant entries into `RECENT_CHANGES.md`.
 
-| Date | Decision | Reason |
-|---|---|---|
-| 2026-09-07 | GitHub is the source repository; Vercel Git integration creates pull-request previews and deploys `main` to Production. | This provides HTTPS for camera APIs, reviewable previews, and a simple frontend-only Phase 1 delivery path. |
-| 2026-09-07 | Phase 1 uses a versioned Base64URL JSON request in the URL fragment and includes no PII. | A cross-device link must work without a backend; fragments are not sent in HTTP requests. |
-| 2026-09-07 | Phase 1 state is React memory only, with no browser or server persistence. | The approved Phase 1 scope explicitly saves no information. |
-| 2026-09-07 | Phase 1 lock, expiry, Admin history, and reactivation are demonstrations, not security boundaries. | These behaviors cannot be authoritative without shared server state and are implemented in Phase 2. |
-| 2026-09-07 | OpenCV.js is locally hosted and lazy-loaded for document detection; Canvas handles normalized image output. | Provides robust perspective correction without sending document images off-device while protecting the initial mobile bundle. |
-| 2026-09-07 | DocumentCollector uses the canonical MBWays logo from `public/brand/` and the endorsement `Powered by MBWays`. | The product is an MBWays-owned tool and must share the parent company's identity. |
-| 2026-09-07 | Generated document PDFs remain unbranded by default. | Adding a cover, watermark, or logo would alter collected-document output and requires a separate explicit product decision. |
-| 2026-09-07 | Use the standard Next.js `src/` layout for application routes, components, modules, and libraries. | Keeps framework code separate from root configuration, assets, tests, and the Memory Bank. |
-| 2026-09-07 | The Phase 1 Admin sign-in is an explicitly non-authenticating UI preview and never submits credentials. | The requested entry experience can be demonstrated without contradicting the no-backend/no-auth Phase 1 boundary or leaking credentials. |
-| 2026-09-07 | Development CSP allows `unsafe-eval`, while production omits it and retains `wasm-unsafe-eval`. | React/Turbopack require eval-based diagnostics only in development; production remains stricter while allowing local OpenCV WASM. |
-| _pending_ | _pending_ | _pending_ |
+| Date       | Decision                                                                                                                | Reason                                                                                                                                   |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-07 | GitHub is the source repository; Vercel Git integration creates pull-request previews and deploys `main` to Production. | This provides HTTPS for camera APIs, reviewable previews, and a simple frontend-only Phase 1 delivery path.                              |
+| 2026-09-07 | Phase 1 uses a versioned Base64URL JSON request in the URL fragment and includes no PII.                                | A cross-device link must work without a backend; fragments are not sent in HTTP requests.                                                |
+| 2026-09-07 | Phase 1 state is React memory only, with no browser or server persistence.                                              | The approved Phase 1 scope explicitly saves no information.                                                                              |
+| 2026-09-07 | Phase 1 lock, expiry, Admin history, and reactivation are demonstrations, not security boundaries.                      | These behaviors cannot be authoritative without shared server state and are implemented in Phase 2.                                      |
+| 2026-09-07 | OpenCV.js is locally hosted and lazy-loaded for document detection; Canvas handles normalized image output.             | Provides robust perspective correction without sending document images off-device while protecting the initial mobile bundle.            |
+| 2026-09-07 | DocumentCollector uses the canonical MBWays logo from `public/brand/` and the endorsement `Powered by MBWays`.          | The product is an MBWays-owned tool and must share the parent company's identity.                                                        |
+| 2026-09-07 | Generated document PDFs remain unbranded by default.                                                                    | Adding a cover, watermark, or logo would alter collected-document output and requires a separate explicit product decision.              |
+| 2026-09-07 | Use the standard Next.js `src/` layout for application routes, components, modules, and libraries.                      | Keeps framework code separate from root configuration, assets, tests, and the Memory Bank.                                               |
+| 2026-09-07 | The Phase 1 Admin sign-in is an explicitly non-authenticating UI preview and never submits credentials.                 | The requested entry experience can be demonstrated without contradicting the no-backend/no-auth Phase 1 boundary or leaking credentials. |
+| 2026-09-07 | Development CSP allows `unsafe-eval`, while production omits it and retains `wasm-unsafe-eval`.                         | React/Turbopack require eval-based diagnostics only in development; production remains stricter while allowing local OpenCV WASM.        |
+| _pending_  | _pending_                                                                                                               | _pending_                                                                                                                                |

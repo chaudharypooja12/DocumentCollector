@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Badge } from "@/components/shared/ui";
+import { Badge } from "@/components/ui/badge";
 
 export function PageHeading({
   eyebrow,
@@ -28,7 +28,7 @@ export function PageHeading({
         <h1 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
           {title}
         </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-white/60 sm:text-base">
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
           {description}
         </p>
       </div>

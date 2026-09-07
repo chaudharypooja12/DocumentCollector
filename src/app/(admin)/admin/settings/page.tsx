@@ -3,7 +3,10 @@
 import { RotateCcw, Save } from "lucide-react";
 import { useState } from "react";
 import { PageHeading } from "@/components/admin/page-heading";
-import { Button, Card, Input } from "@/components/shared/ui";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { InlineAlert } from "@/components/ui/inline-alert";
 
 const defaults = {
   displayName: "MBWays Admin",
@@ -59,12 +62,12 @@ export default function SettingsPage() {
               }
             />
           </label>
-          <div className="rounded-xl border border-orange-300/15 bg-orange-300/6 p-4 text-sm leading-6 text-orange-100/80">
+          <InlineAlert>
             The MBWays logo and “Powered by MBWays” identity are fixed product
             elements and cannot be replaced here.
-          </div>
+          </InlineAlert>
           {message ? (
-            <p role="status" className="text-sm text-emerald-200">
+            <p role="status" className="text-sm text-success">
               {message}
             </p>
           ) : null}

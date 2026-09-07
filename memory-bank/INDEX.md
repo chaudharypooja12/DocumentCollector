@@ -22,46 +22,46 @@ Entry point for all agent and contributor tasks. Read this file first.
 
 ## Documents
 
-| File | Purpose |
-|---|---|
-| [PRD.md](./PRD.md) | Product requirements, business rules, scope, and acceptance criteria |
-| [COMPANY.md](./COMPANY.md) | MBWays ownership, company facts, contact details, brand system, and logo usage |
-| [TECH_STACK.md](./TECH_STACK.md) | Technical requirements, stack, APIs, quality requirements, and pipelines |
-| [DESIGN.md](./DESIGN.md) | UI/UX principles, visual system, screens, responsive behavior, and accessibility |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | System architecture, data flow, security, deployment, and decision log |
-| [MODELS.md](./MODELS.md) | Data model, database schema, storage layout, indexes, and validation rules |
-| [PHASE_1_FRONTEND.md](./PHASE_1_FRONTEND.md) | Phase 1 frontend implementation checklist |
-| [PHASE_2_BACKEND.md](./PHASE_2_BACKEND.md) | Phase 2 Supabase backend checklist |
-| [PHASE_3_PAYMENT_GATEWAY.md](./PHASE_3_PAYMENT_GATEWAY.md) | Phase 3 payment gateway checklist |
-| [RECENT_CHANGES.md](./RECENT_CHANGES.md) | Chronological, append-only implementation log |
+| File                                                       | Purpose                                                                          |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| [PRD.md](./PRD.md)                                         | Product requirements, business rules, scope, and acceptance criteria             |
+| [COMPANY.md](./COMPANY.md)                                 | MBWays ownership, company facts, contact details, brand system, and logo usage   |
+| [TECH_STACK.md](./TECH_STACK.md)                           | Technical requirements, stack, APIs, quality requirements, and pipelines         |
+| [DESIGN.md](./DESIGN.md)                                   | UI/UX principles, visual system, screens, responsive behavior, and accessibility |
+| [ARCHITECTURE.md](./ARCHITECTURE.md)                       | System architecture, data flow, security, deployment, and decision log           |
+| [MODELS.md](./MODELS.md)                                   | Data model, database schema, storage layout, indexes, and validation rules       |
+| [PHASE_1_FRONTEND.md](./PHASE_1_FRONTEND.md)               | Phase 1 frontend implementation checklist                                        |
+| [PHASE_2_BACKEND.md](./PHASE_2_BACKEND.md)                 | Phase 2 Supabase backend checklist                                               |
+| [PHASE_3_PAYMENT_GATEWAY.md](./PHASE_3_PAYMENT_GATEWAY.md) | Phase 3 payment gateway checklist                                                |
+| [RECENT_CHANGES.md](./RECENT_CHANGES.md)                   | Chronological, append-only implementation log                                    |
 
 ## Modules
 
-| Module | File | Scope |
-|---|---|---|
-| Admin Panel | [modules/admin.md](./modules/admin.md) | Dashboard, users, templates, submissions, PDFs, and settings |
-| User Upload | [modules/user-upload.md](./modules/user-upload.md) | Public token flow, required-document list, review, submission, and state screens |
+| Module           | File                                                         | Scope                                                                            |
+| ---------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| Admin Panel      | [modules/admin.md](./modules/admin.md)                       | Dashboard, users, templates, submissions, PDFs, and settings                     |
+| User Upload      | [modules/user-upload.md](./modules/user-upload.md)           | Public token flow, required-document list, review, submission, and state screens |
 | Document Capture | [modules/document-capture.md](./modules/document-capture.md) | Camera UI, edge detection, perspective correction, crop, resize, and compression |
-| PDF Generation | [modules/pdf-generation.md](./modules/pdf-generation.md) | A4 layout, front/back composition, combined PDFs, and individual PDFs |
-| Link Management | [modules/link-management.md](./modules/link-management.md) | Token generation, expiry, submission lock, and admin reactivation |
+| PDF Generation   | [modules/pdf-generation.md](./modules/pdf-generation.md)     | A4 layout, front/back composition, combined PDFs, and individual PDFs            |
+| Link Management  | [modules/link-management.md](./modules/link-management.md)   | Token generation, expiry, submission lock, and admin reactivation                |
 
 ## Module Map
 
-| If the task involves... | Read |
-|---|---|
-| User records, dashboard, document templates, submission review, PDF downloads, or settings | `modules/admin.md` |
-| Public link landing, document list, submission confirmation, success, expired, or locked screens | `modules/user-upload.md` |
+| If the task involves...                                                                           | Read                          |
+| ------------------------------------------------------------------------------------------------- | ----------------------------- |
+| User records, dashboard, document templates, submission review, PDF downloads, or settings        | `modules/admin.md`            |
+| Public link landing, document list, submission confirmation, success, expired, or locked screens  | `modules/user-upload.md`      |
 | Camera preview, positioning guide, edge/corner detection, perspective correction, crop, or resize | `modules/document-capture.md` |
-| A4 layout, combined/individual PDF assembly, or front/back page composition | `modules/pdf-generation.md` |
-| Link tokens, expiry enforcement, submission lock, or reactivation | `modules/link-management.md` |
+| A4 layout, combined/individual PDF assembly, or front/back page composition                       | `modules/pdf-generation.md`   |
+| Link tokens, expiry enforcement, submission lock, or reactivation                                 | `modules/link-management.md`  |
 
 ## Project Status
 
-| Phase | Status |
-|---|---|
-| Phase 1 — Frontend | Implementation complete and locally verified; Vercel and physical-device acceptance pending |
-| Phase 2 — Backend | Not started |
-| Phase 3 — Payment Gateway | Not started |
+| Phase                     | Status                                                                                      |
+| ------------------------- | ------------------------------------------------------------------------------------------- |
+| Phase 1 — Frontend        | Implementation complete and locally verified; Vercel and physical-device acceptance pending |
+| Phase 2 — Backend         | Not started                                                                                 |
+| Phase 3 — Payment Gateway | Not started                                                                                 |
 
 ## Core Rules
 

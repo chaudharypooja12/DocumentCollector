@@ -20,13 +20,13 @@ independent brand.
 
 ## MBWays Identity
 
-| Field | Value |
-|---|---|
-| Company name | MBWays |
-| Tagline | Opening Pathways to Opportunities. |
-| Journey | Learn. Get Certified. Find a Job. Work Abroad. |
-| Company type | Career, professional development, and global opportunities consultancy |
-| Description | MBWays helps individuals build skills, enhance employability, and access suitable career opportunities in India and abroad. |
+| Field        | Value                                                                                                                       |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| Company name | MBWays                                                                                                                      |
+| Tagline      | Opening Pathways to Opportunities.                                                                                          |
+| Journey      | Learn. Get Certified. Find a Job. Work Abroad.                                                                              |
+| Company type | Career, professional development, and global opportunities consultancy                                                      |
+| Description  | MBWays helps individuals build skills, enhance employability, and access suitable career opportunities in India and abroad. |
 
 ### Vision
 
@@ -46,13 +46,13 @@ Customer Success.
 
 ## Contact and Social
 
-| Field | Value |
-|---|---|
-| Email | `info@mbways.com` |
-| Office | Shop No. 14, Garg Plaza, Bhera Enclave, Paschim Vihar, Delhi 110087 |
-| Hours | Mon-Sat, 10:00 AM - 7:00 PM IST |
-| Instagram | https://www.instagram.com/mbways.official |
-| LinkedIn | https://www.linkedin.com/company/mb-ways/ |
+| Field     | Value                                                               |
+| --------- | ------------------------------------------------------------------- |
+| Email     | `info@mbways.com`                                                   |
+| Office    | Shop No. 14, Garg Plaza, Bhera Enclave, Paschim Vihar, Delhi 110087 |
+| Hours     | Mon-Sat, 10:00 AM - 7:00 PM IST                                     |
+| Instagram | https://www.instagram.com/mbways.official                           |
+| LinkedIn  | https://www.linkedin.com/company/mb-ways/                           |
 
 The current MBWays runtime constants do not define a business phone or WhatsApp
 number. Do not hardcode the legacy number found in the MBWays README unless the
@@ -71,19 +71,19 @@ position or directly provides licensed recruitment services.
 
 ### Colors
 
-| Token | Value | Use |
-|---|---|---|
-| Primary | `#FF6B00` | Primary actions, accents, and glow |
-| Secondary | `#FF8F1F` | Gradients and hover states |
-| Accent | `#FFB347` | Highlights |
-| Dark background | `#090B11` | Default dark page background |
-| Dark card | `#10131D` | Solid dark panels |
-| Dark text | `#FFFFFF` | Primary text on dark surfaces |
-| Dark muted text | `#A8B0BF` | Secondary text on dark surfaces |
-| Light background | `#F3F5F9` | Light page background |
-| Light card | `#FFFFFF` | Light solid panels |
-| Light text | `#0F1419` | Primary text on light surfaces |
-| Light muted text | `#5A6270` | Secondary text on light surfaces |
+| Token            | Value     | Use                                |
+| ---------------- | --------- | ---------------------------------- |
+| Primary          | `#FF6B00` | Primary actions, accents, and glow |
+| Secondary        | `#FF8F1F` | Gradients and hover states         |
+| Accent           | `#FFB347` | Highlights                         |
+| Dark background  | `#090B11` | Default dark page background       |
+| Dark card        | `#10131D` | Solid dark panels                  |
+| Dark text        | `#FFFFFF` | Primary text on dark surfaces      |
+| Dark muted text  | `#A8B0BF` | Secondary text on dark surfaces    |
+| Light background | `#F3F5F9` | Light page background              |
+| Light card       | `#FFFFFF` | Light solid panels                 |
+| Light text       | `#0F1419` | Primary text on light surfaces     |
+| Light muted text | `#5A6270` | Secondary text on light surfaces   |
 
 Semantic capture, error, warning, and success colors remain distinct from the
 orange brand palette.
@@ -96,14 +96,15 @@ orange brand palette.
 
 ### Logo Assets
 
-| Asset | Purpose |
-|---|---|
-| `../public/brand/logo.png` | Original transparent MBWays logo lockup |
-| `../public/brand/logo.svg` | Theme-aware logo wrapper used by the web UI |
-| `../public/brand/logo-neutral-mask.png` | Neutral logo layer required by `logo.svg` |
-| `../public/brand/logo-orange-layer.png` | Orange logo layer required by `logo.svg` |
+| Asset                                   | Purpose                                                     |
+| --------------------------------------- | ----------------------------------------------------------- |
+| `../public/brand/logo.png`              | Original transparent MBWays logo lockup                     |
+| `../public/brand/logo.svg`              | Standalone theme-aware wrapper retained for non-Next.js use |
+| `../public/brand/logo-neutral-mask.png` | Neutral layer used by the inline application logo           |
+| `../public/brand/logo-orange-layer.png` | Orange layer used by the inline application logo            |
 
-Use `/brand/logo.svg` in the application when theme-aware rendering is needed.
+The application renders a unique-id inline SVG from the two PNG layers so nested
+asset loading remains reliable on localhost and Vercel.
 Do not rename, recolor, redraw, stretch, crop, or separate the logo elements.
 Use the accessible label `MBWays - Opening Pathways to Opportunities`.
 

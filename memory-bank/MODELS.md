@@ -38,8 +38,8 @@ type Phase1Capture = {
 - `Phase1Capture` exists only in current-page React memory.
 - No Phase 1 type is written to localStorage, sessionStorage, IndexedDB,
   cookies, a backend, or a database.
-- The implemented types and validation live under `../src/lib/request-link/`
-  and `../src/modules/user-upload/`; captures are released after local PDF
+- The implemented types and validation live in `../src/lib/request-link.ts`
+  and `../src/features/user-upload/`; captures are released after local PDF
   generation or flow teardown.
 - The entities below are Phase 2 persistence targets, not Phase 1 stores.
 
@@ -62,93 +62,100 @@ Admin
 ## 2. Entities
 
 ### 2.1 `admins`
-| Field | Type | Notes |
-|---|---|---|
-| id | uuid, PK | |
-| email | text, unique | Supabase Auth linked |
-| name | text | |
-| created_at | timestamptz | |
+
+| Field      | Type         | Notes                |
+| ---------- | ------------ | -------------------- |
+| id         | uuid, PK     |                      |
+| email      | text, unique | Supabase Auth linked |
+| name       | text         |                      |
+| created_at | timestamptz  |                      |
 
 ### 2.2 `users` (the person whose documents are being collected — not an app "account")
-| Field | Type | Notes |
-|---|---|---|
-| id | uuid, PK | |
-| admin_id | uuid, FK → admins.id | |
-| name | text | |
-| phone_number | text | |
-| email | text | |
-| country | text | |
-| created_at | timestamptz | |
-| submitted_at | timestamptz, nullable | |
+
+| Field        | Type                  | Notes |
+| ------------ | --------------------- | ----- |
+| id           | uuid, PK              |       |
+| admin_id     | uuid, FK → admins.id  |       |
+| name         | text                  |       |
+| phone_number | text                  |       |
+| email        | text                  |       |
+| country      | text                  |       |
+| created_at   | timestamptz           |       |
+| submitted_at | timestamptz, nullable |       |
 
 ### 2.3 `document_template_items` (per-user configured required documents, ordered)
-| Field | Type | Notes |
-|---|---|---|
-| id | uuid, PK | |
-| user_id | uuid, FK → users.id | |
-| document_name | text | e.g. "Passport", "Photograph" |
-| document_type | enum(`SINGLE`, `FRONT_BACK`) | |
-| sort_order | integer | drag-and-drop order, ascending |
-| created_at | timestamptz | |
+
+| Field         | Type                         | Notes                          |
+| ------------- | ---------------------------- | ------------------------------ |
+| id            | uuid, PK                     |                                |
+| user_id       | uuid, FK → users.id          |                                |
+| document_name | text                         | e.g. "Passport", "Photograph"  |
+| document_type | enum(`SINGLE`, `FRONT_BACK`) |                                |
+| sort_order    | integer                      | drag-and-drop order, ascending |
+| created_at    | timestamptz                  |                                |
 
 ### 2.4 `links`
-| Field | Type | Notes |
-|---|---|---|
-| id | uuid, PK | |
-| user_id | uuid, FK → users.id, unique | one active link per user |
-| token | text, unique, indexed | random ≥128-bit token, used in public URL |
-| status | enum(`ACTIVE`, `EXPIRED`, `SUBMITTED`) | |
-| expiry_hours | integer | admin-configured, max 6 |
-| expires_at | timestamptz | computed at creation/reactivation |
-| reactivated_count | integer, default 0 | audit trail of reactivations |
-| created_at | timestamptz | |
-| submitted_at | timestamptz, nullable | |
+
+| Field             | Type                                   | Notes                                     |
+| ----------------- | -------------------------------------- | ----------------------------------------- |
+| id                | uuid, PK                               |                                           |
+| user_id           | uuid, FK → users.id, unique            | one active link per user                  |
+| token             | text, unique, indexed                  | random ≥128-bit token, used in public URL |
+| status            | enum(`ACTIVE`, `EXPIRED`, `SUBMITTED`) |                                           |
+| expiry_hours      | integer                                | admin-configured, max 6                   |
+| expires_at        | timestamptz                            | computed at creation/reactivation         |
+| reactivated_count | integer, default 0                     | audit trail of reactivations              |
+| created_at        | timestamptz                            |                                           |
+| submitted_at      | timestamptz, nullable                  |                                           |
 
 ### 2.5 `document_captures` (uploaded images per document/side)
-| Field | Type | Notes |
-|---|---|---|
-| id | uuid, PK | |
-| link_id | uuid, FK → links.id | |
-| document_template_item_id | uuid, FK → document_template_items.id | |
-| side | enum(`SINGLE`, `FRONT`, `BACK`) | `SINGLE` when document_type = SINGLE |
-| storage_path | text | path in `raw-captures` bucket |
-| width | integer | post-processing pixel width |
-| height | integer | post-processing pixel height |
-| captured_at | timestamptz | |
-| replaced_count | integer, default 0 | increments on retake/replace |
+
+| Field                     | Type                                  | Notes                                |
+| ------------------------- | ------------------------------------- | ------------------------------------ |
+| id                        | uuid, PK                              |                                      |
+| link_id                   | uuid, FK → links.id                   |                                      |
+| document_template_item_id | uuid, FK → document_template_items.id |                                      |
+| side                      | enum(`SINGLE`, `FRONT`, `BACK`)       | `SINGLE` when document_type = SINGLE |
+| storage_path              | text                                  | path in `raw-captures` bucket        |
+| width                     | integer                               | post-processing pixel width          |
+| height                    | integer                               | post-processing pixel height         |
+| captured_at               | timestamptz                           |                                      |
+| replaced_count            | integer, default 0                    | increments on retake/replace         |
 
 ### 2.6 `submissions`
-| Field | Type | Notes |
-|---|---|---|
-| id | uuid, PK | |
-| link_id | uuid, FK → links.id, unique | |
-| status | enum(`PENDING`, `PROCESSING`, `COMPLETED`, `FAILED`) | |
-| submitted_at | timestamptz | |
-| pdf_status | enum(`NOT_GENERATED`, `GENERATED`, `REGENERATED`) | |
+
+| Field        | Type                                                 | Notes |
+| ------------ | ---------------------------------------------------- | ----- |
+| id           | uuid, PK                                             |       |
+| link_id      | uuid, FK → links.id, unique                          |       |
+| status       | enum(`PENDING`, `PROCESSING`, `COMPLETED`, `FAILED`) |       |
+| submitted_at | timestamptz                                          |       |
+| pdf_status   | enum(`NOT_GENERATED`, `GENERATED`, `REGENERATED`)    |       |
 
 ### 2.7 `generated_pdfs`
-| Field | Type | Notes |
-|---|---|---|
-| id | uuid, PK | |
-| submission_id | uuid, FK → submissions.id | |
-| type | enum(`COMBINED`, `INDIVIDUAL`) | |
-| document_template_item_id | uuid, nullable, FK | set only when type=INDIVIDUAL |
-| storage_path | text | path in `generated-pdfs` bucket |
-| page_count | integer | |
-| generated_at | timestamptz | |
+
+| Field                     | Type                           | Notes                           |
+| ------------------------- | ------------------------------ | ------------------------------- |
+| id                        | uuid, PK                       |                                 |
+| submission_id             | uuid, FK → submissions.id      |                                 |
+| type                      | enum(`COMBINED`, `INDIVIDUAL`) |                                 |
+| document_template_item_id | uuid, nullable, FK             | set only when type=INDIVIDUAL   |
+| storage_path              | text                           | path in `generated-pdfs` bucket |
+| page_count                | integer                        |                                 |
+| generated_at              | timestamptz                    |                                 |
 
 ---
 
 ## 3. Enumerations Summary
 
-| Enum | Values |
-|---|---|
-| `document_type` | `SINGLE`, `FRONT_BACK` |
-| `link.status` | `ACTIVE`, `EXPIRED`, `SUBMITTED` |
-| `document_captures.side` | `SINGLE`, `FRONT`, `BACK` |
-| `submissions.status` | `PENDING`, `PROCESSING`, `COMPLETED`, `FAILED` |
-| `pdf_status` | `NOT_GENERATED`, `GENERATED`, `REGENERATED` |
-| `generated_pdfs.type` | `COMBINED`, `INDIVIDUAL` |
+| Enum                     | Values                                         |
+| ------------------------ | ---------------------------------------------- |
+| `document_type`          | `SINGLE`, `FRONT_BACK`                         |
+| `link.status`            | `ACTIVE`, `EXPIRED`, `SUBMITTED`               |
+| `document_captures.side` | `SINGLE`, `FRONT`, `BACK`                      |
+| `submissions.status`     | `PENDING`, `PROCESSING`, `COMPLETED`, `FAILED` |
+| `pdf_status`             | `NOT_GENERATED`, `GENERATED`, `REGENERATED`    |
+| `generated_pdfs.type`    | `COMBINED`, `INDIVIDUAL`                       |
 
 > Note: `EXPIRED` may be computed at read-time (`now() > expires_at`) rather than stored, to avoid stale state; `REACTIVATED` is represented as `status = ACTIVE` with `reactivated_count > 0`, not a separate stored status — keep implementation consistent with whichever approach is chosen and document the decision in `ARCHITECTURE.md` §9.
 

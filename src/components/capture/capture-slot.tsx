@@ -1,10 +1,10 @@
 "use client";
 
 import { Camera, CheckCircle2, RotateCcw, Trash2 } from "lucide-react";
-import { Button } from "@/components/shared/ui";
+import { Button } from "@/components/ui/button";
 import type { NormalizedImage } from "@/lib/image-processing";
-import type { CaptureSide } from "@/modules/user-upload/capture-store";
-import { useCaptures } from "@/modules/user-upload/capture-store";
+import type { CaptureSide } from "@/features/user-upload/capture-store";
+import { useCaptures } from "@/features/user-upload/capture-store";
 
 export function CaptureSlot({
   documentId,
@@ -29,7 +29,7 @@ export function CaptureSlot({
       : `${documentName} — ${side === "FRONT" ? "Front" : "Back"}`;
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/20 p-3">
+    <div className="rounded-2xl border border-border bg-muted/35 p-3">
       {capture ? (
         <div className="flex items-center gap-3">
           {/* Local Blob URL; no request leaves the browser. */}
@@ -46,7 +46,7 @@ export function CaptureSlot({
                 {side === "SINGLE" ? "Captured" : side}
               </span>
             </p>
-            <p className="mt-1 text-xs text-white/45">
+            <p className="mt-1 text-xs text-muted-foreground">
               {capture.width} × {capture.height}
             </p>
           </div>
@@ -55,7 +55,7 @@ export function CaptureSlot({
               <button
                 type="button"
                 onClick={() => onCapture({ documentId, documentName, side })}
-                className="inline-flex size-11 items-center justify-center rounded-xl text-white/60 hover:bg-white/8 hover:text-white"
+                className="inline-flex size-11 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground"
                 aria-label={`Retake ${label}`}
               >
                 <RotateCcw className="size-4" />
@@ -63,7 +63,7 @@ export function CaptureSlot({
               <button
                 type="button"
                 onClick={() => removeCapture(documentId, side)}
-                className="inline-flex size-11 items-center justify-center rounded-xl text-red-200 hover:bg-red-400/10"
+                className="inline-flex size-11 items-center justify-center rounded-xl text-destructive hover:bg-destructive/10"
                 aria-label={`Remove ${label}`}
               >
                 <Trash2 className="size-4" />

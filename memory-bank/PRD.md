@@ -89,6 +89,7 @@ Phase 1 does not create or save a User record. Admin user records begin in
 Phase 2.
 
 ### Phase 2 User Record Fields
+
 - Name
 - Phone Number
 - Email
@@ -117,6 +118,7 @@ Phase 2.
 - Phase 2 adds the single authenticated Admin and persistent records.
 
 ### Admin Modules
+
 ```
 Admin Panel
 │
@@ -139,17 +141,18 @@ request.
 
 **Example — User A**
 
-| # | Document | Type |
-|---|----------|------|
-| 1 | Passport | Front + Back |
-| 2 | Driving License | Front + Back |
-| 3 | Aadhaar Card | Front + Back |
-| 4 | Photograph | Single Image |
-| 5 | Residence Proof | Single Image |
+| #   | Document        | Type         |
+| --- | --------------- | ------------ |
+| 1   | Passport        | Front + Back |
+| 2   | Driving License | Front + Back |
+| 3   | Aadhaar Card    | Front + Back |
+| 4   | Photograph      | Single Image |
+| 5   | Residence Proof | Single Image |
 
 - Admin can **drag & drop** documents to arrange the required order.
 
 ### Document Types
+
 - **Type 1 — Single:** one image/document → one A4 PDF page.
 - **Type 2 — Front + Back:** two images → one A4 PDF page (both sides on the same page).
 
@@ -195,13 +198,16 @@ Every "single" document gets its own separate A4 PDF page.
 - The camera screen shows a **document positioning guide/box**.
 
 ### Capture Box States
+
 **Incorrect Position → RED box**, shown when:
+
 - Document is outside the box
 - Corners are not clearly visible
 - Document is not properly aligned
 - Document does not fully fill the frame
 
 **Correct Position → GREEN box**, shown when:
+
 - All four corners are detected
 - Document is properly aligned within the frame
 - Required area is properly covered
@@ -213,6 +219,7 @@ Once green, the user is allowed to capture.
 ## 9. Document Image Processing
 
 After capture, the system processes the image:
+
 - Document detection
 - Corner detection
 - Alignment
@@ -231,6 +238,7 @@ After capture, the system processes the image:
 - Only the documents configured for that specific user are shown.
 
 **Example screen:**
+
 ```
 Document Upload
 
@@ -248,6 +256,7 @@ Document Upload
 ## 11. Edit Before Submission
 
 Until the user submits, **edit/retake is always allowed**:
+
 - Retake any image
 - Replace an uploaded document
 - Recapture Front/Back independently
@@ -325,6 +334,7 @@ Phase 2 feature.
 ## 16. PDF Generation
 
 ### PDF Standard
+
 - Format: **A4**
 - Orientation: predefined system standard (portrait)
 - Multiple pages supported
@@ -333,6 +343,7 @@ Phase 2 feature.
 - Single document = one A4 page
 
 **Example (5 documents):**
+
 ```
 Page 1 → Photograph
 Page 2 → Aadhaar Front + Back
@@ -377,6 +388,7 @@ Admin-side capability and become functional with real submissions in Phase 2.
 ## 19. Link Sharing
 
 Admin can manually share the generated link. Initial implementation supports:
+
 - Copy Link
 - QR code
 - Native Web Share
@@ -387,20 +399,22 @@ Admin can manually share the generated link. Initial implementation supports:
 
 ## 20–22. Technology Phases (summary — see phase docs for detail)
 
-| Phase | Scope |
-|---|---|
+| Phase   | Scope                                                                                                                     |
+| ------- | ------------------------------------------------------------------------------------------------------------------------- |
 | Phase 1 | Frontend-only — Next.js, React, TypeScript, Tailwind CSS, self-contained links, in-memory capture, on-device PDFs, Vercel |
-| Phase 2 | Backend — Supabase (DB, Storage, Auth, REST/RPC APIs) |
-| Phase 3 | Payment Gateway & paid features |
+| Phase 2 | Backend — Supabase (DB, Storage, Auth, REST/RPC APIs)                                                                     |
+| Phase 3 | Payment Gateway & paid features                                                                                           |
 
 ---
 
 ## 23. CI/CD
 
 GitHub-based CI/CD pipeline:
+
 ```
 Developer → GitHub → Pull Request → CI Checks → Build/Test → Deploy
 ```
+
 Frontend deployment integrates with Vercel.
 
 ---
@@ -444,6 +458,7 @@ project/
 ## 25. Memory Bank Rules
 
 The Memory Bank is the coding agent's persistent project context. It maintains:
+
 - PRD
 - Architecture
 - Module context
@@ -467,8 +482,9 @@ See `../AGENT.md` for the full, enforceable instruction set. In short:
 
 ## 27. UI/UX Direction
 
-- Overall style: **MBWays Orbital Glass** — dark-first glass cards, orange
-  accents, soft transparency, subtle blur, and clean typography.
+- Overall style: **MBWays Orbital Glass** — Light by default with an optional
+  Dark theme, orange accents, semantic surfaces, clear border separation,
+  restrained blur, and clean typography.
 - Responsive, **mobile-first** Admin and User experience from 320px upward.
 - Clear visual states (red/green capture box, success/error, loading).
 - User side kept intentionally simple (only uploads documents).
@@ -480,6 +496,7 @@ See `../AGENT.md` for the full, enforceable instruction set. In short:
 ## 28. MVP Scope
 
 ### Included in MVP
+
 - [x] MBWays logo and `Powered by MBWays` identity across shared Admin and public layouts
 - [x] Responsive Admin UI with no Phase 1 authentication
 - [x] Request builder with no stored User record or PII in the link
@@ -502,12 +519,14 @@ See `../AGENT.md` for the full, enforceable instruction set. In short:
 - [x] Memory Bank + agent instructions
 
 ### Phase 2 (Backend)
+
 - [ ] Supabase backend (Database, Storage, REST APIs)
 - [ ] Admin authentication
 - [ ] CI/CD
 - [ ] Production document management
 
 ### Phase 3 (Later)
+
 - [ ] Payment Gateway & paid features
 
 ---

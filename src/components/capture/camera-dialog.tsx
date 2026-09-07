@@ -16,7 +16,7 @@ import {
   useState,
   type ChangeEvent,
 } from "react";
-import { Button } from "@/components/shared/ui";
+import { Button } from "@/components/ui/button";
 import {
   assessGuideFrame,
   correctPerspective,
@@ -268,7 +268,7 @@ export function CameraDialog({
       role="dialog"
       aria-modal="true"
       aria-label={`Capture ${title}`}
-      className="fixed inset-0 z-50 flex min-h-svh flex-col bg-[#050609]"
+      className="fixed inset-0 z-50 flex min-h-svh flex-col bg-[#050609] text-white"
     >
       <header className="flex min-h-16 items-center justify-between gap-3 border-b border-white/10 px-4 pt-[env(safe-area-inset-top)]">
         <div>
@@ -297,7 +297,7 @@ export function CameraDialog({
           <div className="flex w-full max-w-md gap-3">
             <Button
               variant="secondary"
-              className="flex-1"
+              className="flex-1 border-white/20 bg-white/10 text-white hover:bg-white/15"
               onClick={() => {
                 URL.revokeObjectURL(review.previewUrl);
                 setReview(null);
@@ -381,6 +381,7 @@ export function CameraDialog({
             <Button
               type="button"
               variant="ghost"
+              className="text-white hover:bg-white/10 hover:text-white"
               disabled={Boolean(error) || starting}
               onClick={() => setManual(true)}
             >

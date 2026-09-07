@@ -8,26 +8,29 @@ import {
   Sparkles,
 } from "lucide-react";
 import { BrandLockup } from "@/components/shared/brand-lockup";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 export default function Home() {
   return (
     <div className="min-h-svh">
-      <header className="border-b border-white/8 bg-[#090b11]/75 backdrop-blur-2xl">
+      <header className="border-b border-border bg-header backdrop-blur-xl">
         <div className="page-shell flex min-h-20 items-center justify-between gap-3">
           <BrandLockup href="/" />
-          <Link
-            href="/admin/login"
-            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/15 bg-white/7 px-4 text-sm font-semibold transition hover:bg-white/12"
-          >
-            Admin workspace
-          </Link>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button asChild variant="outline">
+              <Link href="/admin/login">Admin workspace</Link>
+            </Button>
+          </div>
         </div>
       </header>
 
       <main>
         <section className="page-shell grid min-h-[calc(100svh-5rem)] items-center gap-12 py-14 lg:grid-cols-[1.1fr_.9fr] lg:py-20">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-orange-300/20 bg-orange-300/8 px-3 py-1.5 text-xs font-semibold text-orange-100">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/8 px-3 py-1.5 text-xs font-semibold text-primary">
               <Sparkles className="size-4" />
               Private, mobile-first document collection
             </div>
@@ -37,26 +40,22 @@ export default function Home() {
                 guided phone workflow.
               </span>
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-white/60 sm:text-lg">
+            <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
               DocumentCollector helps MBWays prepare a temporary checklist,
               guide each camera capture, and produce a clean A4 PDF directly on
               the user&apos;s device.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/admin/login"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-6 text-sm font-semibold shadow-xl shadow-orange-950/35 transition hover:brightness-110"
-              >
-                Open Admin workspace <ArrowRight className="size-4" />
-              </Link>
-              <a
-                href="#how-it-works"
-                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/15 bg-white/7 px-6 text-sm font-semibold transition hover:bg-white/12"
-              >
-                See how it works
-              </a>
+              <Button asChild size="lg">
+                <Link href="/admin/login">
+                  Open Admin workspace <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <a href="#how-it-works">See how it works</a>
+              </Button>
             </div>
-            <div className="mt-8 flex items-start gap-3 text-sm text-white/50">
+            <div className="mt-8 flex items-start gap-3 text-sm text-muted-foreground">
               <ShieldCheck className="mt-0.5 size-5 shrink-0 text-success" />
               <p>
                 Phase 1 uploads nothing and stores nothing. Images and PDFs
@@ -67,15 +66,15 @@ export default function Home() {
 
           <div className="relative mx-auto w-full max-w-lg">
             <div className="absolute -inset-8 rounded-full bg-primary/15 blur-3xl" />
-            <div className="glass-card-strong relative overflow-hidden p-5 sm:p-7">
-              <div className="flex items-center justify-between gap-3 border-b border-white/8 pb-5">
+            <Card className="relative overflow-hidden">
+              <div className="flex items-center justify-between gap-3 border-b border-border pb-5">
                 <div>
                   <p className="text-xs font-semibold tracking-wider text-primary uppercase">
                     Request preview
                   </p>
                   <h2 className="mt-1 text-xl font-bold">Student documents</h2>
                 </div>
-                <span className="rounded-full bg-success/10 px-3 py-1 text-xs font-semibold text-emerald-200">
+                <span className="rounded-full bg-success/10 px-3 py-1 text-xs font-semibold text-success">
                   3 hours
                 </span>
               </div>
@@ -87,30 +86,32 @@ export default function Home() {
                 ].map(([name, type, number]) => (
                   <div
                     key={name}
-                    className="flex items-center gap-3 rounded-2xl border border-white/8 bg-white/4 p-4"
+                    className="flex items-center gap-3 rounded-2xl border border-border bg-muted/35 p-4"
                   >
-                    <span className="flex size-9 items-center justify-center rounded-xl bg-primary/12 text-sm font-bold text-orange-200">
+                    <span className="flex size-9 items-center justify-center rounded-xl bg-primary/12 text-sm font-bold text-primary">
                       {number}
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold">{name}</p>
-                      <p className="mt-0.5 text-xs text-white/45">{type}</p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {type}
+                      </p>
                     </div>
-                    <FileCheck2 className="size-5 text-white/25" />
+                    <FileCheck2 className="size-5 text-muted-foreground/50" />
                   </div>
                 ))}
               </div>
-              <div className="mt-5 flex items-center gap-2 rounded-xl bg-white/5 p-3 text-xs text-white/55">
+              <div className="mt-5 flex items-center gap-2 rounded-xl bg-muted p-3 text-xs text-muted-foreground">
                 <Link2 className="size-4 text-primary" /> Share by secure link
                 or QR code
               </div>
-            </div>
+            </Card>
           </div>
         </section>
 
         <section
           id="how-it-works"
-          className="border-y border-white/8 bg-black/15"
+          className="border-y border-border bg-muted/30"
         >
           <div className="page-shell py-16">
             <p className="text-center text-xs font-semibold tracking-[0.18em] text-primary uppercase">
@@ -137,20 +138,22 @@ export default function Home() {
                   copy: "The browser arranges captures into an A4 PDF ready to download or share.",
                 },
               ].map(({ icon: Icon, title, copy }) => (
-                <article key={title} className="glass-card p-6">
-                  <span className="flex size-11 items-center justify-center rounded-xl bg-primary/12 text-orange-200">
+                <Card key={title}>
+                  <span className="flex size-11 items-center justify-center rounded-xl bg-primary/12 text-primary">
                     <Icon className="size-5" />
                   </span>
                   <h3 className="mt-5 text-lg font-bold">{title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-white/55">{copy}</p>
-                </article>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {copy}
+                  </p>
+                </Card>
               ))}
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="page-shell flex flex-col gap-3 py-7 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between">
+      <footer className="page-shell flex flex-col gap-3 py-7 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
         <p>DocumentCollector — Powered by MBWays</p>
         <p>Opening Pathways to Opportunities.</p>
       </footer>

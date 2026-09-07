@@ -1,11 +1,50 @@
-import { Download, FileText } from "lucide-react";
+"use client";
+
+import { DataTable, type DataTableColumn } from "@/components/admin/data-table";
 import { PageHeading } from "@/components/admin/page-heading";
-import { Badge, Button, Card } from "@/components/shared/ui";
+import { Badge } from "@/components/ui/badge";
 
 const files = [
-  { name: "Complete_Documents.pdf", type: "Combined", pages: 5 },
-  { name: "Passport.pdf", type: "Individual", pages: 1 },
-  { name: "Photograph.pdf", type: "Individual", pages: 1 },
+  {
+    id: "pdf-1",
+    name: "Complete_Documents.pdf",
+    type: "Combined",
+    pages: 5,
+    status: "Preview",
+  },
+  {
+    id: "pdf-2",
+    name: "Passport.pdf",
+    type: "Individual",
+    pages: 1,
+    status: "Preview",
+  },
+  {
+    id: "pdf-3",
+    name: "Photograph.pdf",
+    type: "Individual",
+    pages: 1,
+    status: "Preview",
+  },
+];
+
+type DemoPdf = (typeof files)[number];
+
+const columns: DataTableColumn<DemoPdf>[] = [
+  {
+    id: "name",
+    header: "File",
+    value: (file) => file.name,
+    cell: (file) => <span className="font-semibold">{file.name}</span>,
+  },
+  { id: "type", header: "Type", value: (file) => file.type },
+  { id: "pages", header: "A4 pages", value: (file) => file.pages },
+  {
+    id: "status",
+    header: "Availability",
+    value: (file) => file.status,
+    cell: (file) => <Badge>{file.status}</Badge>,
+  },
 ];
 
 export default function PdfPage() {
@@ -17,38 +56,14 @@ export default function PdfPage() {
         description="Phase 1 creates PDFs only on the user device. These static examples preview the downloads available to Admin after Phase 2."
         demo
       />
-      <Card>
-        <div className="space-y-3">
-          {files.map((file) => (
-            <div
-              key={file.name}
-              className="flex flex-col gap-4 rounded-2xl border border-white/8 bg-black/15 p-4 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <span className="rounded-xl bg-white/7 p-2.5 text-primary">
-                  <FileText className="size-5" aria-hidden="true" />
-                </span>
-                <div>
-                  <p className="font-semibold">{file.name}</p>
-                  <p className="mt-1 text-xs text-white/45">
-                    {file.pages} A4 page
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Badge>{file.type}</Badge>
-                <Button
-                  variant="secondary"
-                  disabled
-                  title="Available with persistent submissions in Phase 2"
-                >
-                  <Download className="size-4" /> Download
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+      <DataTable
+        caption="Demonstration PDF files"
+        columns={columns}
+        rows={files}
+        rowKey={(file) => file.id}
+        searchPlaceholder="Search PDF files"
+        exportFileName="documentcollector-demo-pdfs.csv"
+      />
     </>
   );
 }

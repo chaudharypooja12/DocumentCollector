@@ -52,11 +52,11 @@ Admin → Configure Required Documents → Generate Temporary Link / QR
 
 ## Tech Stack
 
-| Phase | Stack |
-|---|---|
+| Phase              | Stack                                                                                     |
+| ------------------ | ----------------------------------------------------------------------------------------- |
 | Phase 1 — Frontend | Next.js 16, React 19, TypeScript 5, Tailwind CSS 4, shadcn/ui, OpenCV.js, pdf-lib, Vercel |
-| Phase 2 — Backend | Supabase (Database, Storage, Auth, Edge Functions), REST/RPC |
-| Phase 3 — Payment | Payment gateway integration (TBD) |
+| Phase 2 — Backend  | Supabase (Database, Storage, Auth, Edge Functions), REST/RPC                              |
+| Phase 3 — Payment  | Payment gateway integration (TBD)                                                         |
 
 ## Deployment
 
@@ -126,15 +126,25 @@ Use Node.js 22 (`.nvmrc`). Playwright browser binaries can be installed with
 ```
 project/
 ├── src/
-│   ├── app/        Next.js routes ((admin) and (public) groups)
-│   ├── components/ UI components (glass primitives, capture UI, admin UI)
-│   ├── modules/    Domain logic (admin, user-upload, document-capture, pdf-generation, link-management)
-│   └── lib/        Shared libraries (image processing, PDF, request-link, validation)
+│   ├── app/         Next.js routes ((admin) and (public) groups)
+│   ├── components/  Admin, brand, capture, shared, and shadcn UI components
+│   ├── data/        Typed Phase 1 demonstration fixtures
+│   ├── features/    Feature state and composed flows
+│   ├── providers/   In-memory application providers
+│   └── lib/         Flat shared libraries (image processing, PDF, request links)
+├── tests/
+│   ├── component/   React component behavior
+│   ├── e2e/         Playwright browser journeys and responsive matrix
+│   ├── privacy/     Phase 1 source guards
+│   └── unit/        Domain and library tests
 ├── public/brand/   Canonical MBWays logo assets
 ├── memory-bank/    Persistent project context (see above)
 ├── AGENT.md         Mandatory project workflow and business rules
 └── README.md        This file
 ```
+
+Playwright reports, screenshots, traces, and TypeScript incremental metadata are
+generated under ignored `.artifacts/`; they are not source files.
 
 ## Contributing
 

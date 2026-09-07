@@ -4,7 +4,7 @@
 physical-device acceptance checks remain external follow-ups
 **Primary device:** Mobile phone
 **Stack:** Next.js 16, React 19, TypeScript 5, Tailwind CSS 4,
-shadcn/ui with Base UI, Lucide, React Hook Form, Zod, dnd-kit, OpenCV.js,
+shadcn/ui with Radix UI, Lucide, React Hook Form, Zod, dnd-kit, OpenCV.js,
 Canvas API, pdf-lib, qrcode.react, Vitest, React Testing Library, Playwright
 **Deployment:** Vercel over HTTPS
 **Related docs:** `COMPANY.md`, `PRD.md`, `TECH_STACK.md`, `DESIGN.md`,
@@ -39,7 +39,7 @@ current page memory.
 - [x] Configure Tailwind CSS 4
 - [x] Configure ESLint and Prettier
 - [x] Install and configure:
-  - [x] shadcn/ui conventions with Base UI primitives
+  - [x] shadcn/ui conventions with reusable Radix UI primitives
   - [x] `lucide-react`
   - [x] React Hook Form and Zod
   - [x] `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`
@@ -49,7 +49,7 @@ current page memory.
   - [x] Playwright
 - [x] Add a pinned local OpenCV.js WASM asset; do not load it from a runtime CDN
 - [x] Configure scripts: `dev`, `build`, `start`, `lint`, `type-check`, `test`,
-  and `test:e2e`
+      and `test:e2e`
 - [x] Configure security headers:
   - [x] `Permissions-Policy: camera=(self)`
   - [x] `Referrer-Policy: no-referrer`
@@ -60,12 +60,16 @@ current page memory.
 - [x] Configure GitHub Actions for lint, type-check, unit tests, and build
 - [ ] Import the GitHub repository into Vercel using the Next.js preset
 - [x] Configure repository Vercel settings to run `npm ci` and `npm run build`
-  on Node.js 22 LTS
+      on Node.js 22 LTS
 - [ ] Enable Vercel Preview Deployments for pull requests
 - [ ] Map pushes/merges to `main` to Vercel Production
 - [x] Keep `.vercel/` local metadata ignored
 - [x] Scaffold Memory Bank and root `AGENT.md`
 - [x] Import canonical MBWays assets into `public/brand/`
+- [x] Consolidate unit, component, privacy, and Playwright suites under `tests/`
+- [x] Route Playwright artifacts and TypeScript incremental metadata to ignored
+      `.artifacts/`
+- [x] Flatten shared `src/lib` files and remove redundant module re-export folders
 
 ## 2. Phase 1 Data and Privacy Guardrails
 
@@ -82,13 +86,13 @@ current page memory.
 - [x] Add a refresh/close warning after the first accepted capture
 - [x] Clear in-memory capture/PDF state on flow teardown
 - [x] Add an automated source scan/test for prohibited persistence APIs and
-  backend SDK imports
+      backend SDK imports
 
 ## 3. MBWays Design System and Shared Shells
 
 - [x] Define MBWays colors, typography, radii, blur, and shadows from
-  `COMPANY.md` and `DESIGN.md`
-- [x] Build a shared brand lockup using `/brand/logo.svg`
+      `COMPANY.md` and `DESIGN.md`
+- [x] Build a deployment-safe shared brand lockup from canonical MBWays layers
   - [x] Product name: `DocumentCollector`
   - [x] Supporting line: `Powered by MBWays`
 - [x] Build accessible primitives:
@@ -102,6 +106,9 @@ current page memory.
   - [x] Skeleton and empty state
 - [x] Build a mobile-first Admin shell
 - [x] Build a minimal mobile-first public User shell
+- [x] Default to Light theme and provide an in-memory Light/Dark switch
+- [x] Use semantic theme tokens instead of dark-only page colors
+- [x] Keep theme selection non-persistent under the Phase 1 privacy contract
 - [x] Retain the brand lockup on success, expired, invalid, and locked screens
 - [x] Meet WCAG 2.2 AA contrast and visible-focus requirements
 - [x] Honor reduced-motion preferences
@@ -111,10 +118,15 @@ current page memory.
 ### 4.1 Dashboard and Demonstration Screens
 
 - [x] Build `/admin` responsive dashboard
+- [x] Add a sticky Admin top bar with page context, theme control, and Logout
+- [x] Add clearly visible sidebar/header/content borders in both themes
+- [x] Use a shadcn Sheet for responsive mobile navigation
 - [x] Clearly label Phase 1 data-dependent cards as demonstrations
 - [x] Add static fixtures for counts and recent activity
 - [x] Build responsive Users, Submissions, PDF Management, and Settings screens
-  from typed static fixtures
+- [x] Add reusable responsive Admin tables with search, pagination, and CSV
+      export for demonstration records
+      from typed static fixtures
 - [x] Ensure no form on these demonstration screens claims that data was saved
 - [x] Reset all interactive demonstration state on refresh
 
@@ -142,7 +154,7 @@ current page memory.
 - [x] Surface actionable validation when a checklist exceeds URL capacity
 - [x] Show Copy Link action with feedback
 - [x] Render a scannable QR code when capacity permits and show share fallbacks
-  for longer valid links
+      for longer valid links
 - [x] Add native Web Share when supported
 - [x] Add WhatsApp and email share links
 - [x] Add Regenerate Link to create a new payload from the current form
@@ -176,11 +188,11 @@ current page memory.
 - [x] Detect secure context and MediaDevices support
 - [x] Request rear camera with `facingMode: environment`
 - [x] Handle permission granted, denied, dismissed, unavailable, and device-busy
-  states
+      states
 - [x] Stop all media tracks when leaving capture
 - [x] Stop late-resolving camera streams after dialog teardown or cancellation
 - [x] Provide file input fallback with
-  `accept="image/*" capture="environment"`
+      `accept="image/*" capture="environment"`
 - [x] Explain that selected/captured files stay on the device
 
 ### 5.4 Guided Capture
@@ -212,8 +224,8 @@ current page memory.
 - [x] Show review preview with Retake and Use Photo
 - [x] Store only the accepted normalized Blob in memory
 - [x] Test portrait/landscape layout and low-light/high-glare guide states;
-  skew/perspective receives OpenCV integration coverage and remains a
-  physical-device acceptance item
+      skew/perspective receives OpenCV integration coverage and remains a
+      physical-device acceptance item
 
 ## 6. Client-Side PDF Generation
 
@@ -224,7 +236,7 @@ current page memory.
 - [x] Preserve Admin document order
 - [x] Generate `Complete_Documents.pdf`
 - [x] Implement one sanitized individual PDF per document for Admin-side
-  capability tests/fixtures
+      capability tests/fixtures
 - [x] Keep document pages unbranded
 - [x] Show local processing progress and actionable errors
 - [x] Provide the combined PDF download on the User result screen
@@ -237,7 +249,7 @@ current page memory.
 - [x] Confirm before local generation
 - [x] Explain that Phase 1 does not upload or save documents
 - [x] Transition the current tab to in-memory `SUBMITTED` after successful PDF
-  generation
+      generation
 - [x] Prevent capture/edit actions in that tab after generation
 - [x] Keep generated download/share actions available while memory remains
 - [x] Document and test that refresh/reopen starts a fresh session
@@ -270,10 +282,12 @@ current page memory.
 - [x] Unit: image fit/layout calculations
 - [x] Unit: PDF page count and filenames
 - [x] Component: request builder, ordering, and generated share URL
+- [x] Component: deployment-safe logo, Light default, theme switch, top bar, and
+      Logout
 - [x] Component: resolver invalid/expired states
 - [x] Component: camera fallback and camera error states
 - [x] E2E: Admin creates link -> User opens link -> captures/selects files ->
-  generates and downloads PDF
+      generates and downloads PDF
 - [x] E2E: mobile Chromium and mobile WebKit viewport projects
 
 ### Real device
@@ -298,10 +312,10 @@ paths pass locally.
 - [x] Confirm GitHub checks pass before production merge/deployment
 - [ ] Verify Vercel HTTPS camera access
 - [x] Verify direct navigation to `/admin`, `/admin/login`, and `/u` in the
-  production build
+      production build
 - [x] Verify generated links use the active deployment origin
 - [x] Verify security headers in the local production build; repeat against
-  Vercel Preview and Production after project connection
+      Vercel Preview and Production after project connection
 - [x] Confirm no backend/database/auth/upload environment variables exist
 - [x] Confirm production bundle does not include a persistence or backend SDK
 - [x] Confirm OpenCV is capture-route-lazy and locally hosted

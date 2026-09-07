@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { UserFlow } from "@/modules/user-upload/user-flow";
+import { UserFlow } from "@/features/user-upload/user-flow";
 
 export const metadata: Metadata = {
   title: "Document request",

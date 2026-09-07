@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { Logo } from "@/components/brand/logo";
 
 type BrandLockupProps = {
   compact?: boolean;
@@ -16,25 +16,12 @@ export function BrandLockup({
       className="flex min-h-11 items-center gap-3 rounded-xl"
       aria-label="DocumentCollector home"
     >
-      <span
-        className={`relative block shrink-0 ${
-          compact ? "h-[60px] w-[97px]" : "h-[68px] w-[110px]"
-        }`}
-      >
-        <Image
-          src="/brand/logo.svg"
-          fill
-          sizes={compact ? "97px" : "110px"}
-          alt="MBWays - Opening Pathways to Opportunities"
-          className="object-contain"
-          priority
-        />
-      </span>
-      <span className="hidden border-l border-white/15 pl-3 sm:block">
-        <span className="block text-sm font-bold tracking-tight text-white">
+      <Logo size={compact ? "compact" : "default"} className="shrink-0" />
+      <span className="hidden border-l border-border pl-3 sm:block">
+        <span className="block text-sm font-bold tracking-tight text-foreground">
           DocumentCollector
         </span>
-        <span className="block text-[11px] text-white/60">
+        <span className="block text-[11px] text-muted-foreground">
           Powered by MBWays
         </span>
       </span>

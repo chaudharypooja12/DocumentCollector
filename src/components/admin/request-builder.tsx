@@ -31,7 +31,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Controller,
   useFieldArray,
@@ -42,13 +42,17 @@ import {
   type UseFormRegister,
 } from "react-hook-form";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { InlineAlert } from "@/components/ui/inline-alert";
+import { Input } from "@/components/ui/input";
 import {
-  Button,
-  Card,
-  InlineAlert,
-  Input,
   Select,
-} from "@/components/shared/ui";
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   buildRequestUrl,
   createRequestPayload,
@@ -122,14 +126,14 @@ function SortableDocument({
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`rounded-2xl border border-white/10 bg-black/20 p-4 ${
+      className={`rounded-2xl border border-border bg-muted/35 p-4 ${
         isDragging ? "relative z-10 border-primary/60 shadow-xl" : ""
       }`}
     >
       <div className="grid gap-3 sm:grid-cols-[44px_1fr_180px_auto] sm:items-start">
         <button
           type="button"
-          className="hidden size-11 cursor-grab items-center justify-center rounded-xl text-white/45 hover:bg-white/8 hover:text-white sm:inline-flex"
+          className="hidden size-11 cursor-grab items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground sm:inline-flex"
           aria-label={`Drag document ${index + 1}`}
           {...attributes}
           {...listeners}
@@ -137,7 +141,7 @@ function SortableDocument({
           <GripVertical className="size-5" />
         </button>
         <label>
-          <span className="mb-2 block text-xs font-semibold text-white/55">
+          <span className="mb-2 block text-xs font-semibold text-muted-foreground">
             Document {index + 1}
           </span>
           <Input
@@ -146,22 +150,27 @@ function SortableDocument({
             aria-invalid={Boolean(errors.documents?.[index]?.name)}
           />
           {errors.documents?.[index]?.name?.message ? (
-            <span className="mt-1 block text-xs text-red-200">
+            <span className="mt-1 block text-xs text-destructive">
               {errors.documents[index]?.name?.message}
             </span>
           ) : null}
         </label>
         <label>
-          <span className="mb-2 block text-xs font-semibold text-white/55">
+          <span className="mb-2 block text-xs font-semibold text-muted-foreground">
             Capture type
           </span>
           <Controller
             control={control}
             name={`documents.${index}.type`}
             render={({ field }) => (
-              <Select {...field}>
-                <option value="SINGLE">Single image</option>
-                <option value="FRONT_BACK">Front + back</option>
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="min-h-11 rounded-xl">
+                  <SelectValue aria-label={field.value} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="SINGLE">Single image</SelectItem>
+                  <SelectItem value="FRONT_BACK">Front + back</SelectItem>
+                </SelectContent>
               </Select>
             )}
           />
@@ -171,7 +180,7 @@ function SortableDocument({
             type="button"
             onClick={() => onMove(index, index - 1)}
             disabled={index === 0}
-            className="inline-flex size-11 items-center justify-center rounded-xl text-white/60 hover:bg-white/8 hover:text-white disabled:opacity-25"
+            className="inline-flex size-11 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-25"
             aria-label={`Move document ${index + 1} up`}
           >
             <ArrowUp className="size-4" />
@@ -180,7 +189,7 @@ function SortableDocument({
             type="button"
             onClick={() => onMove(index, index + 1)}
             disabled={index === count - 1}
-            className="inline-flex size-11 items-center justify-center rounded-xl text-white/60 hover:bg-white/8 hover:text-white disabled:opacity-25"
+            className="inline-flex size-11 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-25"
             aria-label={`Move document ${index + 1} down`}
           >
             <ArrowDown className="size-4" />
@@ -189,7 +198,7 @@ function SortableDocument({
             type="button"
             onClick={onRemove}
             disabled={count === 1}
-            className="inline-flex size-11 items-center justify-center rounded-xl text-red-200 hover:bg-red-400/10 disabled:opacity-25"
+            className="inline-flex size-11 items-center justify-center rounded-xl text-destructive hover:bg-destructive/10 disabled:opacity-25"
             aria-label={`Remove document ${index + 1}`}
           >
             <Trash2 className="size-4" />
@@ -240,10 +249,28 @@ export function RequestBuilder() {
   );
   const values = useWatch({ control });
   const watchedDocuments = values.documents ?? [];
+  const configurationKey = JSON.stringify({
+    documents: watchedDocuments.map(({ id, name, type }) => ({
+      id,
+      name,
+      type,
+    })),
+    expiryHours: values.expiryHours,
+  });
+  const previousConfigurationKey = useRef(configurationKey);
   const totalCaptures = watchedDocuments.reduce(
     (sum, document) => sum + (document.type === "FRONT_BACK" ? 2 : 1),
     0,
   );
+
+  useEffect(() => {
+    if (previousConfigurationKey.current === configurationKey) return;
+
+    previousConfigurationKey.current = configurationKey;
+    setGeneratedUrl("");
+    setFeedback("");
+    setGenerationError("");
+  }, [configurationKey]);
 
   function reorder(event: DragEndEvent) {
     if (!event.over || event.active.id === event.over.id) return;
@@ -294,12 +321,12 @@ export function RequestBuilder() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-bold">Required documents</h2>
-              <p className="mt-1 text-sm text-white/50">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Add labels only. Never include a person&apos;s name or contact
                 details.
               </p>
             </div>
-            <span className="text-xs text-white/45">
+            <span className="text-xs text-muted-foreground">
               {fields.length}/{MAX_DOCUMENTS}
             </span>
           </div>
@@ -343,18 +370,32 @@ export function RequestBuilder() {
             <Plus className="size-4" /> Add document
           </Button>
 
-          <div className="border-t border-white/8 pt-5">
+          <div className="border-t border-border pt-5">
             <label className="block max-w-xs">
               <span className="mb-2 block text-sm font-semibold">
                 Link expiry
               </span>
-              <Select {...register("expiryHours", { valueAsNumber: true })}>
-                {[1, 2, 3, 4, 5, 6].map((hour) => (
-                  <option key={hour} value={hour}>
-                    {hour} {hour === 1 ? "hour" : "hours"}
-                  </option>
-                ))}
-              </Select>
+              <Controller
+                control={control}
+                name="expiryHours"
+                render={({ field }) => (
+                  <Select
+                    value={String(field.value)}
+                    onValueChange={(value) => field.onChange(Number(value))}
+                  >
+                    <SelectTrigger className="min-h-11 rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[1, 2, 3, 4, 5, 6].map((hour) => (
+                        <SelectItem key={hour} value={String(hour)}>
+                          {hour} {hour === 1 ? "hour" : "hours"}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </label>
           </div>
 
@@ -377,19 +418,19 @@ export function RequestBuilder() {
           <h2 className="text-lg font-bold">Request summary</h2>
           <dl className="mt-5 space-y-3 text-sm">
             <div className="flex justify-between gap-3">
-              <dt className="text-white/50">Documents</dt>
+              <dt className="text-muted-foreground">Documents</dt>
               <dd className="font-semibold">{watchedDocuments.length}</dd>
             </div>
             <div className="flex justify-between gap-3">
-              <dt className="text-white/50">Captures required</dt>
+              <dt className="text-muted-foreground">Captures required</dt>
               <dd className="font-semibold">{totalCaptures}</dd>
             </div>
             <div className="flex justify-between gap-3">
-              <dt className="text-white/50">Expires after</dt>
+              <dt className="text-muted-foreground">Expires after</dt>
               <dd className="font-semibold">{values.expiryHours ?? 3} hours</dd>
             </div>
           </dl>
-          <div className="mt-5 rounded-xl border border-emerald-300/15 bg-emerald-300/6 p-4 text-xs leading-5 text-emerald-100/75">
+          <div className="mt-5 rounded-xl border border-success/20 bg-success/5 p-4 text-xs leading-5 text-muted-foreground">
             No user information is requested or stored. The link carries only
             this checklist and its expiry.
           </div>
@@ -412,7 +453,7 @@ export function RequestBuilder() {
                 WhatsApp, or Email instead.
               </InlineAlert>
             )}
-            <p className="mt-4 break-all rounded-xl bg-black/20 p-3 text-left text-xs text-white/55">
+            <p className="mt-4 break-all rounded-xl bg-muted p-3 text-left text-xs text-muted-foreground">
               {generatedUrl}
             </p>
             <div className="mt-4 grid grid-cols-2 gap-2">
@@ -426,13 +467,13 @@ export function RequestBuilder() {
                 href={`https://wa.me/?text=${encodeURIComponent(generatedUrl)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/8 px-3 text-sm font-semibold"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card px-3 text-sm font-semibold hover:bg-muted"
               >
                 <Send className="size-4" /> WhatsApp
               </a>
               <a
                 href={`mailto:?subject=${encodeURIComponent("Document request from MBWays")}&body=${encodeURIComponent(generatedUrl)}`}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/8 px-3 text-sm font-semibold"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card px-3 text-sm font-semibold hover:bg-muted"
               >
                 <Mail className="size-4" /> Email
               </a>
@@ -440,7 +481,7 @@ export function RequestBuilder() {
             {feedback ? (
               <p
                 role="status"
-                className="mt-4 flex items-center justify-center gap-2 text-xs text-emerald-200"
+                className="mt-4 flex items-center justify-center gap-2 text-xs text-success"
               >
                 <Check className="size-4" /> {feedback}
               </p>
