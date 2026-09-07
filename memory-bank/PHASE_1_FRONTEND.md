@@ -295,7 +295,7 @@ paths pass locally.
 
 - [ ] Confirm GitHub pull requests receive a Vercel Preview URL
 - [ ] Confirm `main` deploys to Vercel Production
-- [ ] Confirm GitHub checks pass before production merge/deployment
+- [x] Confirm GitHub checks pass before production merge/deployment
 - [ ] Verify Vercel HTTPS camera access
 - [x] Verify direct navigation to `/admin`, `/admin/login`, and `/u` in the
   production build

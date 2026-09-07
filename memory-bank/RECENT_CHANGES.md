@@ -15,6 +15,12 @@ Entry format:
 
 ---
 
+## 2026-09-07 — Phase 1 release published and CI verified
+- Module(s): project setup and deployment
+- Summary: Published the locally verified Phase 1 implementation to the private repository's `main` branch and confirmed the GitHub Actions quality job passes installation, lint, strict type-checking, 30 unit/component/privacy tests, and the production build on Node.js 22. Updated the official checkout and setup-node actions to their Node.js 24-based v5 runtimes after GitHub reported the v4 runtime deprecation.
+- Files touched: `.github/workflows/ci.yml`, `memory-bank/PHASE_1_FRONTEND.md`, `memory-bank/RECENT_CHANGES.md`
+- Follow-ups: Connect the repository to Vercel and complete the physical Android/iOS camera, rotation, QR, Web Share, and low-memory acceptance matrix before marking Phase 1 fully complete.
+
 ## 2026-09-07 — Phase 1 frontend implemented and locally verified
 - Module(s): admin, user-upload, document-capture, pdf-generation, link-management, project setup and deployment
 - Summary: Implemented the complete mobile-first Phase 1 frontend in a standard `src/` Next.js structure. Added the MBWays landing page, local-only Admin sign-in preview, responsive Admin demonstration screens, functional request builder and sharing, PII-free URL-fragment contract, no-login User resolver/checklist, camera and file fallback, pinned local OpenCV contour/perspective pipeline, in-memory capture lifecycle, client-side A4 combined/individual PDF generation, current-tab submitted lock, CI, privacy guards, unit/component tests, cross-browser Playwright journeys, viewport-matrix validation, and Vercel-ready configuration. Development CSP now permits React/Turbopack `unsafe-eval` diagnostics while production omits that source. Final release review also added cancellation-safe camera startup, actionable oversized-link validation, and a non-crashing share fallback when a valid link exceeds QR capacity.
