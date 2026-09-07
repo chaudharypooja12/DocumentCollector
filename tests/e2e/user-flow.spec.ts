@@ -29,6 +29,18 @@ test("Admin link opens the no-login capture and PDF flow", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByText(/login|sign up/iu)).toHaveCount(0);
 
+  await page.getByLabel("Full name").fill("Priya Sharma");
+  await page.getByLabel("Age").fill("24");
+  await page.getByRole("combobox", { name: /gender/iu }).click();
+  await page.getByRole("option", { name: "Female" }).click();
+  await page.getByLabel("Phone number").fill("+91 98765 43210");
+  await page
+    .getByLabel("Permanent address")
+    .fill("12 MG Road, Pune, Maharashtra");
+  await page
+    .getByRole("checkbox", { name: /same as my permanent address/iu })
+    .click();
+
   const captureButtons = page.getByRole("button", {
     name: /^Capture (document|front|back)$/iu,
   });

@@ -28,6 +28,9 @@
 - Backdrop filter: `blur(24px)`.
 - Border radius: `12-24px` according to shadcn component role.
 - Shadow: large, soft MBWays orange glow used sparingly.
+- Scrollbars use the MBWays brand color for the thumb against a muted track in
+  both themes, applied globally via `scrollbar-color` and themed
+  `::-webkit-scrollbar` rules.
 
 ### 2.2 MBWays Color Palette
 
@@ -97,28 +100,41 @@ All state screens retain the shared DocumentCollector and MBWays brand lockup.
 
 - [x] **Landing and Admin Sign-in Preview** — MBWays-branded entry with an
       explicitly local-only, non-authenticating Phase 1 form.
-- [x] **Dashboard** — clearly labeled Phase 1 demonstration cards and activity fixtures.
+- [x] **Dashboard** — four at-a-glance stat cards (Total profiles, Pending
+      with a hover explanation, Male users, Female users) computed from
+      typed static fixtures.
 - [x] **Admin Shell** — desktop sidebar, sticky top bar, responsive navigation
       sheet, in-memory Light/Dark switch, and Phase 1 Logout-to-preview action.
-- [x] **Users (list)** — responsive demonstration table/cards; no saved records in Phase 1.
+      Settings and Logs are ordered at the bottom of navigation.
 - [x] **Create Request** — select document requirements and expiry without adding PII to the link.
 - [x] **Document Templates** — select documents required for this user; drag-and-drop ordering; toggle Single vs Front+Back per document.
 - [x] **Document Requests / Link Generation** — set expiry (max 6h), generate link, share options (Copy / WhatsApp / Email).
 - [x] **Share Request** — copy link, QR code, native share, WhatsApp, and email.
-- [x] **Submission Management** — complete demonstration UI; no real User captures are available to Admin in Phase 1.
-- [x] **PDF Management** — complete demonstration UI using fixtures.
+- [x] **Users / Profiles** — a single responsive table merges profile
+      records and their submission preview. Status and gender filters, search,
+      pagination, and CSV export are available. Per-row actions provide View
+      submission (Eye), Update profile (Pencil), and Delete profile (Trash),
+      replacing the separate Submissions and PDF Management pages from
+      earlier iterations.
+- [x] **Logs** — demonstration activity log with search, pagination, and CSV
+      export.
 - [x] **Settings** — demonstration UI; values reset on refresh.
 
 ### 4.2 User Upload Flow (simple, mobile-first)
 
 - [x] **Link Landing / Loading** — decodes and validates the URL-fragment request, then opens the document checklist automatically.
+- [x] **Basic Details** — the User enters Full Name, Age, Gender, Phone,
+      Permanent Address, and Residence Address (with a "same as permanent
+      address" checkbox) directly in the browser. These details are never
+      encoded in the link, never uploaded, and exist only in current-page
+      memory alongside captures.
 - [x] **Document Upload List** — list of required documents with capture buttons (Front/Back where applicable), progress indicators.
 - [x] **Camera Capture Screen** — live preview, positioning guide box (red/green), capture button, retake button.
 - [x] **Review/Edit Screen** — thumbnail of captured image(s), retake/replace controls, per-document status.
 - [x] **Generation Confirmation** — confirms local PDF generation and explains the current session will lock afterward.
 - [x] **Success / Download Screen** — Documents Ready message + Download and supported Share actions.
 - [x] **Expired Link Screen** — static message, no interactive upload elements.
-- [x] **Locked/Already-Submitted Screen** — current-tab state only in Phase 1; preserve generated download actions while memory remains.
+- [x] **Locked/Already-Submitted Screen** — current-tab state only in Phase 1; preserve generated download actions while memory remains. The link accepts a single submission per tab session.
 
 ---
 

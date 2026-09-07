@@ -1,142 +1,246 @@
-export type DemoUser = {
-  id: string;
+export type Gender = "Male" | "Female";
+
+export type ProfileStatus = "Pending" | "In progress" | "Submitted";
+
+export type DemoDocumentFile = {
   name: string;
-  country: string;
-  documents: number;
-  status: "Pending" | "In progress" | "Submitted";
-  updatedAt: string;
+  type: "Combined" | "Individual";
+  pages: number;
 };
 
-export type DemoSubmission = {
+export type DemoProfile = {
   id: string;
+  fullName: string;
+  age: number;
+  gender: Gender;
+  phone: string;
+  country: string;
+  permanentAddress: string;
+  residenceAddress: string;
+  sameAsPermanentAddress: boolean;
+  documentsRequired: number;
+  status: ProfileStatus;
+  updatedAt: string;
   reference: string;
-  documents: number;
-  status: "Ready" | "Review" | "Processing";
-  createdAt: string;
+  files: DemoDocumentFile[];
 };
 
-export const demoUsers: DemoUser[] = [
+export const demoProfiles: DemoProfile[] = [
   {
     id: "demo-1",
-    name: "Sample applicant",
+    fullName: "Priya Sharma",
+    age: 24,
+    gender: "Female",
+    phone: "+91 98765 43210",
     country: "India",
-    documents: 4,
+    permanentAddress: "12 MG Road, Pune, Maharashtra",
+    residenceAddress: "12 MG Road, Pune, Maharashtra",
+    sameAsPermanentAddress: true,
+    documentsRequired: 4,
     status: "In progress",
     updatedAt: "Today, 10:24",
+    reference: "DC-DEMO-1042",
+    files: [],
   },
   {
     id: "demo-2",
-    name: "Example student",
+    fullName: "Arjun Mehta",
+    age: 29,
+    gender: "Male",
+    phone: "+44 7700 900123",
     country: "United Kingdom",
-    documents: 6,
+    permanentAddress: "45 Baker Street, London",
+    residenceAddress: "12 Camden High Street, London",
+    sameAsPermanentAddress: false,
+    documentsRequired: 6,
     status: "Submitted",
     updatedAt: "Yesterday, 17:40",
+    reference: "DC-DEMO-1039",
+    files: [
+      { name: "Complete_Documents.pdf", type: "Combined", pages: 6 },
+      { name: "Passport.pdf", type: "Individual", pages: 1 },
+      { name: "Photograph.pdf", type: "Individual", pages: 1 },
+    ],
   },
   {
     id: "demo-3",
-    name: "Demo candidate",
+    fullName: "Kavya Nair",
+    age: 22,
+    gender: "Female",
+    phone: "+1 416 555 0123",
     country: "Canada",
-    documents: 3,
+    permanentAddress: "88 Queen Street, Toronto, ON",
+    residenceAddress: "88 Queen Street, Toronto, ON",
+    sameAsPermanentAddress: true,
+    documentsRequired: 3,
     status: "Pending",
     updatedAt: "Sep 05, 12:10",
+    reference: "DC-DEMO-1036",
+    files: [],
   },
   {
     id: "demo-4",
-    name: "Example researcher",
+    fullName: "Rohan Verma",
+    age: 31,
+    gender: "Male",
+    phone: "+49 151 23456789",
     country: "Germany",
-    documents: 5,
+    permanentAddress: "Hauptstrasse 22, Berlin",
+    residenceAddress: "Hauptstrasse 22, Berlin",
+    sameAsPermanentAddress: true,
+    documentsRequired: 5,
     status: "Submitted",
     updatedAt: "Sep 04, 16:35",
+    reference: "DC-DEMO-1031",
+    files: [
+      { name: "Complete_Documents.pdf", type: "Combined", pages: 5 },
+      { name: "Residence_proof.pdf", type: "Individual", pages: 1 },
+    ],
   },
   {
     id: "demo-5",
-    name: "Sample professional",
+    fullName: "Ananya Iyer",
+    age: 27,
+    gender: "Female",
+    phone: "+61 4 1234 5678",
     country: "Australia",
-    documents: 4,
+    permanentAddress: "9 Harbour View, Sydney, NSW",
+    residenceAddress: "21 Collins Street, Melbourne, VIC",
+    sameAsPermanentAddress: false,
+    documentsRequired: 4,
     status: "In progress",
     updatedAt: "Sep 03, 11:15",
+    reference: "DC-DEMO-1028",
+    files: [],
   },
   {
     id: "demo-6",
-    name: "Demo learner",
+    fullName: "Vikram Singh",
+    age: 34,
+    gender: "Male",
+    phone: "+353 85 123 4567",
     country: "Ireland",
-    documents: 6,
+    permanentAddress: "14 O'Connell Street, Dublin",
+    residenceAddress: "14 O'Connell Street, Dublin",
+    sameAsPermanentAddress: true,
+    documentsRequired: 6,
     status: "Pending",
     updatedAt: "Sep 02, 09:45",
+    reference: "DC-DEMO-1024",
+    files: [],
   },
   {
     id: "demo-7",
-    name: "Example applicant",
+    fullName: "Meera Joshi",
+    age: 26,
+    gender: "Female",
+    phone: "+64 21 123 4567",
     country: "New Zealand",
-    documents: 3,
+    permanentAddress: "3 Queen Street, Auckland",
+    residenceAddress: "3 Queen Street, Auckland",
+    sameAsPermanentAddress: true,
+    documentsRequired: 3,
     status: "Submitted",
     updatedAt: "Sep 01, 14:20",
+    reference: "DC-DEMO-1019",
+    files: [{ name: "Complete_Documents.pdf", type: "Combined", pages: 3 }],
   },
   {
     id: "demo-8",
-    name: "Sample candidate",
+    fullName: "Karan Malhotra",
+    age: 30,
+    gender: "Male",
+    phone: "+65 8123 4567",
     country: "Singapore",
-    documents: 5,
+    permanentAddress: "77 Orchard Road, Singapore",
+    residenceAddress: "10 Marina Bay, Singapore",
+    sameAsPermanentAddress: false,
+    documentsRequired: 5,
     status: "In progress",
     updatedAt: "Aug 30, 10:05",
+    reference: "DC-DEMO-1014",
+    files: [],
   },
 ];
 
-export const demoSubmissions: DemoSubmission[] = [
+export type DemoLogEntry = {
+  id: string;
+  event: string;
+  actor: string;
+  details: string;
+  timestamp: string;
+};
+
+export const demoLogs: DemoLogEntry[] = [
   {
-    id: "sub-demo-1",
-    reference: "DC-DEMO-1042",
-    documents: 5,
-    status: "Ready",
-    createdAt: "Today, 09:30",
+    id: "log-1",
+    event: "Profile link created",
+    actor: "Admin · MBWays",
+    details: "Generated a temporary profile link with a 6-hour expiry.",
+    timestamp: "Today, 10:20",
   },
   {
-    id: "sub-demo-2",
-    reference: "DC-DEMO-1039",
-    documents: 4,
-    status: "Review",
-    createdAt: "Yesterday, 16:12",
+    id: "log-2",
+    event: "Basic details captured",
+    actor: "User device",
+    details:
+      "Full name and contact details were entered locally and never uploaded.",
+    timestamp: "Today, 10:24",
   },
   {
-    id: "sub-demo-3",
-    reference: "DC-DEMO-1036",
-    documents: 7,
-    status: "Processing",
-    createdAt: "Sep 05, 14:05",
+    id: "log-3",
+    event: "Document captured",
+    actor: "User device",
+    details: "Passport (front) captured and processed on-device.",
+    timestamp: "Today, 10:26",
   },
   {
-    id: "sub-demo-4",
-    reference: "DC-DEMO-1031",
-    documents: 3,
-    status: "Ready",
-    createdAt: "Sep 04, 11:45",
+    id: "log-4",
+    event: "PDF generated",
+    actor: "User device",
+    details: "Combined A4 PDF generated locally; the link is now locked.",
+    timestamp: "Yesterday, 17:41",
   },
   {
-    id: "sub-demo-5",
-    reference: "DC-DEMO-1028",
-    documents: 6,
-    status: "Review",
-    createdAt: "Sep 03, 15:20",
+    id: "log-5",
+    event: "Theme changed",
+    actor: "Admin · MBWays",
+    details: "Switched the workspace to the Dark theme for this session.",
+    timestamp: "Yesterday, 09:12",
   },
   {
-    id: "sub-demo-6",
-    reference: "DC-DEMO-1024",
-    documents: 4,
-    status: "Processing",
-    createdAt: "Sep 02, 10:15",
+    id: "log-6",
+    event: "Profile link created",
+    actor: "Admin · MBWays",
+    details: "Generated a temporary profile link with a 3-hour expiry.",
+    timestamp: "Sep 05, 12:05",
   },
   {
-    id: "sub-demo-7",
-    reference: "DC-DEMO-1019",
-    documents: 8,
-    status: "Ready",
-    createdAt: "Sep 01, 13:30",
+    id: "log-7",
+    event: "Link expired",
+    actor: "System",
+    details: "A temporary link expired in-browser before any data was received.",
+    timestamp: "Sep 05, 18:05",
   },
   {
-    id: "sub-demo-8",
-    reference: "DC-DEMO-1014",
-    documents: 5,
-    status: "Review",
-    createdAt: "Aug 30, 16:50",
+    id: "log-8",
+    event: "Profile viewed",
+    actor: "Admin · MBWays",
+    details: "Opened the demonstration submission preview for a profile.",
+    timestamp: "Sep 04, 16:50",
+  },
+  {
+    id: "log-9",
+    event: "Reactivation previewed",
+    actor: "Admin · MBWays",
+    details: "Previewed the same-link reactivation control for this session.",
+    timestamp: "Sep 03, 11:30",
+  },
+  {
+    id: "log-10",
+    event: "Settings preview updated",
+    actor: "Admin · MBWays",
+    details: "Updated display name and reply email for this tab only.",
+    timestamp: "Sep 02, 09:50",
   },
 ];

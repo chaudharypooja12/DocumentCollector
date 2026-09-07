@@ -39,7 +39,7 @@ Entry point for all agent and contributor tasks. Read this file first.
 
 | Module           | File                                                         | Scope                                                                            |
 | ---------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------- |
-| Admin Panel      | [modules/admin.md](./modules/admin.md)                       | Dashboard, users, templates, submissions, PDFs, and settings                     |
+| Admin Panel      | [modules/admin.md](./modules/admin.md)                       | Dashboard, merged profiles/submissions Users page, logs, and settings           |
 | User Upload      | [modules/user-upload.md](./modules/user-upload.md)           | Public token flow, required-document list, review, submission, and state screens |
 | Document Capture | [modules/document-capture.md](./modules/document-capture.md) | Camera UI, edge detection, perspective correction, crop, resize, and compression |
 | PDF Generation   | [modules/pdf-generation.md](./modules/pdf-generation.md)     | A4 layout, front/back composition, combined PDFs, and individual PDFs            |

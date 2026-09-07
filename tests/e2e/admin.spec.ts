@@ -34,11 +34,9 @@ test("Admin workspace is responsive and routes to the request builder", async ({
   await page.goto("/admin");
 
   await expect(
-    page.getByRole("heading", {
-      name: "Collect documents without the back-and-forth.",
-    }),
+    page.getByRole("heading", { name: "Dashboard" }),
   ).toBeVisible();
-  await expect(page.getByText("Phase 1 demonstration").first()).toBeVisible();
+  await expect(page.getByText("Total profiles")).toBeVisible();
   await Promise.all([
     page.waitForURL(/\/admin\/requests\/new$/, { timeout: 15_000 }),
     page.getByRole("link", { name: "Create request" }).first().click(),
@@ -62,19 +60,23 @@ test("Admin data tables support search, pagination, and CSV export", async ({
 }) => {
   await page.goto("/admin/users");
   await expect(
-    page.getByRole("table", { name: "Demonstration users" }),
+    page.getByRole("table", { name: "Profiles" }),
   ).toBeVisible();
   await expect(page.getByText("Showing 1-5 of 8")).toBeVisible();
 
   await page.getByRole("button", { name: "Next page" }).click();
   await expect(page.getByText("Page 2 of 2")).toBeVisible();
 
-  await page.getByRole("searchbox", { name: "Search users" }).fill("Canada");
-  await expect(page.getByText("Demo candidate")).toBeVisible();
+  await page
+    .getByRole("searchbox", { name: "Search profiles" })
+    .fill("Canada");
+  await expect(page.getByText("Kavya Nair")).toBeVisible();
   await expect(page.getByText("Showing 1-1 of 1")).toBeVisible();
 
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export as CSV" }).click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toBe("documentcollector-demo-users.csv");
+  expect(download.suggestedFilename()).toBe(
+    "documentcollector-demo-profiles.csv",
+  );
 });

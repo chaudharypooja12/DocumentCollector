@@ -20,6 +20,10 @@ export type DataTableColumn<Row> = {
   value: (row: Row) => string | number;
   cell?: (row: Row) => ReactNode;
   className?: string;
+  /** Set to false to omit this column from search matching (e.g. an Actions column). */
+  searchable?: boolean;
+  /** Set to false to omit this column from CSV export (e.g. an Actions column). */
+  exportable?: boolean;
 };
 
 type DataTableProps<Row> = {
@@ -53,11 +57,13 @@ export function DataTable<Row>({
     () =>
       normalizedQuery
         ? rows.filter((row) =>
-            columns.some((column) =>
-              String(column.value(row))
-                .toLocaleLowerCase()
-                .includes(normalizedQuery),
-            ),
+            columns
+              .filter((column) => column.searchable !== false)
+              .some((column) =>
+                String(column.value(row))
+                  .toLocaleLowerCase()
+                  .includes(normalizedQuery),
+              ),
           )
         : rows,
     [columns, normalizedQuery, rows],
@@ -78,10 +84,15 @@ export function DataTable<Row>({
   }
 
   function exportCsv() {
+    const exportableColumns = columns.filter(
+      (column) => column.exportable !== false,
+    );
     const csv = [
-      columns.map((column) => escapeCsv(column.header)).join(","),
+      exportableColumns.map((column) => escapeCsv(column.header)).join(","),
       ...filteredRows.map((row) =>
-        columns.map((column) => escapeCsv(column.value(row))).join(","),
+        exportableColumns
+          .map((column) => escapeCsv(column.value(row)))
+          .join(","),
       ),
     ].join("\r\n");
     const url = URL.createObjectURL(

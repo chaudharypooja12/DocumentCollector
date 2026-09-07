@@ -1,5 +1,6 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AlertTriangle,
   Clock3,
@@ -11,14 +12,26 @@ import {
   Share2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
 import { BrandLockup } from "@/components/shared/brand-lockup";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { CaptureSlot } from "@/components/capture/capture-slot";
 import { CameraDialog } from "@/components/capture/camera-dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { InlineAlert } from "@/components/ui/inline-alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   decodeRequestPayload,
   getEncodedRequestFromHash,
@@ -31,6 +44,18 @@ import {
   useCaptures,
   type CaptureSide,
 } from "@/features/user-upload/capture-store";
+
+const profileDetailsSchema = z.object({
+  fullName: z.string().trim().min(1).max(120),
+  age: z.number().int().min(1).max(120),
+  gender: z.enum(["Male", "Female"]),
+  phone: z.string().trim().min(6).max(20),
+  permanentAddress: z.string().trim().min(1).max(200),
+  residenceAddress: z.string().trim().min(1).max(200),
+  sameAsPermanentAddress: z.boolean(),
+});
+
+type ProfileDetailsForm = z.infer<typeof profileDetailsSchema>;
 
 type ResolverState =
   | { status: "loading" }
@@ -101,6 +126,36 @@ function Checklist() {
   const [confirming, setConfirming] = useState(false);
   const [pdf, setPdf] = useState<{ blob: Blob; url: string } | null>(null);
   const [generationError, setGenerationError] = useState("");
+  const {
+    register: registerProfile,
+    control: profileControl,
+    handleSubmit: handleProfileSubmit,
+    watch: watchProfile,
+    setValue: setProfileValue,
+    formState: { errors: profileErrors },
+  } = useForm<ProfileDetailsForm>({
+    resolver: zodResolver(profileDetailsSchema),
+    mode: "onChange",
+    defaultValues: {
+      fullName: "",
+      age: undefined as unknown as number,
+      gender: undefined as unknown as ProfileDetailsForm["gender"],
+      phone: "",
+      permanentAddress: "",
+      residenceAddress: "",
+      sameAsPermanentAddress: false,
+    },
+  });
+  const sameAsPermanentAddress = watchProfile("sameAsPermanentAddress");
+  const permanentAddress = watchProfile("permanentAddress");
+
+  useEffect(() => {
+    if (sameAsPermanentAddress) {
+      setProfileValue("residenceAddress", permanentAddress, {
+        shouldValidate: true,
+      });
+    }
+  }, [sameAsPermanentAddress, permanentAddress, setProfileValue]);
 
   useEffect(
     () => () => {
@@ -215,8 +270,140 @@ function Checklist() {
               className="mt-4 flex items-start gap-3 text-xs"
             >
               <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success" />
-              Refreshing or closing this page permanently clears all captures.
+              This link accepts a single submission. Refreshing or closing
+              this page permanently clears all details and captures.
             </InlineAlert>
+          </Card>
+
+          <Card className="mb-5">
+            <h2 className="text-lg font-bold">Basic details</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Entered on this device only. These details are never uploaded
+              or saved.
+            </p>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold">
+                  Full name
+                </span>
+                <Input
+                  placeholder="e.g. Priya Sharma"
+                  {...registerProfile("fullName")}
+                  aria-invalid={Boolean(profileErrors.fullName)}
+                />
+                {profileErrors.fullName ? (
+                  <span className="mt-1 block text-xs text-destructive">
+                    Enter your full name
+                  </span>
+                ) : null}
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold">Age</span>
+                <Input
+                  type="number"
+                  min={1}
+                  max={120}
+                  placeholder="e.g. 28"
+                  {...registerProfile("age", { valueAsNumber: true })}
+                  aria-invalid={Boolean(profileErrors.age)}
+                />
+                {profileErrors.age ? (
+                  <span className="mt-1 block text-xs text-destructive">
+                    Enter a valid age
+                  </span>
+                ) : null}
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold">
+                  Gender
+                </span>
+                <Controller
+                  control={profileControl}
+                  name="gender"
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="min-h-11 rounded-xl">
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Male">Male</SelectItem>
+                        <SelectItem value="Female">Female</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {profileErrors.gender ? (
+                  <span className="mt-1 block text-xs text-destructive">
+                    Select a gender
+                  </span>
+                ) : null}
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold">
+                  Phone number
+                </span>
+                <Input
+                  type="tel"
+                  placeholder="e.g. +91 98765 43210"
+                  {...registerProfile("phone")}
+                  aria-invalid={Boolean(profileErrors.phone)}
+                />
+                {profileErrors.phone ? (
+                  <span className="mt-1 block text-xs text-destructive">
+                    Enter a valid phone number
+                  </span>
+                ) : null}
+              </label>
+              <label className="block sm:col-span-2">
+                <span className="mb-2 block text-sm font-semibold">
+                  Permanent address
+                </span>
+                <Input
+                  placeholder="House number, street, city, state"
+                  {...registerProfile("permanentAddress")}
+                  aria-invalid={Boolean(profileErrors.permanentAddress)}
+                />
+                {profileErrors.permanentAddress ? (
+                  <span className="mt-1 block text-xs text-destructive">
+                    Enter your permanent address
+                  </span>
+                ) : null}
+              </label>
+              <div className="flex items-center gap-2 sm:col-span-2">
+                <Controller
+                  control={profileControl}
+                  name="sameAsPermanentAddress"
+                  render={({ field }) => (
+                    <Checkbox
+                      id="same-as-permanent"
+                      checked={field.value}
+                      onCheckedChange={(checked) =>
+                        field.onChange(checked === true)
+                      }
+                    />
+                  )}
+                />
+                <Label htmlFor="same-as-permanent" className="font-normal">
+                  My residence address is the same as my permanent address
+                </Label>
+              </div>
+              <label className="block sm:col-span-2">
+                <span className="mb-2 block text-sm font-semibold">
+                  Residence address
+                </span>
+                <Input
+                  placeholder="House number, street, city, state"
+                  {...registerProfile("residenceAddress")}
+                  disabled={sameAsPermanentAddress}
+                  aria-invalid={Boolean(profileErrors.residenceAddress)}
+                />
+                {profileErrors.residenceAddress ? (
+                  <span className="mt-1 block text-xs text-destructive">
+                    Enter your residence address
+                  </span>
+                ) : null}
+              </label>
+            </div>
           </Card>
 
           <div className="space-y-4">
@@ -296,7 +483,9 @@ function Checklist() {
             className="w-full sm:ml-auto sm:w-auto"
             disabled={!isComplete}
             loading={status === "GENERATING"}
-            onClick={() => setConfirming(true)}
+            onClick={() => {
+              void handleProfileSubmit(() => setConfirming(true))();
+            }}
           >
             {status === "GENERATING" ? (
               <LoaderCircle className="size-4 animate-spin" />
@@ -341,8 +530,9 @@ function Checklist() {
               Generate and lock this tab?
             </h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              The PDF is created locally. After generation, captures cannot be
-              changed in this tab, and nothing is sent to MBWays.
+              The PDF is created locally. After generation, your details and
+              captures cannot be changed in this tab, and nothing is sent to
+              MBWays.
             </p>
             <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button variant="secondary" onClick={() => setConfirming(false)}>

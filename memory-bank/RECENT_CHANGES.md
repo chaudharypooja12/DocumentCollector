@@ -16,6 +16,13 @@ Entry format:
 
 ---
 
+## 2026-09-07 — Admin dashboard/Users redesign and User Basic Details
+
+- Module(s): admin, user-upload, project setup
+- Summary: Simplified the Dashboard to four stat cards (Total profiles with a View link, Pending with a hover explanation, Male users, Female users) and removed the "Collect documents without the back-and-forth" subheading plus the "Recent demonstration activity" and "Private by design" cards. Merged the former separate Submissions and PDF Management pages into a single Users page with status/gender filters and per-row View (submission preview Dialog), Update (editable profile Dialog with a same-as-permanent-address checkbox), and Delete (confirmation Dialog) actions; removed the redundant "static preview" subheading. Added a Logs page and moved Settings/Logs to the bottom of Admin navigation. Added a themed MBWays-colored scrollbar globally, icons on every Admin page heading, a shadcn Dialog and Checkbox primitive, and a new Basic Details step (Full Name, Age, Gender, Phone, Permanent/Residence Address) in the public User flow that stays in-memory only and is never encoded in the link. Clarified in the Memory Bank that each link accepts a single submission before locking.
+- Files touched: `src/app/(admin)/admin/**`, `src/components/admin/**`, `src/components/ui/dialog.tsx`, `src/components/ui/checkbox.tsx`, `src/data/admin-fixtures.ts`, `src/features/user-upload/user-flow.tsx`, `src/app/globals.css`, `tests/e2e/**`, and affected `memory-bank/**` files
+- Follow-ups: Complete deployed Vercel and physical-device acceptance checks; Phase 2 will persist real profiles/submissions and enforce the single-submission lock authoritatively.
+
 ## 2026-09-07 — Reusable Admin data tables added
 
 - Module(s): admin

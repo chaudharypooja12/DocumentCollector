@@ -4,10 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   FileStack,
-  Files,
   LayoutDashboard,
   LogOut,
   Menu,
+  ScrollText,
   Settings,
   UserRound,
 } from "lucide-react";
@@ -29,9 +29,8 @@ const navigation = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/requests/new", label: "Create request", icon: FileStack },
   { href: "/admin/users", label: "Users", icon: UserRound },
-  { href: "/admin/submissions", label: "Submissions", icon: Files },
-  { href: "/admin/pdf", label: "PDF management", icon: FileStack },
   { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/logs", label: "Logs", icon: ScrollText },
 ];
 
 function getPageTitle(pathname: string) {

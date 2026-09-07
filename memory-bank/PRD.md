@@ -63,6 +63,8 @@ User Opens Link
   ↓
 Link Opens Document Checklist Automatically
   ↓
+User Enters Basic Details Locally (Full Name, Age, Gender, Phone, Addresses)
+  ↓
 Capture Documents (camera permission + file fallback)
   ↓
 Generate Documents
@@ -79,14 +81,29 @@ fragment. The payload includes only document labels/types/order and timestamps;
 it never includes User PII or images. This design works across devices without
 a backend but is not authoritative or tamper-proof.
 
+Basic Details (Full Name, Age, Gender, Phone, Permanent Address, Residence
+Address) are entered by the User directly in the browser after the link opens.
+They are never encoded in the link, never uploaded, and exist only in
+current-page memory alongside captures — the PII-free link contract above is
+unaffected.
+
+The link accepts exactly one submission. After the User generates documents,
+the current tab locks against further edits; Phase 1 cannot yet enforce this
+lock across devices or after a refresh, which remains a documented Phase 2
+requirement (see `ARCHITECTURE.md` and `modules/link-management.md`).
+
 ---
 
 ## 3. User Profile
 
 The **User** has **no login, profile, or account** in the application.
 
-Phase 1 does not create or save a User record. Admin user records begin in
-Phase 2.
+Phase 1 does not create or save a persistent User record. The User does enter
+Basic Details (Full Name, Age, Gender, Phone, Permanent Address, Residence
+Address) locally in the browser as part of the same link-based flow, but this
+data is never transmitted, uploaded, or written to any storage; it exists only
+in current-page memory and disappears on refresh or tab close. Authoritative,
+persistent Admin user records begin in Phase 2.
 
 ### Phase 2 User Record Fields
 
@@ -112,9 +129,9 @@ Phase 2.
   does not claim to protect routes. Real authentication begins in Phase 2.
 - The main functional Phase 1 Admin workflow is a mobile-responsive request
   builder that selects document requirements, expiry, and generates a link.
-- Dashboard, Users, Submissions, PDF Management, and Settings are complete
-  responsive UI demonstrations backed only by static fixtures or current-page
-  memory. They do not claim to show real saved records.
+- Dashboard, Users (merged Profiles/Submissions view), Logs, and Settings are
+  complete responsive UI demonstrations backed only by static fixtures or
+  current-page memory. They do not claim to show real saved records.
 - Phase 2 adds the single authenticated Admin and persistent records.
 
 ### Admin Modules
@@ -123,13 +140,10 @@ Phase 2.
 Admin Panel
 │
 ├── Dashboard
-├── Users
 ├── Create Request
-├── Document Templates
-├── Document Requests
-├── Submission Management
-├── PDF Management
-└── Settings
+├── Users (Profiles + Submissions preview, per-row View/Update/Delete)
+├── Settings
+└── Logs
 ```
 
 ---
@@ -503,15 +517,20 @@ See `../AGENT.md` for the full, enforceable instruction set. In short:
 - [x] Document selection & drag-and-drop ordering
 - [x] Single document configuration
 - [x] Front + Back configuration
-- [x] Temporary link (max 6-hour validity)
+- [x] Temporary link (max 6-hour validity, single submission per link)
 - [x] QR, clipboard, Web Share, WhatsApp, and email sharing
+- [x] In-browser Basic Details entry (Full Name, Age, Gender, Phone,
+      Permanent/Residence Address) held only in current-page memory
 - [x] Camera capture with positioning box (red/green states)
 - [x] Retake/Edit before submission
 - [x] Local document generation
 - [x] A4 PDF generation (Front+Back on same page)
 - [x] Combined PDF + Individual PDF generation helpers
 - [x] User combined PDF download and supported file sharing
-- [x] Admin submission/PDF/reactivation UI demonstrations
+- [x] Admin Users page merges profile and submission-preview demonstrations
+      with per-row View/Update/Delete actions
+- [x] Reusable Admin data table with search, pagination, and CSV export
+- [x] Admin Logs demonstration screen
 - [x] In-memory current-tab lock after local generation
 - [x] Zero persistence audit: no backend, DB, upload, browser storage, or PII in links
 - [x] Glassmorphism UI (Next.js + TypeScript + Tailwind CSS)

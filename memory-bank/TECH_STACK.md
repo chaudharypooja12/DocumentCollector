@@ -49,7 +49,7 @@ are approved.
 | UI runtime           | React 19                                                         | Client state and interactive camera/PDF workflows                                                  |
 | Language             | TypeScript 5, strict mode                                        | No `any`; shared schemas/types across Admin and User flows                                         |
 | Styling              | Tailwind CSS 4                                                   | Mobile-first utilities and MBWays design tokens                                                    |
-| UI primitives        | shadcn/ui with Radix UI primitives                               | Accessible buttons, cards, alerts, fields, selects, sheets, menus, progress, and responsive tables |
+| UI primitives        | shadcn/ui with Radix UI primitives                               | Accessible buttons, cards, alerts, fields, selects, checkboxes, dialogs, sheets, menus, progress, and responsive tables |
 | Icons                | `lucide-react`                                                   | No emoji-based controls                                                                            |
 | Forms                | React Hook Form + Zod                                            | Typed Admin request builder and client validation                                                  |
 | Reordering           | `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`       | Pointer, keyboard, and touch document ordering                                                     |

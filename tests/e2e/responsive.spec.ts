@@ -7,9 +7,8 @@ const routes = [
   "/admin",
   "/admin/requests/new",
   "/admin/users",
-  "/admin/submissions",
-  "/admin/pdf",
   "/admin/settings",
+  "/admin/logs",
   "/u#request=invalid",
 ];
 

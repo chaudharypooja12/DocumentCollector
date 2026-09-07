@@ -6,7 +6,7 @@
 
 ## Purpose
 
-All Admin-facing functionality: user management, document template configuration, link generation/sharing, submission review, PDF downloads, settings, dashboard.
+All Admin-facing functionality: dashboard stats, profile/submission review and management, document template configuration, link generation/sharing, settings, activity logs.
 
 ## Current Implementation Status
 
@@ -15,24 +15,41 @@ All Admin-facing functionality: user management, document template configuration
 - The MBWays landing page routes to a local-only Admin sign-in preview. It
   validates input in memory but deliberately does not authenticate, transmit, or
   store credentials; secure access control remains Phase 2.
-- Dashboard, Users, Submissions, PDF Management, Settings, request creation,
-  link/QR sharing, oversized-link guidance, and same-link reactivation
-  demonstration are implemented.
+- Dashboard, Users (merged Profiles + Submissions preview), Settings, Logs,
+  request creation, link/QR sharing, oversized-link guidance, and same-link
+  reactivation demonstration are implemented.
 - The responsive shell includes a desktop sidebar, sticky top bar, mobile
   navigation sheet, Light-default in-memory theme control, clear structural
-  borders, and Logout back to the local sign-in preview.
+  borders, and Logout back to the local sign-in preview. Settings and Logs are
+  ordered at the bottom of the navigation list.
 
 ## Key Screens / Components
 
-- Mobile-first Dashboard, demonstration Users/Submissions/PDF/Settings screens,
-  and a functional Create Request flow with document configuration, expiry,
+- **Dashboard**: four stat cards only — Total profiles (with a View link to
+  Users), Pending (hover reveals "Links Created but data not received"), Male
+  users, and Female users — computed from typed static fixtures.
+- **Users**: a single merged page replacing the former separate Submissions
+  and PDF Management pages. Status and gender Select filters sit above a
+  responsive data table with search, pagination, and CSV export. Each row's
+  Actions column provides View submission (Eye, opens a Dialog with profile
+  details and demonstration document downloads), Update profile (Pencil,
+  opens an editable Dialog including a "same as permanent address" checkbox),
+  and Delete profile (Trash, opens a confirmation Dialog). All mutations are
+  in-memory `useState` only and reset on refresh.
+- **Settings**: demonstration preferences form; values reset on refresh.
+- **Logs**: demonstration activity log fixtures with search, pagination, and
+  CSV export.
+- A functional Create Request flow with document configuration, expiry,
   self-contained link generation, QR when the link fits QR capacity, and share
   actions that remain available for longer valid links.
-- Reusable shadcn components provide buttons, cards, fields, selects, badges,
-  alerts, sheets, menus, separators, tooltips, skeletons, progress, and tables.
-- Users, submissions, and PDF previews use a shared responsive data table with
-  client-side search, pagination, and CSV export. Phase 1 exports only static
-  demonstration data and does not read from or write to persistent storage.
+- Reusable shadcn components provide buttons, cards, fields, selects,
+  checkboxes, dialogs, badges, alerts, sheets, menus, separators, tooltips,
+  skeletons, progress, and tables.
+- The reusable Admin data table (`src/components/admin/data-table.tsx`)
+  supports per-column `searchable`/`exportable` flags so an Actions column can
+  be excluded from search matching and CSV export.
+- All scrollable surfaces use a themed scrollbar (MBWays orange thumb on a
+  muted track) defined once in `src/app/globals.css`.
 
 ## Data It Owns / Reads
 
@@ -48,8 +65,9 @@ All Admin-facing functionality: user management, document template configuration
 
 ## Known Issues
 
-- Phase 1 cannot receive User captures, show real submissions, persist Admin
-  changes, or reactivate a link on another device.
+- Phase 1 cannot receive real User captures or Basic Details, persist Admin
+  changes, or reactivate a link on another device. The Users page View/Update/
+  Delete actions operate only on in-memory static fixtures.
 - Vercel project connection and physical-device acceptance remain external.
 
 ## Decisions Log
@@ -68,6 +86,12 @@ All Admin-facing functionality: user management, document template configuration
   native form submission, network request, persistence, or route protection.
   This preserves the Phase 1 no-auth contract while showing the intended entry
   experience.
+- 2026-09-07: Merged the separate Submissions and PDF Management pages into
+  the Users page as per-row actions to reduce navigation depth and reflect
+  that Phase 1 has no independent submission or PDF store. Simplified the
+  Dashboard to four stat cards and removed static "recent activity"/"private
+  by design" cards in favor of the dedicated Logs page. Reordered navigation
+  so Settings and Logs sit at the bottom.
 
 ## Next Steps
 
