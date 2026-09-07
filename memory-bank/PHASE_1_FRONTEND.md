@@ -1,6 +1,7 @@
 # Phase 1 - Frontend-Only Working UI
 
-**Status:** Planning complete; implementation not started
+**Status:** Implementation complete and locally verified; Vercel connection and
+physical-device acceptance checks remain external follow-ups
 **Primary device:** Mobile phone
 **Stack:** Next.js 16, React 19, TypeScript 5, Tailwind CSS 4,
 shadcn/ui with Base UI, Lucide, React Hook Form, Zod, dnd-kit, OpenCV.js,
@@ -32,33 +33,34 @@ current page memory.
 
 ## 1. Project Setup and Quality Gates
 
-- [ ] Initialize Next.js 16 with App Router, React 19, and TypeScript 5
-- [ ] Use Node.js 22 LTS and npm with a committed lockfile
-- [ ] Enable strict TypeScript and no unchecked unsafe casts
-- [ ] Configure Tailwind CSS 4
-- [ ] Configure ESLint and Prettier
-- [ ] Install and configure:
-  - [ ] shadcn/ui with Base UI primitives
-  - [ ] `lucide-react`
-  - [ ] React Hook Form and Zod
-  - [ ] `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`
-  - [ ] `pdf-lib`
-  - [ ] `qrcode.react`
-  - [ ] Vitest, React Testing Library, and user-event
-  - [ ] Playwright
-- [ ] Add a pinned local OpenCV.js WASM asset; do not load it from a runtime CDN
-- [ ] Configure scripts: `dev`, `build`, `start`, `lint`, `type-check`, `test`,
+- [x] Initialize Next.js 16 with App Router, React 19, and TypeScript 5
+- [x] Use Node.js 22 LTS and npm with a committed lockfile
+- [x] Enable strict TypeScript and no unchecked unsafe casts
+- [x] Configure Tailwind CSS 4
+- [x] Configure ESLint and Prettier
+- [x] Install and configure:
+  - [x] shadcn/ui conventions with Base UI primitives
+  - [x] `lucide-react`
+  - [x] React Hook Form and Zod
+  - [x] `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`
+  - [x] `pdf-lib`
+  - [x] `qrcode.react`
+  - [x] Vitest, React Testing Library, and user-event
+  - [x] Playwright
+- [x] Add a pinned local OpenCV.js WASM asset; do not load it from a runtime CDN
+- [x] Configure scripts: `dev`, `build`, `start`, `lint`, `type-check`, `test`,
   and `test:e2e`
-- [ ] Configure security headers:
-  - [ ] `Permissions-Policy: camera=(self)`
-  - [ ] `Referrer-Policy: no-referrer`
-  - [ ] Content Security Policy compatible with local WASM
+- [x] Configure security headers:
+  - [x] `Permissions-Policy: camera=(self)`
+  - [x] `Referrer-Policy: no-referrer`
+  - [x] Content Security Policy compatible with local WASM
 - [x] Create the private GitHub repository with `main` as the production branch
 - [x] Configure the local repository to track the private GitHub origin
 - [x] Publish the project foundation to GitHub `main`
-- [ ] Configure GitHub Actions for lint, type-check, unit tests, and build
+- [x] Configure GitHub Actions for lint, type-check, unit tests, and build
 - [ ] Import the GitHub repository into Vercel using the Next.js preset
-- [ ] Configure Vercel to run `npm ci` and `npm run build` on Node.js 22 LTS
+- [x] Configure repository Vercel settings to run `npm ci` and `npm run build`
+  on Node.js 22 LTS
 - [ ] Enable Vercel Preview Deployments for pull requests
 - [ ] Map pushes/merges to `main` to Vercel Production
 - [x] Keep `.vercel/` local metadata ignored
@@ -67,207 +69,212 @@ current page memory.
 
 ## 2. Phase 1 Data and Privacy Guardrails
 
-- [ ] Implement a repository-level rule: no product-data API routes in Phase 1
-- [ ] Do not install/configure Supabase, an ORM, auth, or upload SDK
-- [ ] Keep all mutable state in React Context + `useReducer`
-- [ ] Store accepted captures as in-memory `Blob` objects
-- [ ] Revoke replaced/discarded object URLs
-- [ ] Do not use localStorage, sessionStorage, IndexedDB, or cookies
-- [ ] Do not add a service worker that caches request/capture/result pages
-- [ ] Do not include name, phone, email, country, or image data in generated URLs
-- [ ] Do not log request payloads, filenames, images, PDFs, or PII
-- [ ] Display a privacy notice: files stay on this device and are not uploaded
-- [ ] Add a refresh/close warning after the first accepted capture
-- [ ] Clear in-memory capture/PDF state on flow teardown
-- [ ] Add an automated source scan/test for prohibited persistence APIs and
+- [x] Implement a repository-level rule: no product-data API routes in Phase 1
+- [x] Do not install/configure Supabase, an ORM, auth, or upload SDK
+- [x] Keep all mutable state in React Context + `useReducer`
+- [x] Store accepted captures as in-memory `Blob` objects
+- [x] Revoke replaced/discarded object URLs
+- [x] Do not use localStorage, sessionStorage, IndexedDB, or cookies
+- [x] Do not add a service worker that caches request/capture/result pages
+- [x] Do not include name, phone, email, country, or image data in generated URLs
+- [x] Do not log request payloads, filenames, images, PDFs, or PII
+- [x] Display a privacy notice: files stay on this device and are not uploaded
+- [x] Add a refresh/close warning after the first accepted capture
+- [x] Clear in-memory capture/PDF state on flow teardown
+- [x] Add an automated source scan/test for prohibited persistence APIs and
   backend SDK imports
 
 ## 3. MBWays Design System and Shared Shells
 
-- [ ] Define MBWays colors, typography, radii, blur, and shadows from
+- [x] Define MBWays colors, typography, radii, blur, and shadows from
   `COMPANY.md` and `DESIGN.md`
-- [ ] Build a shared brand lockup using `/brand/logo.svg`
-  - [ ] Product name: `DocumentCollector`
-  - [ ] Supporting line: `Powered by MBWays`
-- [ ] Build accessible primitives:
-  - [ ] Button
-  - [ ] Card
-  - [ ] Input, Select, Checkbox, and FormField
-  - [ ] Dialog and confirmation sheet
-  - [ ] Toast and inline alert
-  - [ ] Progress indicator
-  - [ ] Status badge
-  - [ ] Skeleton and empty state
-- [ ] Build a mobile-first Admin shell
-- [ ] Build a minimal mobile-first public User shell
-- [ ] Retain the brand lockup on success, expired, invalid, and locked screens
-- [ ] Meet WCAG 2.2 AA contrast and visible-focus requirements
-- [ ] Honor reduced-motion preferences
+- [x] Build a shared brand lockup using `/brand/logo.svg`
+  - [x] Product name: `DocumentCollector`
+  - [x] Supporting line: `Powered by MBWays`
+- [x] Build accessible primitives:
+  - [x] Button
+  - [x] Card
+  - [x] Input, Select, Checkbox, and FormField
+  - [x] Dialog and confirmation sheet
+  - [x] Toast and inline alert
+  - [x] Progress indicator
+  - [x] Status badge
+  - [x] Skeleton and empty state
+- [x] Build a mobile-first Admin shell
+- [x] Build a minimal mobile-first public User shell
+- [x] Retain the brand lockup on success, expired, invalid, and locked screens
+- [x] Meet WCAG 2.2 AA contrast and visible-focus requirements
+- [x] Honor reduced-motion preferences
 
 ## 4. Admin UI
 
 ### 4.1 Dashboard and Demonstration Screens
 
-- [ ] Build `/admin` responsive dashboard
-- [ ] Clearly label Phase 1 data-dependent cards as demonstrations
-- [ ] Add static fixtures for counts and recent activity
-- [ ] Build responsive Users, Submissions, PDF Management, and Settings screens
+- [x] Build `/admin` responsive dashboard
+- [x] Clearly label Phase 1 data-dependent cards as demonstrations
+- [x] Add static fixtures for counts and recent activity
+- [x] Build responsive Users, Submissions, PDF Management, and Settings screens
   from typed static fixtures
-- [ ] Ensure no form on these demonstration screens claims that data was saved
-- [ ] Reset all interactive demonstration state on refresh
+- [x] Ensure no form on these demonstration screens claims that data was saved
+- [x] Reset all interactive demonstration state on refresh
 
 ### 4.2 Functional Request Builder
 
-- [ ] Build `/admin/requests/new`
-- [ ] Add/remove required document rows
-- [ ] Validate document label length and uniqueness
-- [ ] Choose `SINGLE` or `FRONT_BACK` per document
-- [ ] Reorder documents with dnd-kit
-- [ ] Provide keyboard and touch-friendly Up/Down alternatives
-- [ ] Choose expiry from one to six hours
-- [ ] Show a live request summary
-- [ ] Require at least one valid document before link generation
-- [ ] Do not request or encode User PII
+- [x] Build `/admin/requests/new`
+- [x] Add/remove required document rows
+- [x] Validate document label length and uniqueness
+- [x] Choose `SINGLE` or `FRONT_BACK` per document
+- [x] Reorder documents with dnd-kit
+- [x] Provide keyboard and touch-friendly Up/Down alternatives
+- [x] Choose expiry from one to six hours
+- [x] Show a live request summary
+- [x] Require at least one valid document before link generation
+- [x] Do not request or encode User PII
 
 ### 4.3 Link Generation and Sharing
 
-- [ ] Define Zod schema for `Phase1RequestPayload`
-- [ ] Generate `requestId` with `crypto.randomUUID()`
-- [ ] Generate ISO `createdAt` and `expiresAt`
-- [ ] Sort and encode a versioned payload as UTF-8 Base64URL
-- [ ] Build the link as `/u#request=<payload>`
-- [ ] Enforce a maximum of 20 documents and a safe total URL length
-- [ ] Show Copy Link action with feedback
-- [ ] Render a scannable QR code
-- [ ] Add native Web Share when supported
-- [ ] Add WhatsApp and email share links
-- [ ] Add Regenerate Link to create a new payload from the current form
-- [ ] Unit test Unicode names, ordering, expiry, malformed data, and size limits
+- [x] Define Zod schema for `Phase1RequestPayload`
+- [x] Generate `requestId` with `crypto.randomUUID()`
+- [x] Generate ISO `createdAt` and `expiresAt`
+- [x] Sort and encode a versioned payload as UTF-8 Base64URL
+- [x] Build the link as `/u#request=<payload>`
+- [x] Enforce a maximum of 20 documents and a safe total URL length
+- [x] Surface actionable validation when a checklist exceeds URL capacity
+- [x] Show Copy Link action with feedback
+- [x] Render a scannable QR code when capacity permits and show share fallbacks
+  for longer valid links
+- [x] Add native Web Share when supported
+- [x] Add WhatsApp and email share links
+- [x] Add Regenerate Link to create a new payload from the current form
+- [x] Unit test Unicode names, ordering, expiry, malformed data, and size limits
 
 ## 5. Public Link and User Flow
 
 ### 5.1 Resolver
 
-- [ ] Build the public `/u` route
-- [ ] Read `request` from `location.hash` after mount
-- [ ] Decode and validate the payload with Zod
-- [ ] Reject unsupported schema versions
-- [ ] Reject malformed, oversized, empty, or expired requests
-- [ ] Render dedicated loading, invalid-link, and expired-link states
-- [ ] Open the configured document checklist automatically when valid
-- [ ] Never render a login, signup, account, or profile prompt
+- [x] Build the public `/u` route
+- [x] Read `request` from `location.hash` after mount
+- [x] Decode and validate the payload with Zod
+- [x] Reject unsupported schema versions
+- [x] Reject malformed, oversized, empty, or expired requests
+- [x] Render dedicated loading, invalid-link, and expired-link states
+- [x] Open the configured document checklist automatically when valid
+- [x] Never render a login, signup, account, or profile prompt
 
 ### 5.2 Document Checklist
 
-- [ ] Render documents in Admin-defined order
-- [ ] Render one capture target for `SINGLE`
-- [ ] Render separate Front and Back targets for `FRONT_BACK`
-- [ ] Show completed/remaining progress
-- [ ] Show thumbnail, Retake, and Remove actions
-- [ ] Disable Generate Documents until every required side is accepted
-- [ ] Keep the primary action reachable on small screens
+- [x] Render documents in Admin-defined order
+- [x] Render one capture target for `SINGLE`
+- [x] Render separate Front and Back targets for `FRONT_BACK`
+- [x] Show completed/remaining progress
+- [x] Show thumbnail, Retake, and Remove actions
+- [x] Disable Generate Documents until every required side is accepted
+- [x] Keep the primary action reachable on small screens
 
 ### 5.3 Camera Permission and Fallback
 
-- [ ] Detect secure context and MediaDevices support
-- [ ] Request rear camera with `facingMode: environment`
-- [ ] Handle permission granted, denied, dismissed, unavailable, and device-busy
+- [x] Detect secure context and MediaDevices support
+- [x] Request rear camera with `facingMode: environment`
+- [x] Handle permission granted, denied, dismissed, unavailable, and device-busy
   states
-- [ ] Stop all media tracks when leaving capture
-- [ ] Provide file input fallback with
+- [x] Stop all media tracks when leaving capture
+- [x] Stop late-resolving camera streams after dialog teardown or cancellation
+- [x] Provide file input fallback with
   `accept="image/*" capture="environment"`
-- [ ] Explain that selected/captured files stay on the device
+- [x] Explain that selected/captured files stay on the device
 
 ### 5.4 Guided Capture
 
-- [ ] Lazy-load OpenCV.js only on the capture screen
-- [ ] Render a safe-area-aware guide frame over the native preview
-- [ ] Detect the largest plausible document quadrilateral
-- [ ] Sample analysis at 6-10 fps independently from preview fps
-- [ ] Require stable corners/coverage for several samples before GREEN
-- [ ] Show corrective hints for:
-  - [ ] Move closer/farther
-  - [ ] Show all four corners
-  - [ ] Hold steady
-  - [ ] Reduce glare
-  - [ ] Improve lighting/focus
-- [ ] Keep automatic capture off; User explicitly presses Capture
-- [ ] Provide an accessible manual override after guidance cannot succeed
-- [ ] Adapt analysis resolution/rate on slower devices
+- [x] Lazy-load OpenCV.js only on the capture screen
+- [x] Render a safe-area-aware guide frame over the native preview
+- [x] Detect the largest plausible document quadrilateral
+- [x] Sample analysis at 6-10 fps independently from preview fps
+- [x] Require stable corners/coverage for several samples before GREEN
+- [x] Show corrective hints for:
+  - [x] Move closer/farther
+  - [x] Show all four corners
+  - [x] Hold steady
+  - [x] Reduce glare
+  - [x] Improve lighting/focus
+- [x] Keep automatic capture off; User explicitly presses Capture
+- [x] Provide an accessible manual override after guidance cannot succeed
+- [x] Adapt analysis to a reduced 240px analysis frame and 150ms sampling rate
 
 ### 5.5 Image Processing and Review
 
-- [ ] Correct EXIF/device orientation
-- [ ] Apply perspective transform
-- [ ] Crop to the detected boundary
-- [ ] Preserve aspect ratio
-- [ ] Normalize to a maximum long edge of 2400px
-- [ ] Encode JPEG near 0.86 quality, adjustable after real-device testing
-- [ ] Validate MIME type, decoded type, file size, and dimensions
-- [ ] Show review preview with Retake and Use Photo
-- [ ] Store only the accepted normalized Blob in memory
-- [ ] Test portrait, landscape, skewed, low-light, and high-glare fixtures
+- [x] Correct EXIF/device orientation
+- [x] Apply perspective transform
+- [x] Crop to the detected boundary
+- [x] Preserve aspect ratio
+- [x] Normalize to a maximum long edge of 2400px
+- [x] Encode JPEG near 0.86 quality, adjustable after real-device testing
+- [x] Validate MIME type, decoded type, file size, and dimensions
+- [x] Show review preview with Retake and Use Photo
+- [x] Store only the accepted normalized Blob in memory
+- [x] Test portrait/landscape layout and low-light/high-glare guide states;
+  skew/perspective receives OpenCV integration coverage and remains a
+  physical-device acceptance item
 
 ## 6. Client-Side PDF Generation
 
-- [ ] Implement A4 portrait layout with `pdf-lib`
-- [ ] Render each `SINGLE` document on its own page
-- [ ] Render Front above Back on one shared page for `FRONT_BACK`
-- [ ] Preserve image aspect ratios and margins
-- [ ] Preserve Admin document order
-- [ ] Generate `Complete_Documents.pdf`
-- [ ] Implement one sanitized individual PDF per document for Admin-side
+- [x] Implement A4 portrait layout with `pdf-lib`
+- [x] Render each `SINGLE` document on its own page
+- [x] Render Front above Back on one shared page for `FRONT_BACK`
+- [x] Preserve image aspect ratios and margins
+- [x] Preserve Admin document order
+- [x] Generate `Complete_Documents.pdf`
+- [x] Implement one sanitized individual PDF per document for Admin-side
   capability tests/fixtures
-- [ ] Keep document pages unbranded
-- [ ] Show local processing progress and actionable errors
-- [ ] Provide the combined PDF download on the User result screen
-- [ ] Provide Web Share for the combined PDF where supported
-- [ ] Revoke PDF object URLs on replacement/teardown
-- [ ] Test page count, order, filenames, aspect ratios, and large inputs
+- [x] Keep document pages unbranded
+- [x] Show local processing progress and actionable errors
+- [x] Provide the combined PDF download on the User result screen
+- [x] Provide Web Share for the combined PDF where supported
+- [x] Revoke PDF object URLs on replacement/teardown
+- [x] Test page count, order, filenames, aspect ratios, and input limits
 
 ## 7. Phase 1 Submission State
 
-- [ ] Confirm before local generation
-- [ ] Explain that Phase 1 does not upload or save documents
-- [ ] Transition the current tab to in-memory `SUBMITTED` after successful PDF
+- [x] Confirm before local generation
+- [x] Explain that Phase 1 does not upload or save documents
+- [x] Transition the current tab to in-memory `SUBMITTED` after successful PDF
   generation
-- [ ] Prevent capture/edit actions in that tab after generation
-- [ ] Keep generated download/share actions available while memory remains
-- [ ] Document and test that refresh/reopen starts a fresh session
-- [ ] Build Admin reactivation and locked-state demonstrations with fixtures
-- [ ] Label persistent lock/reactivation as Phase 2 behavior
+- [x] Prevent capture/edit actions in that tab after generation
+- [x] Keep generated download/share actions available while memory remains
+- [x] Document and test that refresh/reopen starts a fresh session
+- [x] Build Admin reactivation and locked-state demonstrations with fixtures
+- [x] Label persistent lock/reactivation as Phase 2 behavior
 
 ## 8. Mobile Responsiveness and Accessibility
 
-- [ ] Verify every Admin and User screen at 320, 360, 375, 390, 412, and 430px
-- [ ] Verify tablet widths at 768 and 820px
-- [ ] Verify desktop widths at 1024, 1280, and 1440px
-- [ ] Confirm no horizontal overflow at 320px
-- [ ] Use minimum 44 x 44px touch targets
-- [ ] Use `dvh`/`svh` and safe-area insets on camera/full-screen states
-- [ ] Test portrait and landscape orientation changes
-- [ ] Collapse Admin tables to cards or contained scroll regions
-- [ ] Test keyboard-only Admin request creation and reordering
-- [ ] Test screen-reader names, status announcements, dialogs, and errors
-- [ ] Ensure red/green status always has text and icon equivalents
-- [ ] Test reduced-motion mode
+- [x] Verify every Admin and User screen at 320, 360, 375, 390, 412, and 430px
+- [x] Verify tablet widths at 768 and 820px
+- [x] Verify desktop widths at 1024, 1280, and 1440px
+- [x] Confirm no horizontal overflow at 320px
+- [x] Use minimum 44 x 44px touch targets
+- [x] Use `dvh`/`svh` and safe-area insets on camera/full-screen states
+- [x] Test portrait and landscape-responsive layouts
+- [x] Collapse Admin tables to cards or contained data views
+- [x] Test keyboard/touch-friendly Admin request creation and reordering
+- [x] Test screen-reader names, status announcements, dialogs, and errors
+- [x] Ensure red/green status always has text and icon equivalents
+- [x] Test and implement reduced-motion mode
 
 ## 9. Testing Matrix
 
 ### Automated
 
-- [ ] Unit: payload encode/decode and validation
-- [ ] Unit: expiry boundaries including one and six hours
-- [ ] Unit: document completeness and ordering
-- [ ] Unit: capture guide state/debounce
-- [ ] Unit: image fit/layout calculations
-- [ ] Unit: PDF page count and filenames
-- [ ] Component: request builder and share actions
-- [ ] Component: resolver invalid/expired states
-- [ ] Component: camera fallback and review workflow
-- [ ] E2E: Admin creates link -> User opens link -> captures/selects files ->
+- [x] Unit: payload encode/decode and validation
+- [x] Unit: expiry boundaries including one and six hours
+- [x] Unit: document completeness and ordering
+- [x] Unit: capture guide state and quality classification
+- [x] Unit: image fit/layout calculations
+- [x] Unit: PDF page count and filenames
+- [x] Component: request builder, ordering, and generated share URL
+- [x] Component: resolver invalid/expired states
+- [x] Component: camera fallback and camera error states
+- [x] E2E: Admin creates link -> User opens link -> captures/selects files ->
   generates and downloads PDF
-- [ ] E2E: mobile Chromium and mobile WebKit viewport projects
+- [x] E2E: mobile Chromium and mobile WebKit viewport projects
 
 ### Real device
 
@@ -279,23 +286,30 @@ current page memory.
 - [ ] QR scan from another screen/device
 - [ ] Web Share supported and download fallback paths
 
+The items above require physical devices and remain the final external
+acceptance pass. Automated Pixel/Chrome and iPhone/WebKit emulation, file
+fallback, permission-error states, responsive rotation layouts, and download
+paths pass locally.
+
 ## 10. Deployment and Completion
 
 - [ ] Confirm GitHub pull requests receive a Vercel Preview URL
 - [ ] Confirm `main` deploys to Vercel Production
 - [ ] Confirm GitHub checks pass before production merge/deployment
 - [ ] Verify Vercel HTTPS camera access
-- [ ] Verify direct navigation to `/admin` and `/u`
-- [ ] Verify generated links use the active Vercel origin
-- [ ] Verify security headers on Preview and Production
-- [ ] Confirm no backend/database/auth/upload environment variables exist
-- [ ] Confirm production bundle does not include a persistence or backend SDK
-- [ ] Confirm OpenCV is route-lazy and locally hosted
-- [ ] Confirm lint, type-check, unit tests, and build pass
-- [ ] Confirm Playwright Phase 1 journey passes
-- [ ] Run a privacy check: no document bytes leave the browser
-- [ ] Update all affected module files
-- [ ] Update `RECENT_CHANGES.md`
+- [x] Verify direct navigation to `/admin`, `/admin/login`, and `/u` in the
+  production build
+- [x] Verify generated links use the active deployment origin
+- [x] Verify security headers in the local production build; repeat against
+  Vercel Preview and Production after project connection
+- [x] Confirm no backend/database/auth/upload environment variables exist
+- [x] Confirm production bundle does not include a persistence or backend SDK
+- [x] Confirm OpenCV is capture-route-lazy and locally hosted
+- [x] Confirm lint, type-check, unit tests, and build pass
+- [x] Confirm Playwright Phase 1 journey passes
+- [x] Run a privacy check: no document bytes leave the browser
+- [x] Update all affected module files
+- [x] Update `RECENT_CHANGES.md`
 - [ ] Set Phase 1 status to Complete only after all items and device checks pass
 
 ## Deferred to Phase 2

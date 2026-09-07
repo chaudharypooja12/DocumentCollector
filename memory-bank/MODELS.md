@@ -38,6 +38,9 @@ type Phase1Capture = {
 - `Phase1Capture` exists only in current-page React memory.
 - No Phase 1 type is written to localStorage, sessionStorage, IndexedDB,
   cookies, a backend, or a database.
+- The implemented types and validation live under `../src/lib/request-link/`
+  and `../src/modules/user-upload/`; captures are released after local PDF
+  generation or flow teardown.
 - The entities below are Phase 2 persistence targets, not Phase 1 stores.
 
 ---

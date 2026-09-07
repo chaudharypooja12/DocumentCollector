@@ -1,7 +1,7 @@
 # Tech Stack & Technical Requirements
 
 **Project:** DocumentCollector - Powered by MBWays
-**Status:** Phase 1 stack finalized
+**Status:** Phase 1 stack implemented and locally verified
 **Related docs:** `COMPANY.md`, `PRD.md`, `DESIGN.md`, `ARCHITECTURE.md`,
 `MODELS.md`, `PHASE_1_FRONTEND.md`, `PHASE_2_BACKEND.md`,
 `PHASE_3_PAYMENT_GATEWAY.md`
@@ -323,6 +323,8 @@ Vercel team members.
 
 ### Phase 1 deployment behavior
 
+- The repository includes `vercel.json` with the Next.js framework, `npm ci`,
+  and `npm run build` settings.
 - Generate request links from `window.location.origin` so links automatically
   use the current Vercel preview or production domain.
 - Camera testing must use the HTTPS Vercel URL; browser camera permission is not
@@ -334,6 +336,9 @@ Vercel team members.
   configuration, filenames, images, PDFs, or PII.
 - Configure security headers in `next.config.ts` and verify them on both Preview
   and Production deployments.
+- Development CSP adds `'unsafe-eval'` only for React/Turbopack diagnostics.
+  Production omits it while retaining `'wasm-unsafe-eval'` for the locally
+  hosted OpenCV runtime.
 - Use Vercel deployment logs only for build/runtime diagnostics; never log
   request payload or document data.
 

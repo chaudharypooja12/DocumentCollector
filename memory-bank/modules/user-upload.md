@@ -7,7 +7,11 @@
 The unauthenticated, token-based flow the User experiences: landing/state resolution, document list, review/edit, submission, success/expired/locked screens.
 
 ## Current Implementation Status
-- Phase 1 architecture finalized; implementation not started.
+- Phase 1 implemented under `src/app/(public)/u/` and
+  `src/modules/user-upload/`.
+- The hash resolver, loading/invalid/expired states, ordered checklist,
+  capture/review controls, progress, local generation confirmation, submitted
+  lock, combined PDF download, and supported file sharing are functional.
 
 ## Key Screens / Components
 - Link Landing/Loading, Document Upload List, Review/Edit, Submission Confirmation, Success/Download, Expired, Locked/Already-Submitted.
@@ -30,6 +34,7 @@ The unauthenticated, token-based flow the User experiences: landing/state resolu
   reopening the link.
 - Admin cannot access Phase 1 results unless the User explicitly shares the
   downloaded PDF outside the application.
+- Physical Android Chrome and iOS Safari camera acceptance remains pending.
 
 ## Decisions Log
 - None yet.
@@ -41,4 +46,5 @@ The unauthenticated, token-based flow the User experiences: landing/state resolu
   keeps all files in current-page memory, and generates PDFs on-device.
 
 ## Next Steps
-- See `PHASE_1_FRONTEND.md` — User Upload Flow task groups.
+- Complete physical-device and deployed HTTPS camera/share checks, then begin
+  the Phase 2 opaque-token and upload adapters.

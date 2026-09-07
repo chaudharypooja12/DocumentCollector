@@ -36,9 +36,12 @@ Storage, and Edge Functions. The target backend design is defined in Section 3.
 ## 2. Frontend Architecture (Next.js)
 
 ### 2.1 Routing
-- `app/(admin)/admin/...` - Phase 1 Admin UI with no login; protected by
+- `src/app/page.tsx` - MBWays-branded public product landing page.
+- `src/app/(admin)/admin/login/page.tsx` - local-only Phase 1 sign-in UI preview;
+  no authentication or route protection.
+- `src/app/(admin)/admin/...` - Phase 1 Admin UI with no authentication; protected by
   Supabase Auth in Phase 2.
-- `app/(public)/u/page.tsx` - public, unauthenticated Phase 1 flow that reads the
+- `src/app/(public)/u/page.tsx` - public, unauthenticated Phase 1 flow that reads the
   request payload from `location.hash`.
 - Phase 2 may introduce `app/(public)/u/[token]/...` for opaque server-issued
   tokens while preserving the public no-login behavior.
@@ -46,38 +49,37 @@ Storage, and Edge Functions. The target backend design is defined in Section 3.
 ### 2.2 Folder Structure
 ```
 project/
-├── app/
-│   ├── (admin)/
-│   │   └── admin/
-│   │       ├── page.tsx            (dashboard/demo overview)
-│   │       ├── requests/new/        (functional link builder)
-│   │       ├── users/               (Phase 1 fixture UI)
-│   │       ├── submissions/         (Phase 1 fixture UI)
-│   │       ├── pdf/                 (Phase 1 fixture UI)
-│   │       └── settings/            (ephemeral UI)
-│   └── (public)/
-│       └── u/
-│           └── page.tsx             (hash resolver + complete User flow)
+├── src/
+│   ├── app/
+│   │   ├── (admin)/
+│   │   │   └── admin/
+│   │   │       ├── page.tsx            (dashboard/demo overview)
+│   │   │       ├── requests/new/        (functional link builder)
+│   │   │       ├── users/               (Phase 1 fixture UI)
+│   │   │       ├── submissions/         (Phase 1 fixture UI)
+│   │   │       ├── pdf/                 (Phase 1 fixture UI)
+│   │   │       └── settings/            (ephemeral UI)
+│   │   └── (public)/
+│   │       └── u/
+│   │           └── page.tsx             (hash resolver + complete User flow)
 │
-├── components/
-│   ├── glass/                     (glass-card, glass-button, glass-modal primitives)
-│   ├── capture/                   (camera view, positioning box, capture controls)
-│   ├── admin/                     (tables, forms, drag-and-drop list)
-│   └── shared/                    (icons wrapper, toasts, loaders)
+│   ├── components/
+│   │   ├── capture/                   (camera view and capture controls)
+│   │   ├── admin/                     (tables, forms, drag-and-drop list)
+│   │   └── shared/                    (accessible primitives and brand shell)
 │
-├── modules/
-│   ├── admin/                     (admin domain logic: users, templates, links, submissions, pdf)
-│   ├── user-upload/                (public-flow domain logic)
-│   ├── document-capture/           (capture + image-processing logic)
-│   ├── pdf-generation/             (PDF layout/build logic)
-│   └── link-management/            (token issuance, expiry, state machine)
+│   ├── modules/
+│   │   ├── admin/                     (admin fixtures and domain logic)
+│   │   ├── user-upload/               (public-flow state)
+│   │   ├── document-capture/          (capture domain logic)
+│   │   ├── pdf-generation/            (PDF domain logic)
+│   │   └── link-management/           (request-link state)
 │
-├── lib/
-│   ├── supabase/                  (client + server Supabase instances, Phase 2)
-│   ├── image-processing/          (corner detection, perspective correction, resize)
-│   ├── pdf/                        (pdf-lib helpers, A4 layout engine)
-│   ├── request-link/               (payload schema, encoder, decoder)
-│   └── validation/                 (zod schemas, shared validators)
+│   └── lib/
+│       ├── image-processing/          (detection, perspective hooks, normalization)
+│       ├── pdf/                       (pdf-lib helpers and A4 layout engine)
+│       ├── request-link/              (payload schema, encoder, decoder)
+│       └── validation/                (shared validators)
 │
 ├── public/
 │   └── brand/                      (canonical MBWays logo assets)
@@ -166,10 +168,10 @@ Admin creates request -> server stores request and issues token
 
 ## 5. Security Architecture
 
-- [ ] Phase 1 links contain no PII and use a URL fragment to avoid server logs/referrers.
-- [ ] Phase 1 never writes request/capture/PDF data to browser persistence.
-- [ ] Phase 1 never sends document bytes to a server or telemetry provider.
-- [ ] Phase 1 UI clearly labels expiry and lock as client-side prototype behavior.
+- [x] Phase 1 links contain no PII and use a URL fragment to avoid server logs/referrers.
+- [x] Phase 1 never writes request/capture/PDF data to browser persistence.
+- [x] Phase 1 never sends document bytes to a server or telemetry provider.
+- [x] Phase 1 UI clearly labels expiry and lock as client-side prototype behavior.
 - [ ] Link tokens: cryptographically random (≥128-bit), stored hashed if feasible, never derived from predictable data (user id, timestamp, etc.).
 - [ ] Expiry enforcement centralized in one Edge Function/middleware used by every public endpoint (avoid duplicated logic drifting out of sync).
 - [ ] Submission lock enforcement centralized the same way.
@@ -227,4 +229,7 @@ Admin creates request -> server stores request and issues token
 | 2026-09-07 | OpenCV.js is locally hosted and lazy-loaded for document detection; Canvas handles normalized image output. | Provides robust perspective correction without sending document images off-device while protecting the initial mobile bundle. |
 | 2026-09-07 | DocumentCollector uses the canonical MBWays logo from `public/brand/` and the endorsement `Powered by MBWays`. | The product is an MBWays-owned tool and must share the parent company's identity. |
 | 2026-09-07 | Generated document PDFs remain unbranded by default. | Adding a cover, watermark, or logo would alter collected-document output and requires a separate explicit product decision. |
+| 2026-09-07 | Use the standard Next.js `src/` layout for application routes, components, modules, and libraries. | Keeps framework code separate from root configuration, assets, tests, and the Memory Bank. |
+| 2026-09-07 | The Phase 1 Admin sign-in is an explicitly non-authenticating UI preview and never submits credentials. | The requested entry experience can be demonstrated without contradicting the no-backend/no-auth Phase 1 boundary or leaking credentials. |
+| 2026-09-07 | Development CSP allows `unsafe-eval`, while production omits it and retains `wasm-unsafe-eval`. | React/Turbopack require eval-based diagnostics only in development; production remains stricter while allowing local OpenCV WASM. |
 | _pending_ | _pending_ | _pending_ |

@@ -7,13 +7,17 @@
 Temporary link token issuance, expiry enforcement (max 6h), post-submission lock, and admin reactivation. This is the module responsible for the system's most critical business rule.
 
 ## Current Implementation Status
-- Phase 1 link contract finalized; implementation not started. Phase 2 adds
-  opaque server-issued tokens and authoritative enforcement.
+- Phase 1 implemented in `src/lib/request-link/` and
+  `src/modules/link-management/`. The Admin builder and public resolver share
+  the same typed schema, limits, encoder, decoder, and error model.
+- Phase 2 still adds opaque server-issued tokens and authoritative enforcement.
 
 ## Key Logic
 - Phase 1: versioned PII-free request payload encoded in `/u#request=...`,
   `crypto.randomUUID()` request id, one-to-six-hour expiry, Zod validation, and
-  current-tab state.
+  current-tab state. Oversized encoded links are rejected with actionable Admin
+  feedback; valid links beyond conservative QR capacity retain copy and share
+  actions without attempting QR rendering.
 - Phase 2: opaque random tokens and centralized server validation for expiry,
   submission lock, and reactivation.
 
@@ -38,4 +42,5 @@ Temporary link token issuance, expiry enforcement (max 6h), post-submission lock
   configuration and timestamps are allowed; PII is prohibited.
 
 ## Next Steps
-- See `PHASE_1_FRONTEND.md` and `PHASE_2_BACKEND.md` — Link Management task groups.
+- Replace the self-contained payload with the Phase 2 opaque-token adapter while
+  preserving the public no-login experience.

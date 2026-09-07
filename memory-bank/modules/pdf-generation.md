@@ -7,7 +7,11 @@
 Assembling processed document images into A4-formatted PDFs: one page per single document, one shared page per front+back document, combined PDF, and individual per-document PDFs.
 
 ## Current Implementation Status
-- Not started (Phase 1: client-side with `pdf-lib`). Phase 2 adds authoritative server-side generation via Edge Function.
+- Phase 1 client-side generation is implemented in `src/lib/pdf/` and
+  `src/modules/pdf-generation/`. Phase 2 still adds authoritative server-side
+  generation via Edge Function.
+- Combined and individual helpers produce A4 portrait PDFs, preserve Admin
+  order and image aspect ratio, and place front/back on one shared page.
 
 ## Key Logic
 - A4 page layout engine, front/back split-page composition, page ordering per `document_template_items.sort_order`, combined vs individual PDF assembly, deterministic regeneration for reactivation.
@@ -36,4 +40,5 @@ Assembling processed document images into A4-formatted PDFs: one page per single
   User device; no upload or persistent generated-PDF record exists.
 
 ## Next Steps
-- See `PHASE_1_FRONTEND.md` and `PHASE_2_BACKEND.md` — PDF Generation task groups.
+- Validate large real-device capture sets, then implement the Phase 2
+  authoritative generation adapter.

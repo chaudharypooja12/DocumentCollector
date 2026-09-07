@@ -7,12 +7,20 @@
 All Admin-facing functionality: user management, document template configuration, link generation/sharing, submission review, PDF downloads, settings, dashboard.
 
 ## Current Implementation Status
-- Phase 1 architecture finalized; implementation not started.
+- Phase 1 implemented under `src/app/(admin)/admin/`,
+  `src/components/admin/`, and `src/modules/admin/`.
+- The MBWays landing page routes to a local-only Admin sign-in preview. It
+  validates input in memory but deliberately does not authenticate, transmit, or
+  store credentials; secure access control remains Phase 2.
+- Dashboard, Users, Submissions, PDF Management, Settings, request creation,
+  link/QR sharing, oversized-link guidance, and same-link reactivation
+  demonstration are implemented.
 
 ## Key Screens / Components
 - Mobile-first Dashboard, demonstration Users/Submissions/PDF/Settings screens,
   and a functional Create Request flow with document configuration, expiry,
-  self-contained link generation, QR, and share actions.
+  self-contained link generation, QR when the link fits QR capacity, and share
+  actions that remain available for longer valid links.
 
 ## Data It Owns / Reads
 - Phase 1: current-page request-builder state and typed static fixtures only.
@@ -27,6 +35,7 @@ All Admin-facing functionality: user management, document template configuration
 ## Known Issues
 - Phase 1 cannot receive User captures, show real submissions, persist Admin
   changes, or reactivate a link on another device.
+- Vercel project connection and physical-device acceptance remain external.
 
 ## Decisions Log
 - None yet.
@@ -39,6 +48,11 @@ All Admin-facing functionality: user management, document template configuration
   clearly labeled static fixtures.
 - 2026-09-07: Cross-device requests use a PII-free URL-fragment payload and QR
   code. Persistent Admin operations are deferred to Phase 2.
+- 2026-09-07: `/admin/login` is a clearly labeled UI demonstration with no
+  native form submission, network request, persistence, or route protection.
+  This preserves the Phase 1 no-auth contract while showing the intended entry
+  experience.
 
 ## Next Steps
-- See `PHASE_1_FRONTEND.md` — Admin Panel task groups.
+- Connect the private repository to Vercel and complete the physical-device
+  acceptance items in `PHASE_1_FRONTEND.md`.

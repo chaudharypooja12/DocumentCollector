@@ -87,54 +87,57 @@ All state screens retain the shared DocumentCollector and MBWays brand lockup.
 ## 4. Screen Inventory
 
 ### 4.1 Admin Panel (mobile-first and desktop-enhanced)
-- [ ] **Dashboard** — clearly labeled Phase 1 demonstration cards and activity fixtures.
-- [ ] **Users (list)** — responsive demonstration table/cards; no saved records in Phase 1.
-- [ ] **Create Request** — select document requirements and expiry without adding PII to the link.
-- [ ] **Document Templates** — select documents required for this user; drag-and-drop ordering; toggle Single vs Front+Back per document.
-- [ ] **Document Requests / Link Generation** — set expiry (max 6h), generate link, share options (Copy / WhatsApp / Email).
-- [ ] **Share Request** — copy link, QR code, native share, WhatsApp, and email.
-- [ ] **Submission Management** — complete demonstration UI; no real User captures are available to Admin in Phase 1.
-- [ ] **PDF Management** — complete demonstration UI using fixtures.
-- [ ] **Settings** — demonstration UI; values reset on refresh.
+- [x] **Landing and Admin Sign-in Preview** — MBWays-branded entry with an
+  explicitly local-only, non-authenticating Phase 1 form.
+- [x] **Dashboard** — clearly labeled Phase 1 demonstration cards and activity fixtures.
+- [x] **Users (list)** — responsive demonstration table/cards; no saved records in Phase 1.
+- [x] **Create Request** — select document requirements and expiry without adding PII to the link.
+- [x] **Document Templates** — select documents required for this user; drag-and-drop ordering; toggle Single vs Front+Back per document.
+- [x] **Document Requests / Link Generation** — set expiry (max 6h), generate link, share options (Copy / WhatsApp / Email).
+- [x] **Share Request** — copy link, QR code, native share, WhatsApp, and email.
+- [x] **Submission Management** — complete demonstration UI; no real User captures are available to Admin in Phase 1.
+- [x] **PDF Management** — complete demonstration UI using fixtures.
+- [x] **Settings** — demonstration UI; values reset on refresh.
 
 ### 4.2 User Upload Flow (simple, mobile-first)
-- [ ] **Link Landing / Loading** — decodes and validates the URL-fragment request, then opens the document checklist automatically.
-- [ ] **Document Upload List** — list of required documents with capture buttons (Front/Back where applicable), progress indicators.
-- [ ] **Camera Capture Screen** — live preview, positioning guide box (red/green), capture button, retake button.
-- [ ] **Review/Edit Screen** — thumbnail of captured image(s), retake/replace controls, per-document status.
-- [ ] **Generation Confirmation** — confirms local PDF generation and explains the current session will lock afterward.
-- [ ] **Success / Download Screen** — Documents Ready message + Download and supported Share actions.
-- [ ] **Expired Link Screen** — static message, no interactive upload elements.
-- [ ] **Locked/Already-Submitted Screen** — current-tab state only in Phase 1; preserve generated download actions while memory remains.
+- [x] **Link Landing / Loading** — decodes and validates the URL-fragment request, then opens the document checklist automatically.
+- [x] **Document Upload List** — list of required documents with capture buttons (Front/Back where applicable), progress indicators.
+- [x] **Camera Capture Screen** — live preview, positioning guide box (red/green), capture button, retake button.
+- [x] **Review/Edit Screen** — thumbnail of captured image(s), retake/replace controls, per-document status.
+- [x] **Generation Confirmation** — confirms local PDF generation and explains the current session will lock afterward.
+- [x] **Success / Download Screen** — Documents Ready message + Download and supported Share actions.
+- [x] **Expired Link Screen** — static message, no interactive upload elements.
+- [x] **Locked/Already-Submitted Screen** — current-tab state only in Phase 1; preserve generated download actions while memory remains.
 
 ---
 
 ## 5. Responsive Behavior
 
-- [ ] Validate 320, 360, 375, 390, 412, 430, 768, 820, 1024, 1280, and 1440px widths.
-- [ ] Both Admin and User screens are mobile-first; desktop adds space and density.
-- [ ] Admin-side tables/lists collapse into stacked cards on mobile.
-- [ ] Drag-and-drop document ordering has a touch-friendly fallback (e.g., up/down reorder buttons on small screens).
-- [ ] Full-screen camera views use `dvh`/`svh`, safe-area padding, and portrait/landscape layouts.
-- [ ] No horizontal scrolling at 320px.
+- [x] Validate 320, 360, 375, 390, 412, 430, 768, 820, 1024, 1280, and 1440px widths.
+- [x] Both Admin and User screens are mobile-first; desktop adds space and density.
+- [x] Admin-side tables/lists collapse into stacked cards on mobile.
+- [x] Drag-and-drop document ordering has a touch-friendly fallback (e.g., up/down reorder buttons on small screens).
+- [x] Full-screen camera views use `dvh`/`svh`, safe-area padding, and portrait/landscape layouts.
+- [x] No horizontal scrolling at 320px.
 
 ---
 
 ## 6. Accessibility Notes
 
-- [ ] All interactive elements reachable via keyboard on Admin panel.
-- [ ] Color is never the only indicator of state (icon + text label accompany red/green box, success/error banners).
-- [ ] Sufficient tap-target sizes (≥ 44px) on the mobile capture UI.
-- [ ] Alt text / ARIA labels for all icons and capture states.
+- [x] All interactive elements reachable via keyboard on Admin panel.
+- [x] Color is never the only indicator of state (icon + text label accompany red/green box, success/error banners).
+- [x] Sufficient tap-target sizes (≥ 44px) on the mobile capture UI.
+- [x] Alt text / ARIA labels for all icons and capture states.
 
 ---
 
 ## 7. Empty / Edge States
 
-- [ ] No users created yet — Admin dashboard shows onboarding empty state with "Create your first user" CTA.
-- [ ] No documents configured for a user — block link generation until at least one document is configured.
-- [ ] Camera permission denied — fallback to manual file picker with a short explanatory note.
-- [ ] Slow local processing — progress feedback, adaptive processing, and an actionable error state.
-- [ ] Refresh/close after capture — warn that unsaved captures will be lost.
-- [ ] Slow device — reduce detection sampling while keeping preview responsive.
-- [ ] Blur, glare, clipped corners, or low coverage — show a specific corrective hint.
+- [x] No users created yet — Admin dashboard provides a Create Request CTA and
+  labels all current records as demonstrations.
+- [x] No documents configured for a user — block link generation until at least one document is configured.
+- [x] Camera permission denied — fallback to manual file picker with a short explanatory note.
+- [x] Slow local processing — progress feedback, adaptive processing, and an actionable error state.
+- [x] Refresh/close after capture — warn that unsaved captures will be lost.
+- [x] Slow device — reduce detection sampling while keeping preview responsive.
+- [x] Blur, glare, clipped corners, or low coverage — show a specific corrective hint.

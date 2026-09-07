@@ -26,6 +26,21 @@ Phase 1 is a frontend-only implementation:
 Persistent Admin records, uploads, authoritative expiry/locking, and
 reactivation are introduced in Phase 2.
 
+## Phase 1 Implementation
+
+The complete frontend implementation is available under `src/`:
+
+- `/` — MBWays-branded product landing page;
+- `/admin/login` — local-only Admin sign-in UI preview (no authentication or
+  credential storage in Phase 1);
+- `/admin` — responsive demonstration dashboard and management screens;
+- `/admin/requests/new` — functional request builder and link/QR sharing;
+- `/u#request=<payload>` — no-login capture, review, local PDF, and download flow.
+
+OpenCV.js is pinned under `public/opencv/` and loaded only when the camera
+workflow starts. Captures are normalized and PDFs are generated entirely in the
+browser.
+
 ## Core Flow
 
 ```
@@ -85,19 +100,24 @@ memory-bank/
 ## Getting Started (Phase 1)
 
 ```bash
-# install dependencies
-npm install
+# install exact dependencies
+npm ci
 
 # run the dev server
 npm run dev
 
-# lint & type-check
+# quality checks
 npm run lint
 npm run type-check
+npm test
+npm run test:e2e
 
 # build
 npm run build
 ```
+
+Use Node.js 22 (`.nvmrc`). Playwright browser binaries can be installed with
+`npx playwright install chromium webkit`.
 
 > Environment variables and Supabase setup instructions will be added here once Phase 2 begins (see `memory-bank/PHASE_2_BACKEND.md`).
 
@@ -105,10 +125,11 @@ npm run build
 
 ```
 project/
-├── app/            Next.js routes ((admin) and (public) groups)
-├── components/     UI components (glass primitives, capture UI, admin UI)
-├── modules/        Domain logic (admin, user-upload, document-capture, pdf-generation, link-management)
-├── lib/            Shared libraries (supabase client, image processing, pdf helpers, validation)
+├── src/
+│   ├── app/        Next.js routes ((admin) and (public) groups)
+│   ├── components/ UI components (glass primitives, capture UI, admin UI)
+│   ├── modules/    Domain logic (admin, user-upload, document-capture, pdf-generation, link-management)
+│   └── lib/        Shared libraries (image processing, PDF, request-link, validation)
 ├── public/brand/   Canonical MBWays logo assets
 ├── memory-bank/    Persistent project context (see above)
 ├── AGENT.md         Mandatory project workflow and business rules

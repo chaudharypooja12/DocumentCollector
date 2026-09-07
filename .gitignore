@@ -26,7 +26,6 @@ pnpm-debug.log*
 
 # TypeScript
 *.tsbuildinfo
-next-env.d.ts
 
 # Editor and OS files
 .vscode/

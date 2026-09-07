@@ -15,6 +15,12 @@ Entry format:
 
 ---
 
+## 2026-09-07 — Phase 1 frontend implemented and locally verified
+- Module(s): admin, user-upload, document-capture, pdf-generation, link-management, project setup and deployment
+- Summary: Implemented the complete mobile-first Phase 1 frontend in a standard `src/` Next.js structure. Added the MBWays landing page, local-only Admin sign-in preview, responsive Admin demonstration screens, functional request builder and sharing, PII-free URL-fragment contract, no-login User resolver/checklist, camera and file fallback, pinned local OpenCV contour/perspective pipeline, in-memory capture lifecycle, client-side A4 combined/individual PDF generation, current-tab submitted lock, CI, privacy guards, unit/component tests, cross-browser Playwright journeys, viewport-matrix validation, and Vercel-ready configuration. Development CSP now permits React/Turbopack `unsafe-eval` diagnostics while production omits that source. Final release review also added cancellation-safe camera startup, actionable oversized-link validation, and a non-crashing share fallback when a valid link exceeds QR capacity.
+- Files touched: `src/**`, `tests/**`, `e2e/**`, `public/opencv/**`, `.github/workflows/ci.yml`, `package*.json`, `next.config.ts`, `vercel.json`, project configuration, `README.md`, and affected `memory-bank/**` files
+- Follow-ups: Connect the private repository to Vercel, confirm GitHub/Vercel deployment checks, and complete the physical Android/iOS camera, rotation, QR, Web Share, and low-memory acceptance matrix before marking Phase 1 fully complete.
+
 ## 2026-09-07 — Project foundation published to GitHub
 - Module(s): project setup and deployment
 - Summary: Published the MBWays-branded DocumentCollector foundation to the private GitHub repository's `main` branch, including the Memory Bank, root agent guidance, project README, ignore rules, and canonical brand assets.

@@ -2,7 +2,8 @@
 
 **Project:** DocumentCollector - Document Collection & Auto-PDF Generator
 **Doc owner:** Product / Memory Bank
-**Status:** Phase 1 requirements finalized; implementation not started
+**Status:** Phase 1 implemented and locally verified; deployed and
+physical-device acceptance pending
 **Related docs:** `COMPANY.md`, `TECH_STACK.md`, `DESIGN.md`, `ARCHITECTURE.md`, `PHASE_1_FRONTEND.md`, `PHASE_2_BACKEND.md`, `PHASE_3_PAYMENT_GATEWAY.md`, `MODELS.md`
 
 ---
@@ -104,7 +105,10 @@ Phase 2.
 
 ## 4. Admin Panel
 
-- Phase 1 has no Admin login because there is no backend or authentication.
+- Phase 1 has no authenticated Admin session because there is no backend.
+- Phase 1 includes a clearly labeled Admin sign-in UI preview at
+  `/admin/login`; it validates locally, transmits/stores no credentials, and
+  does not claim to protect routes. Real authentication begins in Phase 2.
 - The main functional Phase 1 Admin workflow is a mobile-responsive request
   builder that selects document requirements, expiry, and generates a link.
 - Dashboard, Users, Submissions, PDF Management, and Settings are complete
@@ -476,25 +480,25 @@ See `../AGENT.md` for the full, enforceable instruction set. In short:
 ## 28. MVP Scope
 
 ### Included in MVP
-- [ ] MBWays logo and `Powered by MBWays` identity across shared Admin and public layouts
-- [ ] Responsive Admin UI with no Phase 1 authentication
-- [ ] Request builder with no stored User record or PII in the link
-- [ ] Document selection & drag-and-drop ordering
-- [ ] Single document configuration
-- [ ] Front + Back configuration
-- [ ] Temporary link (max 6-hour validity)
-- [ ] QR, clipboard, Web Share, WhatsApp, and email sharing
-- [ ] Camera capture with positioning box (red/green states)
-- [ ] Retake/Edit before submission
-- [ ] Document submission
-- [ ] A4 PDF generation (Front+Back on same page)
-- [ ] Combined PDF + Individual PDF
-- [ ] User combined/individual PDF download and supported file sharing
-- [ ] Admin submission/PDF/reactivation UI demonstrations
-- [ ] In-memory current-tab lock after local generation
-- [ ] Zero persistence audit: no backend, DB, upload, browser storage, or PII in links
-- [ ] Glassmorphism UI (Next.js + TypeScript + Tailwind CSS)
-- [ ] GitHub + Vercel
+- [x] MBWays logo and `Powered by MBWays` identity across shared Admin and public layouts
+- [x] Responsive Admin UI with no Phase 1 authentication
+- [x] Request builder with no stored User record or PII in the link
+- [x] Document selection & drag-and-drop ordering
+- [x] Single document configuration
+- [x] Front + Back configuration
+- [x] Temporary link (max 6-hour validity)
+- [x] QR, clipboard, Web Share, WhatsApp, and email sharing
+- [x] Camera capture with positioning box (red/green states)
+- [x] Retake/Edit before submission
+- [x] Local document generation
+- [x] A4 PDF generation (Front+Back on same page)
+- [x] Combined PDF + Individual PDF generation helpers
+- [x] User combined PDF download and supported file sharing
+- [x] Admin submission/PDF/reactivation UI demonstrations
+- [x] In-memory current-tab lock after local generation
+- [x] Zero persistence audit: no backend, DB, upload, browser storage, or PII in links
+- [x] Glassmorphism UI (Next.js + TypeScript + Tailwind CSS)
+- [x] GitHub workflow and Vercel-ready repository configuration
 - [x] Memory Bank + agent instructions
 
 ### Phase 2 (Backend)
