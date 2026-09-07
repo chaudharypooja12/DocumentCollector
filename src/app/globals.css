@@ -39,6 +39,7 @@ html.light {
   --focus: #ff8f1f;
   --logo-neutral: #111318;
   --radius: 0.75rem;
+  --shadow-field: inset 0 1px 3px rgba(15, 23, 42, 0.09);
 }
 
 html.dark {
@@ -70,6 +71,7 @@ html.dark {
   --focus: #ffb347;
   --logo-neutral: #ffffff;
   --accent-foreground: #1a0d00;
+  --shadow-field: inset 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 @theme inline {
@@ -201,6 +203,12 @@ textarea {
   background: var(--glass-strong);
   box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
   backdrop-filter: blur(24px);
+}
+
+/* Subtle inset "hollow" shadow used on fillable fields (Input, Select
+   trigger) so users perceive them as empty containers waiting for input. */
+.field-shadow {
+  box-shadow: var(--shadow-field);
 }
 
 .page-shell {

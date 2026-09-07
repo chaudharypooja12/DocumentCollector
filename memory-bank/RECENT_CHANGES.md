@@ -16,6 +16,13 @@ Entry format:
 
 ---
 
+## 2026-09-08 — Settings full-width layout and hollow input shadows
+
+- Module(s): admin
+- Summary: Fixed the Settings page being visibly narrower than every other Admin page — its `Card` was constrained with `max-w-2xl` while Dashboard, Users, Create Request, and Logs all fill the full `page-shell` width. Removed the constraint and restructured the form into a responsive two-column field grid inside a full-width `Card`, matching the rest of the Admin panel. Added a themed inset "hollow" shadow (`--shadow-field` token and `.field-shadow` utility, tuned per Light/Dark theme) to `Input` and the `Select` trigger, replacing their raised `shadow-sm`, so empty fields visually read as containers waiting for input rather than solid raised buttons.
+- Files touched: `src/app/(admin)/admin/settings/page.tsx`, `src/components/ui/input.tsx`, `src/components/ui/select.tsx`, `src/app/globals.css`, and affected `memory-bank/**` files
+- Follow-ups: none.
+
 ## 2026-09-08 — CamScanner-style automatic document capture
 
 - Module(s): document-capture, user-upload

@@ -31,6 +31,13 @@
 - Scrollbars use the MBWays brand color for the thumb against a muted track in
   both themes, applied globally via `scrollbar-color` and themed
   `::-webkit-scrollbar` rules.
+- All Admin content pages (Dashboard, Create Request, Users, Settings, Logs)
+  use the full `page-shell` content width; no page constrains its primary
+  `Card` with a `max-w-*` class. This keeps every page visually consistent at
+  desktop widths instead of a single narrow column floating in extra space.
+- Fillable fields (`Input`, `Select` trigger) use a themed inset "hollow"
+  shadow (`.field-shadow`, driven by the `--shadow-field` token) instead of a
+  raised drop shadow, so empty fields read as containers waiting for input.
 
 ### 2.2 MBWays Color Palette
 
@@ -118,7 +125,8 @@ All state screens retain the shared DocumentCollector and MBWays brand lockup.
       earlier iterations.
 - [x] **Logs** — demonstration activity log with search, pagination, and CSV
       export.
-- [x] **Settings** — demonstration UI; values reset on refresh.
+- [x] **Settings** — demonstration UI, full-width content matching other Admin
+      pages, values reset on refresh.
 
 ### 4.2 User Upload Flow (simple, mobile-first)
 
