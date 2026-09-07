@@ -41,8 +41,9 @@ import {
 import { COMPLETE_PDF_NAME, createCombinedPdf } from "@/lib/pdf";
 import {
   CaptureProvider,
+  nextCaptureTarget,
   useCaptures,
-  type CaptureSide,
+  type CaptureTargetDescriptor,
 } from "@/features/user-upload/capture-store";
 
 const profileDetailsSchema = z.object({
@@ -104,12 +105,6 @@ function UserHeader() {
   );
 }
 
-type CaptureTarget = {
-  documentId: string;
-  documentName: string;
-  side: CaptureSide;
-};
-
 function Checklist() {
   const {
     request,
@@ -122,7 +117,7 @@ function Checklist() {
     completed,
     required,
   } = useCaptures();
-  const [target, setTarget] = useState<CaptureTarget | null>(null);
+  const [target, setTarget] = useState<CaptureTargetDescriptor | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [pdf, setPdf] = useState<{ blob: Blob; url: string } | null>(null);
   const [generationError, setGenerationError] = useState("");
@@ -504,6 +499,7 @@ function Checklist() {
               ? ""
               : ` — ${target.side.toLocaleLowerCase()}`
           }`}
+          sessionKey={`${target.documentId}:${target.side}`}
           onClose={() => setTarget(null)}
           onAccept={(image) => {
             setCapture(
@@ -513,7 +509,7 @@ function Checklist() {
               image.width,
               image.height,
             );
-            setTarget(null);
+            setTarget(nextCaptureTarget(request, captures, target));
           }}
         />
       ) : null}

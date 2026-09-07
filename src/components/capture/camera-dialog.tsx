@@ -20,41 +20,61 @@ import { Button } from "@/components/ui/button";
 import {
   assessGuideFrame,
   correctPerspective,
+  cornersMovement,
   detectDocument,
+  evaluateReadiness,
   loadOpenCv,
+  mapObjectCoverPoint,
   normalizeImage,
   type DocumentDetection,
-  type GuideAssessment,
   type NormalizedImage,
+  type RelativePoint,
 } from "@/lib/image-processing";
 
 type OpenCv = Awaited<ReturnType<typeof loadOpenCv>>;
 
 type CameraError = "insecure" | "denied" | "unavailable" | "busy" | "unknown";
 
+/** Consecutive ~150ms analysis ticks the document must stay detected and
+ * still for before an automatic capture fires. */
+const AUTO_CAPTURE_STABLE_FRAMES = 4;
+/** Sum of per-corner relative movement below which a detection is "still". */
+const STABILITY_TOLERANCE = 0.035;
+/** Pause after an automatic capture so the same physical page held in place
+ * cannot immediately capture again before the user shows the next page. */
+const AUTO_CAPTURE_COOLDOWN_MS = 1400;
+
 export function CameraDialog({
   title,
+  sessionKey,
   onAccept,
   onClose,
 }: {
   title: string;
+  /** Identifies the current capture target (e.g. `${documentId}:${side}`).
+   * When this changes while the dialog stays mounted, per-target guide
+   * state resets without restarting the live camera stream. */
+  sessionKey?: string;
   onAccept: (image: NormalizedImage) => void;
   onClose: () => void;
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const cameraRequestRef = useRef(0);
   const openCvRef = useRef<OpenCv | null>(null);
   const detectionRef = useRef<DocumentDetection | null>(null);
+  const previousPointsRef = useRef<DocumentDetection["points"] | null>(null);
+  const autoCaptureLockRef = useRef(false);
   const analysisCanvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<CameraError | null>(null);
   const [starting, setStarting] = useState(true);
-  const [guide, setGuide] = useState<GuideAssessment>({
-    ready: false,
-    brightness: "balanced",
-    detail: "low",
-    hint: "Center the document and show all four corners.",
-  });
+  const [readyHint, setReadyHint] = useState(
+    "Show all four document corners inside the guide.",
+  );
+  const [overlayPoints, setOverlayPoints] = useState<
+    [RelativePoint, RelativePoint, RelativePoint, RelativePoint] | null
+  >(null);
   const [stableFrames, setStableFrames] = useState(0);
   const [manual, setManual] = useState(false);
   const [review, setReview] = useState<
@@ -62,6 +82,7 @@ export function CameraDialog({
   >(null);
   const [processing, setProcessing] = useState(false);
   const [message, setMessage] = useState("");
+  const [autoCaptured, setAutoCaptured] = useState(false);
   const [visionAvailable, setVisionAvailable] = useState(false);
 
   const stopCamera = useCallback(() => {
@@ -132,7 +153,38 @@ export function CameraDialog({
       window.clearTimeout(start);
       stopCamera();
     };
-  }, [startCamera, stopCamera]);
+    // Intentionally runs once per mount only: the camera stream is reused
+    // across auto-advanced targets within the same scanning session.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Reset per-target guide/review state when the capture target changes
+  // (e.g. auto-advancing from a document's front to its back) without
+  // tearing down the still-running camera stream. This follows React's
+  // "adjust state during render" pattern rather than an Effect, since it is
+  // a synchronous response to a prop change, not a synchronization with an
+  // external system.
+  const [previousSessionKey, setPreviousSessionKey] = useState(sessionKey);
+  if (sessionKey !== previousSessionKey) {
+    setPreviousSessionKey(sessionKey);
+    setOverlayPoints(null);
+    setStableFrames(0);
+    setManual(false);
+    setMessage("");
+    setAutoCaptured(false);
+    setReview((current) => {
+      if (current) URL.revokeObjectURL(current.previewUrl);
+      return null;
+    });
+  }
+
+  // Refs are not part of render output, so they reset in a real Effect keyed
+  // to the same target-change signal above.
+  useEffect(() => {
+    detectionRef.current = null;
+    previousPointsRef.current = null;
+    autoCaptureLockRef.current = false;
+  }, [sessionKey]);
 
   useEffect(
     () => () => {
@@ -141,12 +193,50 @@ export function CameraDialog({
     [review],
   );
 
+  const autoCapture = useCallback(async () => {
+    const video = videoRef.current;
+    const detection = detectionRef.current;
+    const cv = openCvRef.current;
+    if (!video || video.videoWidth === 0 || !detection || !cv) {
+      autoCaptureLockRef.current = false;
+      return;
+    }
+    setProcessing(true);
+    setMessage("");
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext("2d", { alpha: false });
+      if (!context) throw new Error("Capture is unavailable.");
+      context.drawImage(video, 0, 0);
+      const corrected = await correctPerspective(canvas, detection.points, cv);
+      const image = await normalizeImage(corrected);
+      if (navigator.vibrate) navigator.vibrate(40);
+      setAutoCaptured(true);
+      onAccept(image);
+      window.setTimeout(() => setAutoCaptured(false), AUTO_CAPTURE_COOLDOWN_MS);
+    } catch {
+      setMessage(
+        "Automatic capture failed. Use manual capture or choose an image.",
+      );
+    } finally {
+      setProcessing(false);
+      setStableFrames(0);
+      previousPointsRef.current = null;
+      window.setTimeout(() => {
+        autoCaptureLockRef.current = false;
+      }, AUTO_CAPTURE_COOLDOWN_MS);
+    }
+  }, [onAccept]);
+
   useEffect(() => {
-    if (starting || error || review) return;
+    if (starting || error || review || processing) return;
     const interval = window.setInterval(() => {
       const video = videoRef.current;
       const canvas = analysisCanvasRef.current;
-      if (!video || !canvas || video.readyState < 2) return;
+      const container = containerRef.current;
+      if (!video || !canvas || !container || video.readyState < 2) return;
       const width = 240;
       const height = Math.max(
         1,
@@ -175,28 +265,55 @@ export function CameraDialog({
         }
       }
       detectionRef.current = detection;
-      const detectedResult: GuideAssessment = detection
-        ? {
-            ...result,
-            ready: result.ready,
-            hint: result.ready
-              ? "All four corners detected. Hold steady and capture."
-              : result.hint,
-          }
-        : {
-            ...result,
-            ready: false,
-            hint: visionAvailable
-              ? "Show all four document corners inside the guide."
-              : "Preparing document detection. Manual capture is available.",
-          };
-      setGuide(detectedResult);
-      setStableFrames((current) =>
-        detectedResult.ready ? Math.min(current + 1, 5) : 0,
-      );
+      const { ready, hint } = evaluateReadiness(detection, result);
+      setReadyHint(hint);
+
+      if (detection) {
+        const rect = container.getBoundingClientRect();
+        const mapped = detection.points.map((point) =>
+          mapObjectCoverPoint(
+            point,
+            { width: rect.width, height: rect.height },
+            { width: video.videoWidth, height: video.videoHeight },
+          ),
+        ) as [RelativePoint, RelativePoint, RelativePoint, RelativePoint];
+        setOverlayPoints(mapped);
+
+        const previous = previousPointsRef.current;
+        const stillEnough =
+          previous !== null &&
+          cornersMovement(detection.points, previous) < STABILITY_TOLERANCE;
+        previousPointsRef.current = detection.points;
+        setStableFrames((current) => {
+          if (!ready) return 0;
+          return stillEnough
+            ? Math.min(current + 1, AUTO_CAPTURE_STABLE_FRAMES)
+            : 1;
+        });
+      } else {
+        previousPointsRef.current = null;
+        setOverlayPoints(null);
+        setStableFrames(0);
+      }
     }, 150);
     return () => window.clearInterval(interval);
-  }, [starting, error, review, visionAvailable]);
+  }, [starting, error, review, processing]);
+
+  // Fire the automatic shutter once the document has been detected and held
+  // still for AUTO_CAPTURE_STABLE_FRAMES ticks. Manual override skips this.
+  // Deferred via setTimeout so the state updates inside `autoCapture` happen
+  // outside this Effect's synchronous body; the lock is set inside the
+  // timeout so a cancelled/re-run effect can still retrigger correctly.
+  useEffect(() => {
+    if (manual || autoCaptureLockRef.current) return;
+    if (stableFrames < AUTO_CAPTURE_STABLE_FRAMES) return;
+    const timeout = window.setTimeout(() => {
+      if (autoCaptureLockRef.current) return;
+      autoCaptureLockRef.current = true;
+      void autoCapture();
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, [stableFrames, manual, autoCapture]);
 
   async function processBlob(blob: Blob) {
     setProcessing(true);
@@ -231,13 +348,12 @@ export function CameraDialog({
     if (!blob) return;
     const detection = detectionRef.current;
     const cv = openCvRef.current;
-    if (detection && cv && !manual) {
+    if (detection && cv) {
       try {
         await processBlob(
           await correctPerspective(canvas, detection.points, cv),
         );
       } catch {
-        setManual(true);
         setMessage(
           "Automatic perspective correction failed. Use manual capture or choose an image.",
         );
@@ -253,7 +369,7 @@ export function CameraDialog({
     event.target.value = "";
   }
 
-  const guideReady = stableFrames >= 3;
+  const guideReady = stableFrames >= AUTO_CAPTURE_STABLE_FRAMES;
   const errorCopy: Record<CameraError, string> = {
     insecure: "Camera access requires HTTPS. Choose an image instead.",
     denied:
@@ -319,7 +435,10 @@ export function CameraDialog({
         </div>
       ) : (
         <>
-          <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-black">
+          <div
+            ref={containerRef}
+            className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-black"
+          >
             <video
               ref={videoRef}
               playsInline
@@ -329,22 +448,53 @@ export function CameraDialog({
             />
             <canvas ref={analysisCanvasRef} className="hidden" />
             {!error && !starting ? (
-              <div
-                className={`pointer-events-none absolute inset-[10%] rounded-3xl border-4 transition ${
-                  guideReady
-                    ? "border-success shadow-[0_0_30px_rgba(32,199,122,.45)]"
-                    : "border-danger shadow-[0_0_30px_rgba(255,82,99,.35)]"
-                }`}
-              >
-                <span className="absolute -top-11 left-1/2 flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-black/75 px-3 py-2 text-xs font-semibold">
-                  {guideReady ? (
-                    <CheckCircle2 className="size-4 text-success" />
-                  ) : (
-                    <AlertCircle className="size-4 text-danger" />
-                  )}
-                  {guideReady ? "Ready to capture" : guide.hint}
+              overlayPoints ? (
+                <svg
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                  className="pointer-events-none absolute inset-0 h-full w-full"
+                >
+                  <polygon
+                    points={overlayPoints
+                      .map((point) => `${point.x * 100},${point.y * 100}`)
+                      .join(" ")}
+                    fill={
+                      guideReady
+                        ? "rgba(32,199,122,0.18)"
+                        : "rgba(255,82,99,0.12)"
+                    }
+                    stroke={guideReady ? "#20c77a" : "#ff5263"}
+                    strokeWidth={1.2}
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : (
+                <div
+                  className={`pointer-events-none absolute inset-[10%] rounded-3xl border-4 transition ${
+                    guideReady
+                      ? "border-success shadow-[0_0_30px_rgba(32,199,122,.45)]"
+                      : "border-danger shadow-[0_0_30px_rgba(255,82,99,.35)]"
+                  }`}
+                />
+              )
+            ) : null}
+            {!error && !starting ? (
+              <span className="pointer-events-none absolute top-4 left-1/2 flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-black/75 px-3 py-2 text-xs font-semibold">
+                {guideReady ? (
+                  <CheckCircle2 className="size-4 text-success" />
+                ) : (
+                  <AlertCircle className="size-4 text-danger" />
+                )}
+                {guideReady ? "Ready — capturing automatically" : readyHint}
+              </span>
+            ) : null}
+            {autoCaptured ? (
+              <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/10">
+                <span className="flex items-center gap-2 rounded-full bg-success/90 px-4 py-2 text-sm font-semibold text-white">
+                  <CheckCircle2 className="size-4" /> Captured — show the next
+                  page
                 </span>
-              </div>
+              </span>
             ) : null}
             {starting ? (
               <p className="text-sm text-white/65">Starting camera…</p>
@@ -383,9 +533,9 @@ export function CameraDialog({
               variant="ghost"
               className="text-white hover:bg-white/10 hover:text-white"
               disabled={Boolean(error) || starting}
-              onClick={() => setManual(true)}
+              onClick={() => setManual((current) => !current)}
             >
-              Use manual capture
+              {manual ? "Resume automatic capture" : "Use manual capture"}
             </Button>
             {!visionAvailable && !starting && !error ? (
               <p className="text-center text-xs text-white/45 sm:col-span-3">

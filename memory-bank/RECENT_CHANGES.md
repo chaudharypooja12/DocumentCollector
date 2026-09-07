@@ -16,6 +16,13 @@ Entry format:
 
 ---
 
+## 2026-09-08 — CamScanner-style automatic document capture
+
+- Module(s): document-capture, user-upload
+- Summary: Fixed the guide border's core bug — readiness was previously derived purely from a lighting/contrast heuristic (`assessGuideFrame`) and ignored whether OpenCV had actually detected the document's four corners, so the red/green indicator was disconnected from real edge detection. Added `evaluateReadiness` (requires an actual detection plus acceptable lighting) and `cornersMovement` (stability comparison between frames) as pure, unit-tested functions in `image-processing.ts`. The live camera view now draws an overlay polygon tracking the detected document edges (`mapObjectCoverPoint` correctly accounts for the video's `object-fit: cover` crop). Once the detected quadrilateral is present and held steady for several analysis ticks, the camera captures automatically, perspective-corrects, and calls `onAccept` without a manual tap or review step; the dialog then auto-advances to the next required document/side (`orderedCaptureTargets`/`nextCaptureTarget` in `capture-store.tsx`) while keeping the same live camera session open, so each page auto-clears without reopening the camera. A short cooldown plus a "Captured — show the next page" indicator prevent double-capturing the same still-held page. Manual capture and file selection remain as explicit fallbacks with their original Retake/Use Photo review step, preserving existing test coverage for those paths.
+- Files touched: `src/lib/image-processing.ts`, `src/components/capture/camera-dialog.tsx`, `src/features/user-upload/capture-store.tsx`, `src/features/user-upload/user-flow.tsx`, `tests/unit/image-processing.test.ts`, `tests/unit/capture-store.test.ts`, and affected `memory-bank/**` files
+- Follow-ups: Verify auto-capture stability/cooldown thresholds on real Android Chrome and iOS Safari devices; tune `STABILITY_TOLERANCE`/`AUTO_CAPTURE_STABLE_FRAMES`/`AUTO_CAPTURE_COOLDOWN_MS` only from verified device findings.
+
 ## 2026-09-07 — Admin dashboard/Users redesign and User Basic Details
 
 - Module(s): admin, user-upload, project setup

@@ -129,7 +129,12 @@ All state screens retain the shared DocumentCollector and MBWays brand lockup.
       encoded in the link, never uploaded, and exist only in current-page
       memory alongside captures.
 - [x] **Document Upload List** — list of required documents with capture buttons (Front/Back where applicable), progress indicators.
-- [x] **Camera Capture Screen** — live preview, positioning guide box (red/green), capture button, retake button.
+- [x] **Camera Capture Screen** — live preview with a document-tracking edge
+      overlay (red/green reflects real detected-document state, not lighting
+      alone), automatic capture once the document is detected and held
+      steady, auto-advance to the next required page without closing the
+      camera, and manual capture/file-selection fallbacks with a retake
+      review step.
 - [x] **Review/Edit Screen** — thumbnail of captured image(s), retake/replace controls, per-document status.
 - [x] **Generation Confirmation** — confirms local PDF generation and explains the current session will lock afterward.
 - [x] **Success / Download Screen** — Documents Ready message + Download and supported Share actions.

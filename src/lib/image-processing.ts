@@ -140,6 +140,87 @@ export function assessGuideFrame(
   };
 }
 
+/**
+ * Decides whether the live frame is ready to auto-capture. Unlike the raw
+ * lighting/detail heuristic in `assessGuideFrame`, this requires an actual
+ * detected document quadrilateral so the guide border reflects real edge
+ * detection rather than generic brightness.
+ */
+export function evaluateReadiness(
+  detection: DocumentDetection | null,
+  guide: GuideAssessment,
+): { ready: boolean; hint: string } {
+  if (!detection) {
+    return {
+      ready: false,
+      hint: "Show all four document corners inside the guide.",
+    };
+  }
+  if (guide.brightness === "dark") {
+    return { ready: false, hint: "Move to brighter, even lighting." };
+  }
+  if (guide.brightness === "bright") {
+    return { ready: false, hint: "Reduce glare on the document." };
+  }
+  return {
+    ready: true,
+    hint: "All four corners detected. Hold steady…",
+  };
+}
+
+/** Sum of per-corner displacement between two detections, in relative units. */
+export function cornersMovement(
+  a: DocumentDetection["points"],
+  b: DocumentDetection["points"],
+): number {
+  return a.reduce(
+    (total, point, index) => total + distance(point, b[index]!),
+    0,
+  );
+}
+
+type BoxSize = { width: number; height: number };
+
+/**
+ * Maps a point that is relative to the raw media frame (0..1) onto the
+ * container box that renders it with CSS `object-fit: cover`, returning a
+ * point relative to the container (0..1). Used to draw a live overlay that
+ * tracks the detected document even when the video crops to fill its box.
+ */
+export function mapObjectCoverPoint(
+  point: RelativePoint,
+  container: BoxSize,
+  media: BoxSize,
+): RelativePoint {
+  if (
+    container.width <= 0 ||
+    container.height <= 0 ||
+    media.width <= 0 ||
+    media.height <= 0
+  ) {
+    return point;
+  }
+  const containerRatio = container.width / container.height;
+  const mediaRatio = media.width / media.height;
+  let renderWidth = container.width;
+  let renderHeight = container.height;
+  let offsetX = 0;
+  let offsetY = 0;
+  if (mediaRatio > containerRatio) {
+    renderHeight = container.height;
+    renderWidth = renderHeight * mediaRatio;
+    offsetX = (container.width - renderWidth) / 2;
+  } else {
+    renderWidth = container.width;
+    renderHeight = renderWidth / mediaRatio;
+    offsetY = (container.height - renderHeight) / 2;
+  }
+  return {
+    x: (offsetX + point.x * renderWidth) / container.width,
+    y: (offsetY + point.y * renderHeight) / container.height,
+  };
+}
+
 let openCvPromise: Promise<OpenCv> | null = null;
 
 export function loadOpenCv(): Promise<OpenCv> {
