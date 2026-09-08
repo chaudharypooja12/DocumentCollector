@@ -74,7 +74,11 @@ describe("RequestBuilder", () => {
       }),
     );
 
-    expect(screen.getByText("AED 20.00")).toBeVisible();
+    expect(
+      screen.getByText(
+        (content) => content.replace(/\u00A0/gu, " ") === "AED 20.00",
+      ),
+    ).toBeVisible();
     await user.click(
       screen.getByRole("button", { name: "Generate temporary link" }),
     );

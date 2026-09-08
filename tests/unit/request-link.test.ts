@@ -68,7 +68,7 @@ describe("Phase 1 request links", () => {
       payload,
     );
     expect(payload).toMatchObject({
-      version: 3,
+      version: 2,
       payment: {
         countryCode: "IN",
         currency: "INR",
@@ -172,7 +172,7 @@ describe("Phase 1 request links", () => {
     );
     const unsupported = btoa(
       JSON.stringify({
-        version: 2,
+        version: 3,
         requestId: "11111111-1111-4111-8111-111111111111",
         createdAt: now.toISOString(),
         expiresAt: new Date(now.getTime() + 3600000).toISOString(),
