@@ -6,7 +6,6 @@ const routes = [
   "/admin/login",
   "/admin",
   "/admin/requests/new",
-  "/admin/payments/demo",
   "/admin/users",
   "/admin/settings",
   "/admin/logs",

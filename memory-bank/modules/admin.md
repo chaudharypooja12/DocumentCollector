@@ -15,9 +15,10 @@ All Admin-facing functionality: dashboard stats, profile/submission review and m
 - The MBWays landing page routes to a local-only Admin sign-in preview. It
   validates input in memory but deliberately does not authenticate, transmit, or
   store credentials; secure access control remains Phase 2.
-- Dashboard, Users (merged Profiles + Submissions preview), Settings, Logs,
-  request creation, link/QR sharing, oversized-link guidance, in-memory
-  India/UAE pricing, and payment lifecycle demonstrations are implemented.
+- Dashboard, Users (merged Profiles + Submissions preview, now including a
+  per-profile Payment status), Settings, Logs, request creation, link/QR
+  sharing, oversized-link guidance, and in-memory India/UAE pricing are
+  implemented.
 - The responsive shell includes a desktop sidebar, sticky top bar, mobile
   navigation sheet, Light-default in-memory theme control, clear structural
   borders, and Logout back to the local sign-in preview. Settings and Logs are
@@ -29,20 +30,20 @@ All Admin-facing functionality: dashboard stats, profile/submission review and m
   Users), Pending (hover reveals "Links Created but data not received"), Male
   users, and Female users — computed from typed static fixtures.
 - **Users**: a single merged page replacing the former separate Submissions
-  and PDF Management pages. Status and gender Select filters sit above a
-  responsive data table with search, pagination, and CSV export. Each row's
-  Actions column provides View submission (Eye, opens a Dialog with profile
-  details and demonstration document downloads), Update profile (Pencil,
-  opens an editable Dialog including a "same as permanent address" checkbox),
-  and Delete profile (Trash, opens a confirmation Dialog). All mutations are
-  in-memory `useState` only and reset on refresh.
+  and PDF Management pages. Status, gender, and Payment status Select filters
+  sit above a responsive data table with search, pagination, and CSV export.
+  A Payment column shows each profile's payment status (Paid, Awaiting
+  payment, Cancelled, Failed, Expired) with its country and fixed demo amount;
+  the View dialog repeats this detail. Each row's Actions column provides View
+  submission (Eye, opens a Dialog with profile details and demonstration
+  document downloads), Update profile (Pencil, opens an editable Dialog
+  including a "same as permanent address" checkbox), and Delete profile
+  (Trash, opens a confirmation Dialog). All mutations are in-memory `useState`
+  only and reset on refresh.
 - **Settings**: demonstration preferences form spanning the full page width
   (a two-column field grid inside a single full-width `Card`, matching every
-  other Admin page); values reset on refresh.
-- **Payment demo**: deterministic fixture scenarios for awaiting/cancelled/
-  expired/late/superseded/duplicate payment states, 1–24 hour extension, token
-  rotation, original/latest repricing, retained-upload counts, and confirmed
-  deletion.
+  other Admin page); values reset on refresh. A second full-width Payment demo
+  Card below it lets the Admin edit India/UAE prices and enabled status.
 - **Logs**: demonstration activity log fixtures with search, pagination, and
   CSV export.
 - A functional Create Request flow with document configuration, expiry,
@@ -65,8 +66,10 @@ All Admin-facing functionality: dashboard stats, profile/submission review and m
 ## Data It Owns / Reads
 
 - Phase 1: current-page request-builder state and typed static fixtures only.
-- Phase 1 payment settings live in an Admin-layout React context and reset on
-  refresh; lifecycle records are fixtures only.
+- Phase 1 payment settings (India/UAE price, enabled status) live in an
+  Admin-layout React context and reset on refresh. Each fixture profile's
+  payment status/country/amount is static demo data, not derived from a real
+  transaction.
 - Phase 2: `admins`, `users`, `document_template_items`, `links`,
   `submissions`, and `generated_pdfs`.
 
@@ -110,6 +113,11 @@ All Admin-facing functionality: dashboard stats, profile/submission review and m
 - 2026-09-07: Added a no-charge Phase 1 payment prototype for India/INR and
   UAE/AED plus a standalone lifecycle simulator. All settings and actions remain
   in memory; production Razorpay behavior is deferred to Phase 3.
+- 2026-09-08: Removed the standalone Admin payment lifecycle demo page
+  (`/admin/payments/demo`) and its nav entry. Payment status now surfaces
+  directly per profile in the Users table (column + filter) and in the View
+  dialog instead. Fixed the Payment demo Settings Card to match the full-width
+  layout used by every other Admin page.
 
 ## Next Steps
 

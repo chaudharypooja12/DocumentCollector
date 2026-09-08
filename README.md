@@ -38,7 +38,8 @@ The complete frontend implementation is available under `src/`:
   credential storage in Phase 1);
 - `/admin` — responsive demonstration dashboard and management screens;
 - `/admin/requests/new` — functional request builder and link/QR sharing;
-- `/admin/payments/demo` — standalone renewal and payment lifecycle fixtures;
+- `/admin/users` — profiles with a per-user payment status (Paid, Awaiting
+  payment, Cancelled, Failed, Expired) alongside submission status;
 - `/u#request=<payload>` — no-login capture, mock payment, local PDF, and
   download flow.
 

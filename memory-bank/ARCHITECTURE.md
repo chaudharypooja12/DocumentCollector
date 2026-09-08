@@ -174,9 +174,12 @@ User opens /u#request=<payload>
 Closing or refreshing clears the session. Admin does not receive the captures in
 Phase 1.
 
-The Phase 1 Admin payment lifecycle page uses independent fixtures to preview
-1–24 hour renewal, token rotation, repricing, retained uploads, and deletion. It
-does not synchronize with or authoritatively control the public flow.
+The Admin Users table surfaces each demo profile's payment status (Paid,
+Awaiting payment, Cancelled, Failed, Expired) alongside its country and fixed
+demo amount, as a read-only reporting view over static fixtures. It does not
+synchronize with or control the public flow's live payment state; 1–24 hour
+renewal, token rotation, repricing, and deletion behavior remain design-only
+until implemented against a real backend in Phase 2/3.
 
 ### 4.3 Phase 2 Persistent Flow
 

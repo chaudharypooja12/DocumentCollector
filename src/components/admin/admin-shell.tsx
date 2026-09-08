@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  CreditCard,
   FileStack,
   LayoutDashboard,
   LogOut,
@@ -29,7 +28,6 @@ import { cn } from "@/lib/utils";
 const navigation = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/requests/new", label: "Create request", icon: FileStack },
-  { href: "/admin/payments/demo", label: "Payment demo", icon: CreditCard },
   { href: "/admin/users", label: "Users", icon: UserRound },
   { href: "/admin/settings", label: "Settings", icon: Settings },
   { href: "/admin/logs", label: "Logs", icon: ScrollText },

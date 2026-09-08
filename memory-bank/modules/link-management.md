@@ -41,8 +41,8 @@ critical link rules.
 - Phase 1 expiry depends on the User device clock.
 - Phase 1 submitted state and reactivation cannot persist across reloads or
   devices.
-- Phase 1 lifecycle fixtures can preview extension or token rotation but cannot
-  revoke a copied URL.
+- Phase 1 has no interactive renewal or token-rotation UI; extension and
+  rotation remain design-only until built against a real backend.
 
 ## Decisions Log
 

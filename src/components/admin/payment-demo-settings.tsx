@@ -83,7 +83,7 @@ export function PaymentDemoSettings() {
   const [resetVersion, setResetVersion] = useState(0);
 
   return (
-    <Card className="mt-6 max-w-2xl">
+    <Card className="mt-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <span className="rounded-xl bg-primary/10 p-2.5 text-primary">
@@ -112,7 +112,7 @@ export function PaymentDemoSettings() {
         Demo payment — no money will be charged. Prices reset on refresh and are
         not shared with another tab.
       </InlineAlert>
-      <div className="mt-5 space-y-4">
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <PriceEditor
           key={`IN-${prices.IN.revision}-${resetVersion}`}
           countryCode="IN"

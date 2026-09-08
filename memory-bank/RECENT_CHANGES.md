@@ -16,6 +16,32 @@ Entry format:
 
 ---
 
+## 2026-09-08 — Payment status moved from lifecycle demo into Users table
+
+- Module(s): admin
+- Summary: Removed the standalone Admin payment lifecycle demo page
+  (`/admin/payments/demo`), its nav entry, component, and test. Added a
+  `paymentStatus`/`paymentCountryCode`/`paymentCurrency`/`paymentAmountMinor`
+  field set to `DemoProfile` fixtures (Paid, Awaiting payment, Cancelled,
+  Failed, Expired across the 8 demo profiles) and surfaced it as a new
+  Payment column with a Select filter in the Users table, plus a matching
+  detail row in the View dialog. Fixed the Payment demo Settings Card, which
+  still had a leftover `max-w-2xl` constraint, to span the full page width
+  like every other Admin page, and laid its two country price editors out
+  side by side at the `lg` breakpoint.
+- Files touched: `src/app/(admin)/admin/users/page.tsx`,
+  `src/components/admin/profile-actions.tsx`, `src/data/admin-fixtures.ts`,
+  `src/components/admin/payment-demo-settings.tsx`,
+  `src/components/admin/admin-shell.tsx`, removed
+  `src/app/(admin)/admin/payments/`,
+  `src/components/admin/payment-lifecycle-demo.tsx`,
+  `tests/component/payment-lifecycle-demo.test.tsx`, `tests/e2e/responsive.spec.ts`,
+  `README.md`, and affected `memory-bank/**` files
+- Follow-ups: The interactive 1–24 hour renewal/token-rotation/repricing/
+  deletion UI previously demonstrated on the removed page has no Phase 1
+  replacement; it remains design-only until built against a real backend in
+  Phase 2/3.
+
 ## 2026-09-08 — User capture flow simplified and per-document progress fixed
 
 - Module(s): user-upload, document-capture

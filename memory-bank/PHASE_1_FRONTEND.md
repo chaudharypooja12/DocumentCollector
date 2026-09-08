@@ -177,8 +177,9 @@ integration remains Phase 3.
 - [x] Retain current-page captures after mock cancellation or failure
 - [x] Gate PDF generation, submission success, download, and sharing on mock
       payment success
-- [x] Add a standalone Admin lifecycle demo for 1–24 hour renewal, same-token
-      extension, token rotation, repricing, retained uploads, and deletion
+- [x] Show each demo profile's payment status (Paid, Awaiting payment,
+      Cancelled, Failed, Expired), country, and fixed amount in the Users
+      table (column + filter) and its View dialog
 - [x] Keep all mock settings and state in memory and clear them on refresh
 
 ## 5. Public Link and User Flow

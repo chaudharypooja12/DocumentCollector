@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { DemoProfile, Gender } from "@/data/admin-fixtures";
+import { formatDemoMoney } from "@/lib/payment-demo";
 
 function statusTone(status: DemoProfile["status"]) {
   return status === "Submitted"
@@ -32,6 +33,16 @@ function statusTone(status: DemoProfile["status"]) {
     : status === "In progress"
       ? "brand"
       : "neutral";
+}
+
+function paymentStatusTone(status: DemoProfile["paymentStatus"]) {
+  return status === "Paid"
+    ? "success"
+    : status === "Awaiting payment"
+      ? "brand"
+      : status === "Cancelled" || status === "Failed"
+        ? "warning"
+        : "danger";
 }
 
 export function ViewProfileDialog({ profile }: { profile: DemoProfile }) {
@@ -65,6 +76,19 @@ export function ViewProfileDialog({ profile }: { profile: DemoProfile }) {
           <dt className="text-muted-foreground">Status</dt>
           <dd>
             <Badge tone={statusTone(profile.status)}>{profile.status}</Badge>
+          </dd>
+          <dt className="text-muted-foreground">Payment</dt>
+          <dd>
+            <Badge tone={paymentStatusTone(profile.paymentStatus)}>
+              {profile.paymentStatus}
+            </Badge>
+            <span className="ml-2 text-xs text-muted-foreground">
+              {formatDemoMoney(
+                profile.paymentAmountMinor,
+                profile.paymentCurrency,
+              )}{" "}
+              · {profile.paymentCountryCode === "IN" ? "India" : "UAE"}
+            </span>
           </dd>
           <dt className="text-muted-foreground">Permanent address</dt>
           <dd className="col-span-1 font-semibold">

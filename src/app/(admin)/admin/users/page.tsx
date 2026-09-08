@@ -18,8 +18,10 @@ import {
   demoProfiles,
   type DemoProfile,
   type Gender,
+  type PaymentStatus,
   type ProfileStatus,
 } from "@/data/admin-fixtures";
+import { formatDemoMoney } from "@/lib/payment-demo";
 
 const statusFilters: Array<ProfileStatus | "All"> = [
   "All",
@@ -28,6 +30,14 @@ const statusFilters: Array<ProfileStatus | "All"> = [
   "Submitted",
 ];
 const genderFilters: Array<Gender | "All"> = ["All", "Male", "Female"];
+const paymentStatusFilters: Array<PaymentStatus | "All"> = [
+  "All",
+  "Paid",
+  "Awaiting payment",
+  "Cancelled",
+  "Failed",
+  "Expired",
+];
 
 function statusTone(status: ProfileStatus) {
   return status === "Submitted"
@@ -37,21 +47,36 @@ function statusTone(status: ProfileStatus) {
       : "neutral";
 }
 
+function paymentStatusTone(status: PaymentStatus) {
+  return status === "Paid"
+    ? "success"
+    : status === "Awaiting payment"
+      ? "brand"
+      : status === "Cancelled" || status === "Failed"
+        ? "warning"
+        : "danger";
+}
+
 export default function UsersPage() {
   const [profiles, setProfiles] = useState<DemoProfile[]>(demoProfiles);
   const [statusFilter, setStatusFilter] = useState<ProfileStatus | "All">(
     "All",
   );
   const [genderFilter, setGenderFilter] = useState<Gender | "All">("All");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState<
+    PaymentStatus | "All"
+  >("All");
 
   const filteredProfiles = useMemo(
     () =>
       profiles.filter(
         (profile) =>
           (statusFilter === "All" || profile.status === statusFilter) &&
-          (genderFilter === "All" || profile.gender === genderFilter),
+          (genderFilter === "All" || profile.gender === genderFilter) &&
+          (paymentStatusFilter === "All" ||
+            profile.paymentStatus === paymentStatusFilter),
       ),
-    [profiles, statusFilter, genderFilter],
+    [profiles, statusFilter, genderFilter, paymentStatusFilter],
   );
 
   const columns: DataTableColumn<DemoProfile>[] = useMemo(
@@ -79,6 +104,26 @@ export default function UsersPage() {
         value: (profile) => profile.status,
         cell: (profile) => (
           <Badge tone={statusTone(profile.status)}>{profile.status}</Badge>
+        ),
+      },
+      {
+        id: "payment",
+        header: "Payment",
+        value: (profile) =>
+          `${profile.paymentStatus} ${formatDemoMoney(profile.paymentAmountMinor, profile.paymentCurrency)}`,
+        cell: (profile) => (
+          <div className="flex flex-col gap-1">
+            <Badge tone={paymentStatusTone(profile.paymentStatus)}>
+              {profile.paymentStatus}
+            </Badge>
+            <span className="text-xs text-muted-foreground">
+              {formatDemoMoney(
+                profile.paymentAmountMinor,
+                profile.paymentCurrency,
+              )}{" "}
+              · {profile.paymentCountryCode === "IN" ? "India" : "UAE"}
+            </span>
+          </div>
         ),
       },
       { id: "updated", header: "Updated", value: (profile) => profile.updatedAt },
@@ -143,6 +188,23 @@ export default function UsersPage() {
             {genderFilters.map((gender) => (
               <SelectItem key={gender} value={gender}>
                 {gender === "All" ? "All genders" : gender}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={paymentStatusFilter}
+          onValueChange={(value) =>
+            setPaymentStatusFilter(value as PaymentStatus | "All")
+          }
+        >
+          <SelectTrigger className="min-h-11 w-full rounded-xl sm:w-48">
+            <SelectValue aria-label="Payment status filter" />
+          </SelectTrigger>
+          <SelectContent>
+            {paymentStatusFilters.map((status) => (
+              <SelectItem key={status} value={status}>
+                {status === "All" ? "All payment statuses" : status}
               </SelectItem>
             ))}
           </SelectContent>
