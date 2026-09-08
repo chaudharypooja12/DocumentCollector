@@ -66,8 +66,19 @@ test("Admin link opens the no-login capture and PDF flow", async ({ page }) => {
     }
   }
 
-  await page.getByRole("button", { name: "Generate documents" }).click();
-  await page.getByRole("button", { name: "Generate PDF" }).click();
+  await page
+    .getByRole("button", { name: /Continue to pay/iu })
+    .click();
+  await page.getByRole("button", { name: "Open mock checkout" }).click();
+  await page.getByRole("button", { name: "Cancel checkout" }).click();
+  await expect(page.getByText(/captures are still available/iu)).toBeVisible();
+  await page
+    .getByRole("button", { name: "Retry demo payment" })
+    .click();
+  await page.getByRole("button", { name: "Open mock checkout" }).click();
+  await page
+    .getByRole("button", { name: "Simulate successful payment" })
+    .click();
   await expect(
     page.getByRole("heading", { name: "Documents are ready." }),
   ).toBeVisible();

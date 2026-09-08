@@ -22,15 +22,15 @@ export function ReactivationDemo() {
           </span>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="font-bold">Same-link reactivation preview</h2>
+              <h2 className="font-bold">Link renewal preview</h2>
               <Badge tone={reactivated ? "success" : "warning"}>
                 {reactivated ? "Reactivated" : "Submitted / locked"}
               </Badge>
             </div>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              Phase 2 will reactivate the existing token without generating a
-              new link. This control changes only this demonstration card and
-              resets on refresh.
+              Production renewal can extend the existing token or rotate it and
+              revoke the old one. This control changes only this demonstration
+              card and resets on refresh.
             </p>
           </div>
         </div>

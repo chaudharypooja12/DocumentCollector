@@ -10,7 +10,7 @@
 ## 0. Phase 1 Transient Types (Not Stored)
 
 ```ts
-type Phase1RequestPayload = {
+type Phase1RequestPayloadV1 = {
   version: 1;
   requestId: string;
   createdAt: string;
@@ -23,6 +23,20 @@ type Phase1RequestPayload = {
   }>;
 };
 
+type Phase1RequestPayloadV2 = Omit<Phase1RequestPayloadV1, "version"> & {
+  version: 2;
+  payment: {
+    countryCode: "IN" | "AE";
+    currency: "INR" | "AED";
+    amountMinor: number;
+    gateway: "RAZORPAY_MOCK";
+    priceRevision: number;
+    linkRevision: number;
+  };
+};
+
+type Phase1RequestPayload = Phase1RequestPayloadV1 | Phase1RequestPayloadV2;
+
 type Phase1Capture = {
   documentId: string;
   side: "SINGLE" | "FRONT" | "BACK";
@@ -34,7 +48,9 @@ type Phase1Capture = {
 ```
 
 - `Phase1RequestPayload` is encoded in the generated URL fragment.
-- It contains no name, phone, email, country, image, or other PII.
+- It contains no User name, phone, email, address, image, payment credential, or
+  other PII. Version 2 includes only a billing country code and fixed-price
+  snapshot selected by the Admin.
 - `Phase1Capture` exists only in current-page React memory.
 - No Phase 1 type is written to localStorage, sessionStorage, IndexedDB,
   cookies, a backend, or a database.

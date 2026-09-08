@@ -26,7 +26,17 @@ export type Phase1Capture = {
 type State = {
   request: Phase1RequestPayload;
   captures: Record<string, Phase1Capture>;
-  status: "COLLECTING" | "GENERATING" | "SUBMITTED";
+  status:
+    | "COLLECTING"
+    | "READY_FOR_PAYMENT"
+    | "CHECKOUT_OPEN"
+    | "VERIFYING"
+    | "PAYMENT_CANCELLED"
+    | "PAYMENT_FAILED"
+    | "PAID"
+    | "GENERATING"
+    | "SUBMITTED"
+    | "EXPIRED";
 };
 
 type Action =

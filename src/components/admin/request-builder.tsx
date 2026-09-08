@@ -28,21 +28,28 @@ import {
 } from "@/components/ui/select";
 import {
   buildRequestUrl,
-  createRequestPayload,
+  createPaidRequestPayload,
   MAX_QR_VALUE_LENGTH,
   RequestLinkError,
 } from "@/lib/request-link";
+import {
+  formatDemoMoney,
+  toDemoPaymentConfig,
+  type DemoCountryCode,
+} from "@/lib/payment-demo";
+import { usePaymentDemo } from "@/providers/payment-demo-provider";
 import { useTemplates } from "@/providers/templates-provider";
 
 const requestSchema = z.object({
   templateId: z.string().min(1, "Choose a document template"),
   expiryHours: z.number().int().min(1).max(6),
+  countryCode: z.enum(["IN", "AE"]),
 });
-
 type RequestForm = z.infer<typeof requestSchema>;
 
 export function RequestBuilder() {
   const { templates } = useTemplates();
+  const { prices } = usePaymentDemo();
   const [generatedUrl, setGeneratedUrl] = useState("");
   const [feedback, setFeedback] = useState("");
   const [generationError, setGenerationError] = useState("");
@@ -51,10 +58,12 @@ export function RequestBuilder() {
     defaultValues: {
       templateId: templates[0]?.id ?? "",
       expiryHours: 3,
+      countryCode: "IN" as DemoCountryCode,
     },
   });
   const templateId = watch("templateId");
   const expiryHours = watch("expiryHours");
+  const countryCode = watch("countryCode");
   const selectedTemplate = templates.find(
     (template) => template.id === templateId,
   );
@@ -63,7 +72,15 @@ export function RequestBuilder() {
       (sum, document) => sum + (document.type === "FRONT_BACK" ? 2 : 1),
       0,
     ) ?? 0;
-  const configurationKey = JSON.stringify({ templateId, expiryHours });
+  const selectedPrice = prices[countryCode ?? "IN"];
+  const configurationKey = JSON.stringify({
+    templateId,
+    expiryHours,
+    countryCode,
+    amountMinor: selectedPrice.amountMinor,
+    priceRevision: selectedPrice.revision,
+    priceEnabled: selectedPrice.enabled,
+  });
   const previousConfigurationKey = useRef(configurationKey);
 
   useEffect(() => {
@@ -84,10 +101,18 @@ export function RequestBuilder() {
       setGenerationError("Choose a document template to continue.");
       return;
     }
+    const price = prices[data.countryCode];
+    if (!price.enabled) {
+      setGenerationError(
+        `${price.countryName} payments are disabled in demo settings.`,
+      );
+      return;
+    }
     try {
-      const payload = createRequestPayload(
+      const payload = createPaidRequestPayload(
         template.documents,
         data.expiryHours,
+        toDemoPaymentConfig(price, price.revision),
       );
       setGeneratedUrl(buildRequestUrl(window.location.origin, payload));
       setFeedback("A new temporary link was generated.");
@@ -148,7 +173,10 @@ export function RequestBuilder() {
             name="templateId"
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="min-h-11 rounded-xl">
+                <SelectTrigger
+                  className="min-h-11 rounded-xl"
+                  aria-label="Document template"
+                >
                   <SelectValue placeholder="Choose a template" />
                 </SelectTrigger>
                 <SelectContent>
@@ -174,7 +202,30 @@ export function RequestBuilder() {
           ) : null}
 
           <div className="border-t border-border pt-5">
-            <label className="block max-w-xs">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold">
+                  Billing country
+                </span>
+                <Controller
+                  control={control}
+                  name="countryCode"
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="min-h-11 rounded-xl">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="IN">India</SelectItem>
+                        <SelectItem value="AE">
+                          United Arab Emirates (Dubai)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </label>
+              <label className="block">
               <span className="mb-2 block text-sm font-semibold">
                 Link expiry
               </span>
@@ -199,10 +250,21 @@ export function RequestBuilder() {
                   </Select>
                 )}
               />
-            </label>
+              </label>
+            </div>
+            {!selectedPrice.enabled ? (
+              <InlineAlert tone="danger" className="mt-4">
+                {selectedPrice.countryName} is disabled in Payment Demo
+                settings.
+              </InlineAlert>
+            ) : null}
           </div>
 
-          <Button type="submit" className="w-full sm:w-auto">
+          <Button
+            type="submit"
+            className="w-full sm:w-auto"
+            disabled={!selectedPrice.enabled}
+          >
             {generatedUrl ? (
               <RefreshCw className="size-4" />
             ) : (
@@ -234,11 +296,27 @@ export function RequestBuilder() {
               <dt className="text-muted-foreground">Expires after</dt>
               <dd className="font-semibold">{expiryHours ?? 3} hours</dd>
             </div>
+            <div className="flex justify-between gap-3">
+              <dt className="text-muted-foreground">Country</dt>
+              <dd className="text-right font-semibold">
+                {selectedPrice.countryName}
+              </dd>
+            </div>
+            <div className="flex justify-between gap-3">
+              <dt className="text-muted-foreground">Payment</dt>
+              <dd className="font-semibold">
+                {formatDemoMoney(
+                  selectedPrice.amountMinor,
+                  selectedPrice.currency,
+                )}
+              </dd>
+            </div>
           </dl>
-          <div className="mt-5 rounded-xl border border-success/20 bg-success/5 p-4 text-xs leading-5 text-muted-foreground">
-            No user information is requested or stored. The link carries only
-            this checklist and its expiry.
-          </div>
+          <InlineAlert tone="warning" className="mt-5">
+            Demo payment — no money will be charged. The link carries only this
+            checklist, expiry, country code, and fixed price; it contains no
+            user information.
+          </InlineAlert>
         </Card>
 
         {generatedUrl ? (

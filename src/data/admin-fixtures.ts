@@ -1,6 +1,15 @@
+import type { DemoCountryCode, DemoCurrencyCode } from "@/lib/payment-demo";
+
 export type Gender = "Male" | "Female";
 
 export type ProfileStatus = "Pending" | "In progress" | "Submitted";
+
+export type PaymentStatus =
+  | "Paid"
+  | "Awaiting payment"
+  | "Cancelled"
+  | "Failed"
+  | "Expired";
 
 export type DemoDocumentFile = {
   name: string;
@@ -23,6 +32,10 @@ export type DemoProfile = {
   updatedAt: string;
   reference: string;
   files: DemoDocumentFile[];
+  paymentStatus: PaymentStatus;
+  paymentCountryCode: DemoCountryCode;
+  paymentCurrency: DemoCurrencyCode;
+  paymentAmountMinor: number;
 };
 
 export const demoProfiles: DemoProfile[] = [
@@ -41,6 +54,10 @@ export const demoProfiles: DemoProfile[] = [
     updatedAt: "Today, 10:24",
     reference: "DC-DEMO-1042",
     files: [],
+    paymentStatus: "Awaiting payment",
+    paymentCountryCode: "IN",
+    paymentCurrency: "INR",
+    paymentAmountMinor: 20_000,
   },
   {
     id: "demo-2",
@@ -61,6 +78,10 @@ export const demoProfiles: DemoProfile[] = [
       { name: "Passport.pdf", type: "Individual", pages: 1 },
       { name: "Photograph.pdf", type: "Individual", pages: 1 },
     ],
+    paymentStatus: "Paid",
+    paymentCountryCode: "AE",
+    paymentCurrency: "AED",
+    paymentAmountMinor: 2_000,
   },
   {
     id: "demo-3",
@@ -77,6 +98,10 @@ export const demoProfiles: DemoProfile[] = [
     updatedAt: "Sep 05, 12:10",
     reference: "DC-DEMO-1036",
     files: [],
+    paymentStatus: "Expired",
+    paymentCountryCode: "AE",
+    paymentCurrency: "AED",
+    paymentAmountMinor: 2_000,
   },
   {
     id: "demo-4",
@@ -96,6 +121,10 @@ export const demoProfiles: DemoProfile[] = [
       { name: "Complete_Documents.pdf", type: "Combined", pages: 5 },
       { name: "Residence_proof.pdf", type: "Individual", pages: 1 },
     ],
+    paymentStatus: "Paid",
+    paymentCountryCode: "IN",
+    paymentCurrency: "INR",
+    paymentAmountMinor: 20_000,
   },
   {
     id: "demo-5",
@@ -112,6 +141,10 @@ export const demoProfiles: DemoProfile[] = [
     updatedAt: "Sep 03, 11:15",
     reference: "DC-DEMO-1028",
     files: [],
+    paymentStatus: "Cancelled",
+    paymentCountryCode: "AE",
+    paymentCurrency: "AED",
+    paymentAmountMinor: 2_000,
   },
   {
     id: "demo-6",
@@ -128,6 +161,10 @@ export const demoProfiles: DemoProfile[] = [
     updatedAt: "Sep 02, 09:45",
     reference: "DC-DEMO-1024",
     files: [],
+    paymentStatus: "Awaiting payment",
+    paymentCountryCode: "IN",
+    paymentCurrency: "INR",
+    paymentAmountMinor: 20_000,
   },
   {
     id: "demo-7",
@@ -144,6 +181,10 @@ export const demoProfiles: DemoProfile[] = [
     updatedAt: "Sep 01, 14:20",
     reference: "DC-DEMO-1019",
     files: [{ name: "Complete_Documents.pdf", type: "Combined", pages: 3 }],
+    paymentStatus: "Paid",
+    paymentCountryCode: "IN",
+    paymentCurrency: "INR",
+    paymentAmountMinor: 20_000,
   },
   {
     id: "demo-8",
@@ -160,6 +201,10 @@ export const demoProfiles: DemoProfile[] = [
     updatedAt: "Aug 30, 10:05",
     reference: "DC-DEMO-1014",
     files: [],
+    paymentStatus: "Failed",
+    paymentCountryCode: "IN",
+    paymentCurrency: "INR",
+    paymentAmountMinor: 20_000,
   },
 ];
 

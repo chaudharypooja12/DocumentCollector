@@ -4,6 +4,7 @@ import { Settings as SettingsIcon, RotateCcw, Save } from "lucide-react";
 import { useState } from "react";
 import { DataTable, type DataTableColumn } from "@/components/admin/data-table";
 import { PageHeading } from "@/components/admin/page-heading";
+import { PaymentDemoSettings } from "@/components/admin/payment-demo-settings";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -103,6 +104,8 @@ export default function SettingsPage() {
           </div>
         </form>
       </Card>
+
+      <PaymentDemoSettings />
 
       <h2 className="mt-8 mb-4 text-lg font-bold">Activity logs</h2>
       <DataTable

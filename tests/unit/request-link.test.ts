@@ -1,11 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   buildRequestUrl,
+  createPaidRequestPayload,
   createRequestPayload,
   decodeRequestPayload,
   encodeRequestPayload,
   RequestLinkError,
 } from "@/lib/request-link";
+import {
+  DEFAULT_DEMO_PRICES,
+  toDemoPaymentConfig,
+} from "@/lib/payment-demo";
 
 const now = new Date("2026-09-07T00:00:00.000Z");
 
@@ -42,6 +47,65 @@ describe("Phase 1 request links", () => {
     expect(decoded).toEqual(payload);
     expect(buildRequestUrl("https://example.test/", payload)).toMatch(
       /^https:\/\/example\.test\/u#request=/u,
+    );
+  });
+
+  it("round-trips a PII-free India payment snapshot", () => {
+    const payload = createPaidRequestPayload(
+      [
+        {
+          id: "22222222-2222-4222-8222-222222222222",
+          name: "Passport",
+          type: "FRONT_BACK",
+        },
+      ],
+      3,
+      toDemoPaymentConfig(DEFAULT_DEMO_PRICES.IN),
+      now,
+    );
+
+    expect(decodeRequestPayload(encodeRequestPayload(payload), now)).toEqual(
+      payload,
+    );
+    expect(payload).toMatchObject({
+      version: 2,
+      payment: {
+        countryCode: "IN",
+        currency: "INR",
+        amountMinor: 20_000,
+        gateway: "RAZORPAY_MOCK",
+      },
+    });
+    expect(JSON.stringify(payload)).not.toMatch(
+      /fullName|phone|email|cardNumber|upiId/iu,
+    );
+  });
+
+  it("rejects payment fields on version-one payloads", () => {
+    const payload = createRequestPayload(
+      [
+        {
+          id: "22222222-2222-4222-8222-222222222222",
+          name: "Passport",
+          type: "SINGLE",
+        },
+      ],
+      3,
+      now,
+    );
+
+    const encoded = btoa(
+      JSON.stringify({
+        ...payload,
+        payment: toDemoPaymentConfig(DEFAULT_DEMO_PRICES.IN),
+      }),
+    )
+      .replaceAll("+", "-")
+      .replaceAll("/", "_")
+      .replace(/=+$/u, "");
+
+    expect(() => decodeRequestPayload(encoded, now)).toThrow(
+      expect.objectContaining({ code: "MALFORMED" }),
     );
   });
 
@@ -108,7 +172,7 @@ describe("Phase 1 request links", () => {
     );
     const unsupported = btoa(
       JSON.stringify({
-        version: 2,
+        version: 3,
         requestId: "11111111-1111-4111-8111-111111111111",
         createdAt: now.toISOString(),
         expiresAt: new Date(now.getTime() + 3600000).toISOString(),

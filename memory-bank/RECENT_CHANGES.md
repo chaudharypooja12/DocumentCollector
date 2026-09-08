@@ -21,7 +21,33 @@ Entry format:
 - Module(s): admin, user-upload, project setup
 - Summary: Added a full document-template feature: `templates-provider.tsx` (in-memory CRUD context), `template-builder.tsx` (the drag-and-drop document builder, moved out of request creation), and a new `/admin/templates` page for creating/editing/deleting reusable checklists. `RequestBuilder` now only selects a template and expiry, previews its documents read-only, and prompts to create a template first when none exist — removing the "Add labels only..." subheading along with the inline builder. Merged the standalone `/admin/logs` page into Settings as an "Activity logs" section and removed its route/nav item. Removed the Admin top bar's page-title/breadcrumb text entirely, removed eyebrow labels ("Admin workspace", "Functional Phase 1 workflow", "People", "Workspace") and page-level subheadings from Dashboard/Create Request/Users/Settings, and vertically centered each page's icon with its title. Changed the Dashboard stat grid to 2 columns on mobile. Changed Logout to the primary MBWays orange/white-text button style. Moved each Admin table's filter controls (Users' status/gender Selects) into the same toolbar row as the search input, before the search box, via a new `DataTable` `filters` prop. Gave the local-only Admin sign-in page a real `<header>` bar (previously only an absolutely positioned theme toggle with no visible header). Added Age (15–90) and Full name (≤40 words) validation with specific inline errors to both the public Basic Details form and the Admin "Update profile" dialog. In the public flow: Age and Gender now always render in the same row regardless of screen width, added an "Upload documents" heading above the document list, and added a live orange countdown pill (white text) for the link's remaining time next to the completion percentage. Added public Privacy Policy, Terms of Service, and Contact Us pages (`/privacy`, `/terms`, `/contact`) sharing a `LegalPage` layout, linked from the Home page footer.
 - Files touched: `src/providers/templates-provider.tsx`, `src/components/admin/template-builder.tsx`, `src/app/(admin)/admin/templates/page.tsx`, `src/components/admin/request-builder.tsx`, `src/app/(admin)/admin/{page,settings/page,users/page,requests/new/page}.tsx`, `src/components/admin/{admin-shell,admin-login,page-heading,data-table,profile-actions}.tsx`, `src/features/user-upload/user-flow.tsx`, `src/components/shared/legal-page.tsx`, `src/app/{privacy,terms,contact}/page.tsx`, `src/app/page.tsx`, `tests/component/{request-builder,template-builder,admin-login,theme-shell}.test.tsx`, `tests/e2e/{admin,responsive}.spec.ts`, and affected `memory-bank/**` files
-- Follow-ups: Phase 2 should persist templates as `document_template_items` and enforce the same Age/name limits server-side.
+- Follow-ups: Phase 2 should persist templates as `document_template_items` and enforce the same Age/name limits server-side; reconcile the template-based request builder with the parallel India/UAE mock-payment feature merged the same day (both touch `request-builder.tsx`, `user-flow.tsx`, and the Users page).
+
+## 2026-09-08 — Payment status moved from lifecycle demo into Users table
+
+- Module(s): admin
+- Summary: Removed the standalone Admin payment lifecycle demo page
+  (`/admin/payments/demo`), its nav entry, component, and test. Added a
+  `paymentStatus`/`paymentCountryCode`/`paymentCurrency`/`paymentAmountMinor`
+  field set to `DemoProfile` fixtures (Paid, Awaiting payment, Cancelled,
+  Failed, Expired across the 8 demo profiles) and surfaced it as a new
+  Payment column with a Select filter in the Users table, plus a matching
+  detail row in the View dialog. Fixed the Payment demo Settings Card, which
+  still had a leftover `max-w-2xl` constraint, to span the full page width
+  like every other Admin page, and laid its two country price editors out
+  side by side at the `lg` breakpoint.
+- Files touched: `src/app/(admin)/admin/users/page.tsx`,
+  `src/components/admin/profile-actions.tsx`, `src/data/admin-fixtures.ts`,
+  `src/components/admin/payment-demo-settings.tsx`,
+  `src/components/admin/admin-shell.tsx`, removed
+  `src/app/(admin)/admin/payments/`,
+  `src/components/admin/payment-lifecycle-demo.tsx`,
+  `tests/component/payment-lifecycle-demo.test.tsx`, `tests/e2e/responsive.spec.ts`,
+  `README.md`, and affected `memory-bank/**` files
+- Follow-ups: The interactive 1–24 hour renewal/token-rotation/repricing/
+  deletion UI previously demonstrated on the removed page has no Phase 1
+  replacement; it remains design-only until built against a real backend in
+  Phase 2/3.
 
 ## 2026-09-08 — User capture flow simplified and per-document progress fixed
 
@@ -43,6 +69,30 @@ Entry format:
 - Summary: Fixed the guide border's core bug — readiness was previously derived purely from a lighting/contrast heuristic (`assessGuideFrame`) and ignored whether OpenCV had actually detected the document's four corners, so the red/green indicator was disconnected from real edge detection. Added `evaluateReadiness` (requires an actual detection plus acceptable lighting) and `cornersMovement` (stability comparison between frames) as pure, unit-tested functions in `image-processing.ts`. The live camera view now draws an overlay polygon tracking the detected document edges (`mapObjectCoverPoint` correctly accounts for the video's `object-fit: cover` crop). Once the detected quadrilateral is present and held steady for several analysis ticks, the camera captures automatically, perspective-corrects, and calls `onAccept` without a manual tap or review step; the dialog then auto-advances to the next required document/side (`orderedCaptureTargets`/`nextCaptureTarget` in `capture-store.tsx`) while keeping the same live camera session open, so each page auto-clears without reopening the camera. A short cooldown plus a "Captured — show the next page" indicator prevent double-capturing the same still-held page. Manual capture and file selection remain as explicit fallbacks with their original Retake/Use Photo review step, preserving existing test coverage for those paths.
 - Files touched: `src/lib/image-processing.ts`, `src/components/capture/camera-dialog.tsx`, `src/features/user-upload/capture-store.tsx`, `src/features/user-upload/user-flow.tsx`, `tests/unit/image-processing.test.ts`, `tests/unit/capture-store.test.ts`, and affected `memory-bank/**` files
 - Follow-ups: Verify auto-capture stability/cooldown thresholds on real Android Chrome and iOS Safari devices; tune `STABILITY_TOLERANCE`/`AUTO_CAPTURE_STABLE_FRAMES`/`AUTO_CAPTURE_COOLDOWN_MS` only from verified device findings.
+
+## 2026-09-07 — India/UAE mock payment UI implemented
+
+- Module(s): admin, user-upload, link-management, payment planning
+- Summary: Added an explicitly no-charge, frontend-only payment prototype for
+  India/INR and UAE/AED. Admin settings now hold country prices in memory, paid
+  version-2 request links snapshot the selected country/currency/integer amount,
+  and the User flow collects documents before offering deterministic mock
+  success, decline, and cancellation outcomes. Cancel/failure preserves captures
+  for same-tab retry; mock success exclusively unlocks local PDF generation,
+  submission success, download, and sharing. Added a standalone Admin lifecycle
+  fixture page for 1–24 hour extension, token rotation, original/latest
+  repricing, retained uploads, deletion, late payment, superseded attempts, and
+  duplicate-refund states. Version-1 links remain compatible, no payment
+  credentials/provider SDK/API/persistence were added, and privacy guards plus
+  payment-focused automated coverage were updated.
+- Files touched: `src/lib/payment-demo.ts`, `src/lib/request-link.ts`,
+  `src/providers/payment-demo-provider.tsx`, Admin settings/request/payment-demo
+  surfaces, `src/features/user-upload/**`, affected tests, `README.md`,
+  `AGENT.md`, and affected `memory-bank/**` files
+- Follow-ups: The added payment tests were not executed per the requested
+  lint-and-build-only validation scope. Real Razorpay orders, signed webhooks,
+  persistent uploads, authoritative expiry/revocation, payment reconciliation,
+  and INR settlement remain Phase 2/3 work.
 
 ## 2026-09-07 — Admin dashboard/Users redesign and User Basic Details
 

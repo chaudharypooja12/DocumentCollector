@@ -5,7 +5,9 @@
 
 ## Purpose
 
-Temporary link token issuance, expiry enforcement (max 6h), post-submission lock, and admin reactivation. This is the module responsible for the system's most critical business rule.
+Temporary link issuance, initial expiry enforcement (max 6h), post-submission
+lock, and Admin renewal design (1–24h). This module owns the system's most
+critical link rules.
 
 ## Current Implementation Status
 
@@ -19,7 +21,8 @@ Temporary link token issuance, expiry enforcement (max 6h), post-submission lock
   `crypto.randomUUID()` request id, one-to-six-hour expiry, Zod validation, and
   current-tab state. Oversized encoded links are rejected with actionable Admin
   feedback; valid links beyond conservative QR capacity retain copy and share
-  actions without attempting QR rendering.
+  actions without attempting QR rendering. Version 2 adds a non-sensitive
+  country/currency/price snapshot for mock payment UI.
 - Phase 2: opaque random tokens and centralized server validation for expiry,
   submission lock, and reactivation.
 
@@ -38,6 +41,8 @@ Temporary link token issuance, expiry enforcement (max 6h), post-submission lock
 - Phase 1 expiry depends on the User device clock.
 - Phase 1 submitted state and reactivation cannot persist across reloads or
   devices.
+- Phase 1 has no interactive renewal or token-rotation UI; extension and
+  rotation remain design-only until built against a real backend.
 
 ## Decisions Log
 
@@ -46,6 +51,9 @@ Temporary link token issuance, expiry enforcement (max 6h), post-submission lock
 - 2026-09-07: Phase 1 uses a URL fragment because it must work across devices
   without a backend and fragments are not sent to the server. Only document
   configuration and timestamps are allowed; PII is prohibited.
+- 2026-09-07: Initial links remain limited to six hours. Admin renewal may add
+  1–24 hours and may extend or rotate a token; both require authoritative
+  backend enforcement in production.
 
 ## Next Steps
 

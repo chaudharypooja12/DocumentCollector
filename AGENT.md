@@ -47,15 +47,19 @@ A task is not complete until the Memory Bank reflects it.
   IndexedDB, cookies, or persistent product data.
 - Phase 1 request links may encode document configuration and expiry but must
   never contain User PII or document content.
-- Link expiry never exceeds six hours and is server-authoritative in production.
+- Initial request-link expiry never exceeds six hours. Admin renewal may add
+  1–24 hours from the renewal action and is server-authoritative in production.
 - Phase 1 locks only the current in-memory tab after local generation. Phase 2
   must enforce `SUBMITTED` links and Admin reactivation authoritatively.
 - Front and back documents render on one shared A4 page; single documents get
   one page each.
-- Reactivation reuses the existing link and token.
+- Reactivation may extend the existing token or issue a new token that
+  authoritatively revokes the old one.
 - Never expose a Supabase service-role key or another privileged secret to the
   client bundle.
-- Do not add payment or billing behavior before Phase 3.
+- Phase 1 may demonstrate payment UX with clearly labeled, in-memory mock
+  outcomes only. Real gateway SDKs, APIs, keys, charges, verification, and
+  settlement remain Phase 3 work.
 
 ## Documentation Rules
 

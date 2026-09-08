@@ -21,7 +21,9 @@ workspace settings (including activity logs).
   now has its own `<header>` bar (logo + theme toggle) matching every other
   page instead of an absolutely positioned toggle with no visible header.
 - Dashboard, Templates, Create Request, Users (merged Profiles + Submissions
-  preview), and Settings (including merged Activity Logs) are implemented.
+  preview, now including a per-profile Payment status), and Settings
+  (including merged Activity Logs and Payment demo pricing) are implemented,
+  with in-memory India/UAE demo pricing and oversized-link QR guidance.
 - The responsive shell includes a desktop sidebar, sticky top bar, mobile
   navigation sheet, Light-default in-memory theme control, clear structural
   borders, and Logout back to the local sign-in preview. The top bar no
@@ -48,30 +50,38 @@ workspace settings (including activity logs).
   template). This is the only place the document-builder UI
   (add/remove/reorder documents, drag-and-drop, per-document capture type)
   exists; it was moved out of the request-creation flow.
-- **Create Request** (`/admin/requests/new`): `RequestBuilder` now only picks
-  an existing template from a Select and an expiry (1–6 hours), previews the
-  template's documents as read-only badges, then generates the temporary
-  link/QR/share panel exactly as before. If no templates exist, it shows an
-  inline prompt linking to `/admin/templates`. The "Add labels only. Never
-  include a person's name or contact details." subheading no longer appears
-  here since document authoring lives on the Templates page.
+- **Create Request** (`/admin/requests/new`): `RequestBuilder` picks an
+  existing template from a Select, a billing country (India/UAE, using live
+  demo pricing from `usePaymentDemo()`), and an expiry (1–6 hours), previews
+  the template's documents as read-only badges, then always generates a
+  payment-aware (v2) temporary link/QR/share panel via
+  `createPaidRequestPayload`. If no templates exist, it shows an inline
+  prompt linking to `/admin/templates`; if the selected country's demo price
+  is disabled in Settings, generation is blocked with an inline error. The
+  "Add labels only. Never include a person's name or contact details."
+  subheading no longer appears here since document authoring lives on the
+  Templates page.
 - **Users**: a single merged page replacing the former separate Submissions
-  and PDF Management pages. Status and gender Select filters render in the
-  same toolbar row as the table's search input (filters first, then search,
-  then the Export as CSV button, via the `DataTable` `filters` prop). Each
-  row's Actions column provides View submission (Eye, opens a Dialog with
-  profile details and demonstration document downloads), Update profile
-  (Pencil, opens an editable Dialog including a "same as permanent address"
-  checkbox), and Delete profile (Trash, opens a confirmation Dialog). The
-  Update dialog validates Age (15–90) and Full name (at most 40 words) before
-  saving, showing inline errors. All mutations are in-memory `useState` only
-  and reset on refresh.
+  and PDF Management pages. Status, gender, and Payment status Select filters
+  render in the same toolbar row as the table's search input (filters first,
+  then search, then the Export as CSV button, via the `DataTable` `filters`
+  prop). A Payment column shows each profile's payment status (Paid, Awaiting
+  payment, Cancelled, Failed, Expired) with its country and fixed demo
+  amount; the View dialog repeats this detail. Each row's Actions column
+  provides View submission (Eye, opens a Dialog with profile details and
+  demonstration document downloads), Update profile (Pencil, opens an
+  editable Dialog including a "same as permanent address" checkbox), and
+  Delete profile (Trash, opens a confirmation Dialog). The Update dialog
+  validates Age (15–90) and Full name (at most 40 words) before saving,
+  showing inline errors. All mutations are in-memory `useState` only and
+  reset on refresh.
 - **Settings**: demonstration preferences form spanning the full page width
   (a two-column field grid inside a single full-width `Card`, matching every
-  other Admin page), with no page-level or card-level subheading. Below it, an
-  "Activity logs" section renders the same demonstration log fixtures that
-  previously lived on a standalone `/admin/logs` page (now removed) using the
-  shared `DataTable`.
+  other Admin page), with no page-level or card-level subheading. A second
+  full-width Payment demo Card lets the Admin edit India/UAE prices and
+  enabled status. Below it, an "Activity logs" section renders the same
+  demonstration log fixtures that previously lived on a standalone
+  `/admin/logs` page (now removed) using the shared `DataTable`.
 - Reusable shadcn components provide buttons, cards, fields, selects,
   checkboxes, dialogs, badges, alerts, sheets, menus, separators, tooltips,
   skeletons, progress, and tables. `Input` and the `Select` trigger use a
@@ -94,6 +104,10 @@ workspace settings (including activity logs).
 
 - Phase 1: current-page request-builder state, in-memory document templates
   (`src/providers/templates-provider.tsx`), and typed static fixtures only.
+- Phase 1 payment settings (India/UAE price, enabled status) live in an
+  Admin-layout React context and reset on refresh. Each fixture profile's
+  payment status/country/amount is static demo data, not derived from a real
+  transaction.
 - Phase 2: `admins`, `users`, `document_template_items` (persisted version of
   the Phase 1 in-memory templates), `links`, `submissions`, and
   `generated_pdfs`.
@@ -110,6 +124,8 @@ workspace settings (including activity logs).
   changes (including templates), or reactivate a link on another device. The
   Users page View/Update/Delete actions and the Templates CRUD actions all
   operate only on in-memory state that resets on refresh.
+- Payment UI performs no real gateway request, charge, verification, refund, or
+  cross-tab synchronization.
 - Vercel project connection and physical-device acceptance remain external.
 
 ## Decisions Log
@@ -134,12 +150,21 @@ workspace settings (including activity logs).
   Dashboard to four stat cards and removed static "recent activity"/"private
   by design" cards in favor of the dedicated Logs page. Reordered navigation
   so Settings and Logs sit at the bottom.
+- 2026-09-07: Added a no-charge Phase 1 payment prototype for India/INR and
+  UAE/AED plus a standalone lifecycle simulator. All settings and actions remain
+  in memory; production Razorpay behavior is deferred to Phase 3.
+- 2026-09-08: Removed the standalone Admin payment lifecycle demo page
+  (`/admin/payments/demo`) and its nav entry. Payment status now surfaces
+  directly per profile in the Users table (column + filter) and in the View
+  dialog instead. Fixed the Payment demo Settings Card to match the full-width
+  layout used by every other Admin page.
 - 2026-09-08: Added an in-memory document-template feature
   (`templates-provider.tsx`, `template-builder.tsx`, `/admin/templates`) and
   moved the entire document-builder UI (add/reorder/remove documents,
   per-document capture type) out of the request-creation flow and into
-  Template create/edit dialogs; Create Request now only selects a template
-  and expiry. Merged the standalone Logs page into Settings and removed the
+  Template create/edit dialogs; Create Request now selects a template,
+  billing country, and expiry, and always generates a payment-aware link.
+  Merged the standalone Logs page into Settings and removed the
   separate route/nav item. Removed the Admin top bar's page-title/breadcrumb
   text entirely. Removed eyebrow labels ("Admin workspace", "Functional
   Phase 1 workflow", "People", "Workspace") and page-level subheadings from
@@ -151,6 +176,14 @@ workspace settings (including activity logs).
   validation with inline errors to the Users "Update profile" dialog. Gave
   the local-only Admin sign-in page a proper `<header>` bar instead of an
   absolutely positioned theme toggle with no visible header bar.
+- 2026-09-08: Reconciled the document-templates feature with the parallel
+  Phase 1 payment prototype: Create Request combines the template Select with
+  the payment prototype's billing-country/pricing Select and always calls
+  `createPaidRequestPayload`; the Users table combines the filters-before-
+  search layout with the Payment column/filter; Settings keeps both the
+  Payment demo Card and the merged Activity logs section; the Users "Update
+  profile" dialog keeps both the Payment detail row and the Age/name
+  validation.
 
 ## Next Steps
 
