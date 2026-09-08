@@ -29,6 +29,7 @@ import {
 import {
   buildRequestUrl,
   createPaidRequestPayload,
+  documentTypeLabel,
   MAX_QR_VALUE_LENGTH,
   RequestLinkError,
 } from "@/lib/request-link";
@@ -192,12 +193,15 @@ export function RequestBuilder() {
 
           {selectedTemplate ? (
             <div className="flex flex-wrap gap-2">
-              {selectedTemplate.documents.map((document) => (
-                <Badge key={document.id} tone="neutral">
-                  {document.name}
-                  {document.type === "FRONT_BACK" ? " (Front + Back)" : ""}
-                </Badge>
-              ))}
+              {selectedTemplate.documents.map((document) => {
+                const typeLabel = documentTypeLabel(document.type);
+                return (
+                  <Badge key={document.id} tone="neutral">
+                    {document.name}
+                    {typeLabel ? ` (${typeLabel})` : ""}
+                  </Badge>
+                );
+              })}
             </div>
           ) : null}
 

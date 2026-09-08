@@ -21,6 +21,8 @@ export type Phase1Capture = {
   previewUrl: string;
   width: number;
   height: number;
+  /** Original filename for an uploaded PDF capture (not applicable to camera captures). */
+  fileName?: string;
 };
 
 type State = {
@@ -79,6 +81,7 @@ type CaptureContextValue = State & {
     blob: Blob,
     width: number,
     height: number,
+    fileName?: string,
   ) => void;
   removeCapture: (documentId: string, side: CaptureSide) => void;
   clearCaptures: () => void;
@@ -142,6 +145,7 @@ export function CaptureProvider({
       blob: Blob,
       width: number,
       height: number,
+      fileName?: string,
     ) => {
       const key = keyFor(documentId, side);
       const existing = capturesRef.current[key];
@@ -155,6 +159,7 @@ export function CaptureProvider({
           previewUrl: URL.createObjectURL(blob),
           width,
           height,
+          ...(fileName ? { fileName } : {}),
         },
       });
     },
@@ -179,10 +184,10 @@ export function CaptureProvider({
   const completed = useMemo(
     () =>
       request.documents.filter((document) =>
-        document.type === "SINGLE"
-          ? Boolean(state.captures[keyFor(document.id, "SINGLE")])
-          : Boolean(state.captures[keyFor(document.id, "FRONT")]) &&
-            Boolean(state.captures[keyFor(document.id, "BACK")]),
+        document.type === "FRONT_BACK"
+          ? Boolean(state.captures[keyFor(document.id, "FRONT")]) &&
+            Boolean(state.captures[keyFor(document.id, "BACK")])
+          : Boolean(state.captures[keyFor(document.id, "SINGLE")]),
       ).length,
     [request.documents, state.captures],
   );
@@ -222,9 +227,9 @@ export function captureKey(documentId: string, side: CaptureSide) {
 
 export function requiredCaptureKeys(request: Phase1RequestPayload) {
   return request.documents.flatMap((document) =>
-    document.type === "SINGLE"
-      ? [keyFor(document.id, "SINGLE")]
-      : [keyFor(document.id, "FRONT"), keyFor(document.id, "BACK")],
+    document.type === "FRONT_BACK"
+      ? [keyFor(document.id, "FRONT"), keyFor(document.id, "BACK")]
+      : [keyFor(document.id, "SINGLE")],
   );
 }
 
@@ -246,15 +251,8 @@ export function orderedCaptureTargets(
   request: Phase1RequestPayload,
 ): CaptureTargetDescriptor[] {
   return request.documents.flatMap((document) =>
-    document.type === "SINGLE"
+    document.type === "FRONT_BACK"
       ? [
-          {
-            documentId: document.id,
-            documentName: document.name,
-            side: "SINGLE" as CaptureSide,
-          },
-        ]
-      : [
           {
             documentId: document.id,
             documentName: document.name,
@@ -264,6 +262,13 @@ export function orderedCaptureTargets(
             documentId: document.id,
             documentName: document.name,
             side: "BACK" as CaptureSide,
+          },
+        ]
+      : [
+          {
+            documentId: document.id,
+            documentName: document.name,
+            side: "SINGLE" as CaptureSide,
           },
         ],
   );

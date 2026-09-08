@@ -546,6 +546,10 @@ function Checklist() {
                       <p className="mt-1 text-xs text-muted-foreground">
                         One image · one A4 page
                       </p>
+                    ) : document.type === "PDF_UPLOAD" ? (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Upload an existing PDF file
+                      </p>
                     ) : null}
                   </div>
                 </div>
@@ -556,14 +560,7 @@ function Checklist() {
                       : ""
                   }
                 >
-                  {document.type === "SINGLE" ? (
-                    <CaptureSlot
-                      documentId={document.id}
-                      documentName={document.name}
-                      side="SINGLE"
-                      onCapture={setTarget}
-                    />
-                  ) : (
+                  {document.type === "FRONT_BACK" ? (
                     <>
                       <CaptureSlot
                         documentId={document.id}
@@ -578,6 +575,24 @@ function Checklist() {
                         onCapture={setTarget}
                       />
                     </>
+                  ) : document.type === "PDF_UPLOAD" ? (
+                    <CaptureSlot
+                      documentId={document.id}
+                      documentName={document.name}
+                      side="SINGLE"
+                      isPdfUpload
+                      onCapture={setTarget}
+                      onUploadPdf={(file) =>
+                        setCapture(document.id, "SINGLE", file, 0, 0, file.name)
+                      }
+                    />
+                  ) : (
+                    <CaptureSlot
+                      documentId={document.id}
+                      documentName={document.name}
+                      side="SINGLE"
+                      onCapture={setTarget}
+                    />
                   )}
                 </div>
               </Card>

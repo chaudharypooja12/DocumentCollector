@@ -78,6 +78,18 @@ async function addDocumentPage(
   document: RequestDocument,
   captures: Record<string, Phase1Capture>,
 ) {
+  if (document.type === "PDF_UPLOAD") {
+    const capture = findCapture(captures, document.id, "SINGLE");
+    const sourceBytes = await capture.blob.arrayBuffer();
+    const sourcePdf = await PDFDocument.load(sourceBytes);
+    const copiedPages = await pdf.copyPages(
+      sourcePdf,
+      sourcePdf.getPageIndices(),
+    );
+    copiedPages.forEach((page) => pdf.addPage(page));
+    return;
+  }
+
   const page = pdf.addPage([A4_WIDTH, A4_HEIGHT]);
   const contentWidth = A4_WIDTH - PDF_MARGIN * 2;
   const contentHeight = A4_HEIGHT - PDF_MARGIN * 2;

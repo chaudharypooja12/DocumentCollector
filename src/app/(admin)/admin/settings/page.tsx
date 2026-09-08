@@ -8,7 +8,6 @@ import { PaymentDemoSettings } from "@/components/admin/payment-demo-settings";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { InlineAlert } from "@/components/ui/inline-alert";
 import { Label } from "@/components/ui/label";
 import { demoLogs, type DemoLogEntry } from "@/data/admin-fixtures";
 
@@ -78,10 +77,6 @@ export default function SettingsPage() {
               />
             </div>
           </div>
-          <InlineAlert>
-            The MBWays logo and “Powered by MBWays” identity are fixed product
-            elements and cannot be replaced here.
-          </InlineAlert>
           {message ? (
             <p role="status" className="text-sm text-success">
               {message}

@@ -47,7 +47,7 @@ const templateDocumentSchema = z.object({
     .trim()
     .min(1, "Enter a document name")
     .max(MAX_DOCUMENT_NAME_LENGTH),
-  type: z.enum(["SINGLE", "FRONT_BACK"]),
+  type: z.enum(["SINGLE", "FRONT_BACK", "PDF_UPLOAD"]),
 });
 
 const templateFormSchema = z
@@ -112,7 +112,7 @@ function SortableTemplateDocument({
         isDragging ? "relative z-10 border-primary/60 shadow-xl" : ""
       }`}
     >
-      <div className="grid gap-3 sm:grid-cols-[44px_1fr_180px_auto] sm:items-start">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-[44px_1fr_180px_auto] sm:items-start">
         <button
           type="button"
           className="hidden size-11 cursor-grab items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground sm:inline-flex"
@@ -150,14 +150,15 @@ function SortableTemplateDocument({
                   <SelectValue aria-label={field.value} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="SINGLE">Single image</SelectItem>
-                  <SelectItem value="FRONT_BACK">Front + back</SelectItem>
+                  <SelectItem value="SINGLE">Single side</SelectItem>
+                  <SelectItem value="FRONT_BACK">Front + back side</SelectItem>
+                  <SelectItem value="PDF_UPLOAD">Upload PDF</SelectItem>
                 </SelectContent>
               </Select>
             )}
           />
         </label>
-        <div className="flex items-end gap-1 sm:pt-6">
+        <div className="flex items-center justify-end gap-1 sm:items-end sm:justify-start sm:pt-6">
           <button
             type="button"
             onClick={() => onMove(index, index - 1)}

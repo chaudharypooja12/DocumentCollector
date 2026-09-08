@@ -84,17 +84,12 @@ export function PaymentDemoSettings() {
 
   return (
     <Card className="mt-6">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-3">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
           <span className="rounded-xl bg-primary/10 p-2.5 text-primary">
             <WalletCards className="size-5" />
           </span>
-          <div>
-            <h2 className="text-lg font-bold">Payment demo</h2>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Configure prices used in temporary Phase 1 links.
-            </p>
-          </div>
+          <h2 className="text-lg font-bold">Payment demo</h2>
         </div>
         <Button
           type="button"

@@ -9,7 +9,7 @@ export const MAX_LINK_LENGTH = 7000;
 export const MAX_QR_VALUE_LENGTH = 2200;
 export const MAX_DOCUMENT_NAME_LENGTH = 80;
 
-export type DocumentType = "SINGLE" | "FRONT_BACK";
+export type DocumentType = "SINGLE" | "FRONT_BACK" | "PDF_UPLOAD";
 
 export type RequestDocument = {
   id: string;
@@ -17,6 +17,16 @@ export type RequestDocument = {
   type: DocumentType;
   sortOrder: number;
 };
+
+/** Short human label describing a document's capture requirement, used as a
+ * badge suffix in the Templates and Create Request UI. */
+export function documentTypeLabel(type: DocumentType) {
+  return type === "FRONT_BACK"
+    ? "Front + Back"
+    : type === "PDF_UPLOAD"
+      ? "PDF upload"
+      : null;
+}
 
 type RequestPayloadBase = {
   requestId: string;
@@ -59,7 +69,7 @@ export class RequestLinkError extends Error {
 const documentSchema = z.object({
   id: z.string().uuid(),
   name: z.string().trim().min(1).max(MAX_DOCUMENT_NAME_LENGTH),
-  type: z.enum(["SINGLE", "FRONT_BACK"]),
+  type: z.enum(["SINGLE", "FRONT_BACK", "PDF_UPLOAD"]),
   sortOrder: z
     .number()
     .int()
