@@ -36,7 +36,9 @@ All Admin-facing functionality: dashboard stats, profile/submission review and m
   opens an editable Dialog including a "same as permanent address" checkbox),
   and Delete profile (Trash, opens a confirmation Dialog). All mutations are
   in-memory `useState` only and reset on refresh.
-- **Settings**: demonstration preferences form; values reset on refresh.
+- **Settings**: demonstration preferences form spanning the full page width
+  (a two-column field grid inside a single full-width `Card`, matching every
+  other Admin page); values reset on refresh.
 - **Payment demo**: deterministic fixture scenarios for awaiting/cancelled/
   expired/late/superseded/duplicate payment states, 1–24 hour extension, token
   rotation, original/latest repricing, retained-upload counts, and confirmed
@@ -48,7 +50,12 @@ All Admin-facing functionality: dashboard stats, profile/submission review and m
   version-2 link generation, QR when the link fits capacity, and share actions.
 - Reusable shadcn components provide buttons, cards, fields, selects,
   checkboxes, dialogs, badges, alerts, sheets, menus, separators, tooltips,
-  skeletons, progress, and tables.
+  skeletons, progress, and tables. `Input` and the `Select` trigger use a
+  themed inset "hollow" shadow (`.field-shadow`) instead of a raised shadow so
+  empty fields read as containers waiting for input.
+- No Admin content page constrains its primary `Card` with a `max-w-*` class;
+  every page (Dashboard, Create Request, Users, Settings, Logs) fills the
+  full `page-shell` content width for visual consistency.
 - The reusable Admin data table (`src/components/admin/data-table.tsx`)
   supports per-column `searchable`/`exportable` flags so an Actions column can
   be excluded from search matching and CSV export.

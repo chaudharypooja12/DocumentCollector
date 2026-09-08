@@ -16,6 +16,27 @@ Entry format:
 
 ---
 
+## 2026-09-08 — User capture flow simplified and per-document progress fixed
+
+- Module(s): user-upload, document-capture
+- Summary: Removed redundant copy from the public capture screen: the "Capture your documents"/"Follow the checklist below" heading, the single-submission reminder alert, the "Entered on this device only" Basic Details subheading, and the "Front and back · one shared A4 page" subheading (single-capture documents keep "One image · one A4 page"). Fixed the progress bar/footer counting bug where a front+back document counted as 2 toward the total instead of 1 — `completed`/`required` in `capture-store.tsx` now count fully-captured documents, not individual capture sides, so requesting 2 documents shows "X of 2" instead of "X of 3". Changed the per-slot Capture button to the primary MBWays orange gradient with white text instead of the neutral secondary style. Updated the affected Playwright flow for the camera dialog's auto-advance-without-closing behavior and fixed a pre-existing `getByLabel` ambiguity between the Permanent Address field and the "same as permanent address" checkbox.
+- Files touched: `src/features/user-upload/user-flow.tsx`, `src/features/user-upload/capture-store.tsx`, `src/components/capture/capture-slot.tsx`, `tests/e2e/user-flow.spec.ts`, and affected `memory-bank/**` files
+- Follow-ups: none.
+
+## 2026-09-08 — Settings full-width layout and hollow input shadows
+
+- Module(s): admin
+- Summary: Fixed the Settings page being visibly narrower than every other Admin page — its `Card` was constrained with `max-w-2xl` while Dashboard, Users, Create Request, and Logs all fill the full `page-shell` width. Removed the constraint and restructured the form into a responsive two-column field grid inside a full-width `Card`, matching the rest of the Admin panel. Added a themed inset "hollow" shadow (`--shadow-field` token and `.field-shadow` utility, tuned per Light/Dark theme) to `Input` and the `Select` trigger, replacing their raised `shadow-sm`, so empty fields visually read as containers waiting for input rather than solid raised buttons.
+- Files touched: `src/app/(admin)/admin/settings/page.tsx`, `src/components/ui/input.tsx`, `src/components/ui/select.tsx`, `src/app/globals.css`, and affected `memory-bank/**` files
+- Follow-ups: none.
+
+## 2026-09-08 — CamScanner-style automatic document capture
+
+- Module(s): document-capture, user-upload
+- Summary: Fixed the guide border's core bug — readiness was previously derived purely from a lighting/contrast heuristic (`assessGuideFrame`) and ignored whether OpenCV had actually detected the document's four corners, so the red/green indicator was disconnected from real edge detection. Added `evaluateReadiness` (requires an actual detection plus acceptable lighting) and `cornersMovement` (stability comparison between frames) as pure, unit-tested functions in `image-processing.ts`. The live camera view now draws an overlay polygon tracking the detected document edges (`mapObjectCoverPoint` correctly accounts for the video's `object-fit: cover` crop). Once the detected quadrilateral is present and held steady for several analysis ticks, the camera captures automatically, perspective-corrects, and calls `onAccept` without a manual tap or review step; the dialog then auto-advances to the next required document/side (`orderedCaptureTargets`/`nextCaptureTarget` in `capture-store.tsx`) while keeping the same live camera session open, so each page auto-clears without reopening the camera. A short cooldown plus a "Captured — show the next page" indicator prevent double-capturing the same still-held page. Manual capture and file selection remain as explicit fallbacks with their original Retake/Use Photo review step, preserving existing test coverage for those paths.
+- Files touched: `src/lib/image-processing.ts`, `src/components/capture/camera-dialog.tsx`, `src/features/user-upload/capture-store.tsx`, `src/features/user-upload/user-flow.tsx`, `tests/unit/image-processing.test.ts`, `tests/unit/capture-store.test.ts`, and affected `memory-bank/**` files
+- Follow-ups: Verify auto-capture stability/cooldown thresholds on real Android Chrome and iOS Safari devices; tune `STABILITY_TOLERANCE`/`AUTO_CAPTURE_STABLE_FRAMES`/`AUTO_CAPTURE_COOLDOWN_MS` only from verified device findings.
+
 ## 2026-09-07 — India/UAE mock payment UI implemented
 
 - Module(s): admin, user-upload, link-management, payment planning

@@ -28,7 +28,7 @@ export default function SettingsPage() {
         icon={SettingsIcon}
         demo
       />
-      <Card className="max-w-2xl">
+      <Card>
         <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/12 text-primary">
           <SettingsIcon className="size-5" aria-hidden="true" />
         </div>
@@ -43,34 +43,38 @@ export default function SettingsPage() {
           }}
           className="mt-6 space-y-5"
         >
-          <div>
-            <Label htmlFor="settings-display-name">Admin display name</Label>
-            <Input
-              id="settings-display-name"
-              className="mt-2"
-              value={values.displayName}
-              onChange={(event) =>
-                setValues((current) => ({
-                  ...current,
-                  displayName: event.target.value,
-                }))
-              }
-            />
-          </div>
-          <div>
-            <Label htmlFor="settings-reply-email">Reply email</Label>
-            <Input
-              id="settings-reply-email"
-              type="email"
-              className="mt-2"
-              value={values.replyEmail}
-              onChange={(event) =>
-                setValues((current) => ({
-                  ...current,
-                  replyEmail: event.target.value,
-                }))
-              }
-            />
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="settings-display-name">
+                Admin display name
+              </Label>
+              <Input
+                id="settings-display-name"
+                className="mt-2"
+                value={values.displayName}
+                onChange={(event) =>
+                  setValues((current) => ({
+                    ...current,
+                    displayName: event.target.value,
+                  }))
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="settings-reply-email">Reply email</Label>
+              <Input
+                id="settings-reply-email"
+                type="email"
+                className="mt-2"
+                value={values.replyEmail}
+                onChange={(event) =>
+                  setValues((current) => ({
+                    ...current,
+                    replyEmail: event.target.value,
+                  }))
+                }
+              />
+            </div>
           </div>
           <InlineAlert>
             The MBWays logo and “Powered by MBWays” identity are fixed product

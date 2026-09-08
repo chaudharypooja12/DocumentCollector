@@ -222,16 +222,21 @@ integration remains Phase 3.
 - [x] Render a safe-area-aware guide frame over the native preview
 - [x] Detect the largest plausible document quadrilateral
 - [x] Sample analysis at 6-10 fps independently from preview fps
-- [x] Require stable corners/coverage for several samples before GREEN
+- [x] Require the document to be geometrically detected (not lighting alone)
+      and held stable across several samples before showing READY/GREEN
 - [x] Show corrective hints for:
   - [x] Move closer/farther
   - [x] Show all four corners
   - [x] Hold steady
   - [x] Reduce glare
   - [x] Improve lighting/focus
-- [x] Keep automatic capture off; User explicitly presses Capture
-- [x] Provide an accessible manual override after guidance cannot succeed
+- [x] Automatically capture once the document is detected and stable;
+      auto-advance to the next required page without closing the camera
+- [x] Provide an accessible manual override (disables auto-capture) and a
+      file-selection fallback, both retaining an explicit review step
 - [x] Adapt analysis to a reduced 240px analysis frame and 150ms sampling rate
+- [x] Render a live overlay that tracks the detected document's edges, mapped
+      through the video's `object-fit: cover` crop
 
 ### 5.5 Image Processing and Review
 

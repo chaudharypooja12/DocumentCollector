@@ -69,6 +69,16 @@ The unauthenticated, token-based flow the User experiences: landing/state resolu
 - 2026-09-07: Version-2 links add an Admin-selected India/UAE price snapshot and
   a mock checkout after capture. Cancel/failure supports retry; only mock success
   unlocks local PDF generation.
+- 2026-09-08: Progress now counts per-document completion (each document, not
+  each capture side) so a front+back document counts as 1 of N rather than 2,
+  matching what the User requested. Removed redundant page copy: the
+  "Capture your documents"/"Follow the checklist below" heading, the
+  single-submission reminder alert, the "Entered on this device only"
+  subheading under Basic Details, and the "Front and back · one shared A4
+  page" subheading (the "One image · one A4 page" subheading remains for
+  single-capture documents). The per-slot Capture button now uses the primary
+  MBWays orange gradient with white text instead of the neutral secondary
+  style.
 
 ## Next Steps
 

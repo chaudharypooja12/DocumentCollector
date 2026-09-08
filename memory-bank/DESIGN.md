@@ -31,6 +31,13 @@
 - Scrollbars use the MBWays brand color for the thumb against a muted track in
   both themes, applied globally via `scrollbar-color` and themed
   `::-webkit-scrollbar` rules.
+- All Admin content pages (Dashboard, Create Request, Users, Settings, Logs)
+  use the full `page-shell` content width; no page constrains its primary
+  `Card` with a `max-w-*` class. This keeps every page visually consistent at
+  desktop widths instead of a single narrow column floating in extra space.
+- Fillable fields (`Input`, `Select` trigger) use a themed inset "hollow"
+  shadow (`.field-shadow`, driven by the `--shadow-field` token) instead of a
+  raised drop shadow, so empty fields read as containers waiting for input.
 
 ### 2.2 MBWays Color Palette
 
@@ -118,18 +125,29 @@ All state screens retain the shared DocumentCollector and MBWays brand lockup.
       earlier iterations.
 - [x] **Logs** — demonstration activity log with search, pagination, and CSV
       export.
-- [x] **Settings** — demonstration UI; values reset on refresh.
+- [x] **Settings** — demonstration UI, full-width content matching other Admin
+      pages, values reset on refresh.
 
 ### 4.2 User Upload Flow (simple, mobile-first)
 
 - [x] **Link Landing / Loading** — decodes and validates the URL-fragment request, then opens the document checklist automatically.
 - [x] **Basic Details** — the User enters Full Name, Age, Gender, Phone,
       Permanent Address, and Residence Address (with a "same as permanent
-      address" checkbox) directly in the browser. These details are never
-      encoded in the link, never uploaded, and exist only in current-page
-      memory alongside captures.
-- [x] **Document Upload List** — list of required documents with capture buttons (Front/Back where applicable), progress indicators.
-- [x] **Camera Capture Screen** — live preview, positioning guide box (red/green), capture button, retake button.
+      address" checkbox) directly in the browser, with no explanatory
+      subheading beneath the section title. These details are never encoded
+      in the link, never uploaded, and exist only in current-page memory
+      alongside captures.
+- [x] **Document Upload List** — list of required documents with capture
+      buttons (Front/Back where applicable) and a progress indicator that
+      counts completed documents (a front+back document counts as one, not
+      two). Only single-capture documents show a "One image · one A4 page"
+      subheading; front/back documents show no subheading.
+- [x] **Camera Capture Screen** — live preview with a document-tracking edge
+      overlay (red/green reflects real detected-document state, not lighting
+      alone), automatic capture once the document is detected and held
+      steady, auto-advance to the next required page without closing the
+      camera, and manual capture/file-selection fallbacks with a retake
+      review step.
 - [x] **Review/Edit Screen** — thumbnail of captured image(s), retake/replace controls, per-document status.
 - [x] **Generation Confirmation** — confirms local PDF generation and explains the current session will lock afterward.
 - [x] **Success / Download Screen** — Documents Ready message + Download and supported Share actions.

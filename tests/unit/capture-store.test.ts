@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   isCaptureSetComplete,
+  nextCaptureTarget,
+  orderedCaptureTargets,
   requiredCaptureKeys,
   type Phase1Capture,
 } from "@/features/user-upload/capture-store";
@@ -71,5 +73,49 @@ describe("capture completeness", () => {
         ),
       }),
     ).toBe(true);
+  });
+});
+
+describe("auto-advance capture ordering", () => {
+  const singleTarget = {
+    documentId: "22222222-2222-4222-8222-222222222222",
+    documentName: "Photo",
+    side: "SINGLE" as const,
+  };
+  const frontTarget = {
+    documentId: "33333333-3333-4333-8333-333333333333",
+    documentName: "Passport",
+    side: "FRONT" as const,
+  };
+  const backTarget = {
+    documentId: "33333333-3333-4333-8333-333333333333",
+    documentName: "Passport",
+    side: "BACK" as const,
+  };
+
+  it("orders targets by document then front before back", () => {
+    expect(orderedCaptureTargets(request)).toEqual([
+      singleTarget,
+      frontTarget,
+      backTarget,
+    ]);
+  });
+
+  it("advances to the next uncaptured target after the current one", () => {
+    expect(nextCaptureTarget(request, {}, singleTarget)).toEqual(frontTarget);
+    expect(nextCaptureTarget(request, {}, frontTarget)).toEqual(backTarget);
+    expect(nextCaptureTarget(request, {}, backTarget)).toBeNull();
+  });
+
+  it("skips targets that already have a capture", () => {
+    const captures = {
+      "33333333-3333-4333-8333-333333333333:FRONT": capture(
+        "33333333-3333-4333-8333-333333333333",
+        "FRONT",
+      ),
+    };
+    expect(nextCaptureTarget(request, captures, singleTarget)).toEqual(
+      backTarget,
+    );
   });
 });

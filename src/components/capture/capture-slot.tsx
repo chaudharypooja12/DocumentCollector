@@ -74,7 +74,6 @@ export function CaptureSlot({
       ) : (
         <Button
           type="button"
-          variant="secondary"
           className="w-full"
           disabled={status !== "COLLECTING"}
           onClick={() => onCapture({ documentId, documentName, side })}

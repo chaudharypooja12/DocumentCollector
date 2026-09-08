@@ -175,15 +175,17 @@ export function CaptureProvider({
     dispatch({ type: "CLEAR_CAPTURES" });
   }, []);
 
-  const required = useMemo(
+  const required = request.documents.length;
+  const completed = useMemo(
     () =>
-      request.documents.reduce(
-        (total, document) => total + (document.type === "FRONT_BACK" ? 2 : 1),
-        0,
-      ),
-    [request.documents],
+      request.documents.filter((document) =>
+        document.type === "SINGLE"
+          ? Boolean(state.captures[keyFor(document.id, "SINGLE")])
+          : Boolean(state.captures[keyFor(document.id, "FRONT")]) &&
+            Boolean(state.captures[keyFor(document.id, "BACK")]),
+      ).length,
+    [request.documents, state.captures],
   );
-  const completed = Object.keys(state.captures).length;
 
   const value = useMemo<CaptureContextValue>(
     () => ({
@@ -231,4 +233,60 @@ export function isCaptureSetComplete(
   captures: Record<string, Phase1Capture>,
 ) {
   return requiredCaptureKeys(request).every((key) => Boolean(captures[key]));
+}
+
+export type CaptureTargetDescriptor = {
+  documentId: string;
+  documentName: string;
+  side: CaptureSide;
+};
+
+/** All capture targets for a request, in document and front/back order. */
+export function orderedCaptureTargets(
+  request: Phase1RequestPayload,
+): CaptureTargetDescriptor[] {
+  return request.documents.flatMap((document) =>
+    document.type === "SINGLE"
+      ? [
+          {
+            documentId: document.id,
+            documentName: document.name,
+            side: "SINGLE" as CaptureSide,
+          },
+        ]
+      : [
+          {
+            documentId: document.id,
+            documentName: document.name,
+            side: "FRONT" as CaptureSide,
+          },
+          {
+            documentId: document.id,
+            documentName: document.name,
+            side: "BACK" as CaptureSide,
+          },
+        ],
+  );
+}
+
+/**
+ * The next capture target after `current` that does not already have a
+ * capture, or `null` when every remaining target is filled. Used to
+ * auto-advance the camera to the next required page without closing it.
+ */
+export function nextCaptureTarget(
+  request: Phase1RequestPayload,
+  captures: Record<string, Phase1Capture>,
+  current: CaptureTargetDescriptor,
+): CaptureTargetDescriptor | null {
+  const targets = orderedCaptureTargets(request);
+  const currentIndex = targets.findIndex(
+    (target) =>
+      target.documentId === current.documentId && target.side === current.side,
+  );
+  for (let index = currentIndex + 1; index < targets.length; index += 1) {
+    const target = targets[index]!;
+    if (!captures[keyFor(target.documentId, target.side)]) return target;
+  }
+  return null;
 }
