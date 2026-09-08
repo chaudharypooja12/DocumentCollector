@@ -1,26 +1,28 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useEffect } from "react";
+import { describe, expect, it } from "vitest";
 import { RequestBuilder } from "@/components/admin/request-builder";
+import {
+  TemplatesProvider,
+  useTemplates,
+} from "@/providers/templates-provider";
+
+function renderBuilder() {
+  render(
+    <TemplatesProvider>
+      <RequestBuilder />
+    </TemplatesProvider>,
+  );
+}
 
 describe("RequestBuilder", () => {
-  beforeEach(() => {
-    let sequence = 100;
-    vi.spyOn(globalThis.crypto, "randomUUID").mockImplementation(
-      () =>
-        `00000000-0000-4000-8000-${String(sequence++).padStart(12, "0")}` as `${string}-${string}-${string}-${string}-${string}`,
-    );
-  });
-
-  it("adds documents and generates a PII-free request URL", async () => {
+  it("generates a PII-free request URL from the default template", async () => {
     const user = userEvent.setup();
-    render(<RequestBuilder />);
+    renderBuilder();
 
-    expect(screen.getAllByPlaceholderText("e.g. Passport")).toHaveLength(2);
-    await user.click(screen.getByRole("button", { name: "Add document" }));
-    const inputs = screen.getAllByPlaceholderText("e.g. Passport");
-    expect(inputs).toHaveLength(3);
-    await user.type(inputs[2]!, "Residence proof");
+    expect(screen.getByText("Passport (Front + Back)")).toBeVisible();
+    expect(screen.getByText("Photograph")).toBeVisible();
 
     await user.click(
       screen.getByRole("button", { name: "Generate temporary link" }),
@@ -35,91 +37,43 @@ describe("RequestBuilder", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("supports touch and keyboard-friendly move controls", async () => {
+  it("removes a generated link when the expiry changes", async () => {
     const user = userEvent.setup();
-    render(<RequestBuilder />);
-
-    expect(screen.getAllByPlaceholderText("e.g. Passport")[0]).toHaveValue(
-      "Passport",
-    );
-    await user.click(
-      screen.getByRole("button", { name: "Move document 1 down" }),
-    );
-
-    expect(screen.getAllByPlaceholderText("e.g. Passport")[0]).toHaveValue(
-      "Photograph",
-    );
-    expect(screen.getAllByPlaceholderText("e.g. Passport")[1]).toHaveValue(
-      "Passport",
-    );
-  });
-
-  it("removes a generated link when its request configuration changes", async () => {
-    const user = userEvent.setup();
-    render(<RequestBuilder />);
+    renderBuilder();
 
     await user.click(
       screen.getByRole("button", { name: "Generate temporary link" }),
     );
     expect(await screen.findByText(/\/u#request=/u)).toBeVisible();
 
-    await user.type(
-      screen.getAllByPlaceholderText("e.g. Passport")[0]!,
-      " updated",
-    );
+    await user.click(screen.getByRole("combobox", { name: /hours?/iu }));
+    await user.click(screen.getByRole("option", { name: "5 hours" }));
 
     expect(screen.queryByText(/\/u#request=/u)).not.toBeInTheDocument();
-    expect(
-      screen.queryByText("A new temporary link was generated."),
-    ).not.toBeInTheDocument();
   });
 
-  it(
-    "handles links that exceed QR or encoded-link capacity",
-    { timeout: 15000 },
-    async () => {
-      const user = userEvent.setup();
-      render(<RequestBuilder />);
-
-      for (let index = 2; index < 20; index += 1) {
-        await user.click(screen.getByRole("button", { name: "Add document" }));
-      }
-
-      const inputs = screen.getAllByPlaceholderText("e.g. Passport");
-      inputs.forEach((input, index) => {
-        fireEvent.change(input, {
-          target: {
-            value: `${String(index).padStart(2, "0")}-${"a".repeat(77)}`,
-          },
-        });
-      });
-      await user.click(
-        screen.getByRole("button", { name: "Generate temporary link" }),
-      );
-
-      expect(
-        await screen.findByText(/too long for a reliable QR code/u),
-      ).toBeVisible();
-      expect(
-        screen.queryByLabelText("QR code for temporary document request"),
-      ).not.toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Copy" })).toBeVisible();
-
-      inputs.forEach((input, index) => {
-        fireEvent.change(input, {
-          target: {
-            value: `${String(index).padStart(2, "0")}-${"界".repeat(77)}`,
-          },
-        });
-      });
-      await user.click(
-        screen.getByRole("button", { name: "Generate temporary link" }),
-      );
-
-      expect(await screen.findByText(/checklist is too large/u)).toBeVisible();
-      expect(
-        screen.queryByRole("button", { name: "Copy" }),
-      ).not.toBeInTheDocument();
-    },
-  );
+  it("prompts to create a template when none exist", () => {
+    render(
+      <TemplatesProvider>
+        <EmptyTemplatesHarness />
+      </TemplatesProvider>,
+    );
+    expect(
+      screen.getByText(/No document templates exist yet/u),
+    ).toBeVisible();
+  });
 });
+
+/** Clears the provider's seeded default template so RequestBuilder renders
+ * its empty-state prompt instead. */
+function EmptyTemplatesHarness() {
+  const { templates, removeTemplate } = useTemplates();
+
+  useEffect(() => {
+    templates.forEach((template) => removeTemplate(template.id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (templates.length > 0) return null;
+  return <RequestBuilder />;
+}

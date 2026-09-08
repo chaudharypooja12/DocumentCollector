@@ -19,7 +19,10 @@ test("Landing page and local-only Admin sign-in lead to the workspace", async ({
   await expect(page).toHaveURL(/\/admin$/);
   expect(new URL(page.url()).search).toBe("");
   await expect(page.locator("html")).toHaveClass(/light/u);
-  await expect(page.getByRole("banner").getByText("Dashboard")).toBeVisible();
+  await expect(page.getByRole("banner")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Dashboard" }),
+  ).toBeVisible();
   await expect(page.getByRole("link", { name: "Logout" })).toBeVisible();
 
   await page.getByRole("button", { name: "Switch to dark theme" }).click();

@@ -33,7 +33,6 @@ export default function AdminDashboard() {
   return (
     <>
       <PageHeading
-        eyebrow="Admin workspace"
         title="Dashboard"
         icon={LayoutDashboard}
         action={
@@ -48,7 +47,7 @@ export default function AdminDashboard() {
       <TooltipProvider>
         <section
           aria-label="Overview"
-          className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+          className="grid grid-cols-2 gap-4 xl:grid-cols-4"
         >
           <Card>
             <div className="flex items-start justify-between">

@@ -112,35 +112,47 @@ current page memory.
 - [x] Retain the brand lockup on success, expired, invalid, and locked screens
 - [x] Meet WCAG 2.2 AA contrast and visible-focus requirements
 - [x] Honor reduced-motion preferences
+- [x] Build public Privacy Policy, Terms of Service, and Contact Us pages
+      (`/privacy`, `/terms`, `/contact`) sharing a common `LegalPage` layout
+      with the same header/footer as the rest of the site; link them from the
+      Home page footer
 
 ## 4. Admin UI
 
 ### 4.1 Dashboard and Demonstration Screens
 
 - [x] Build `/admin` responsive dashboard
-- [x] Add a sticky Admin top bar with page context, theme control, and Logout
+- [x] Add a sticky Admin top bar with theme control and a primary-styled
+      Logout action (no page-title/breadcrumb text)
 - [x] Add clearly visible sidebar/header/content borders in both themes
 - [x] Use a shadcn Sheet for responsive mobile navigation
 - [x] Clearly label Phase 1 data-dependent cards as demonstrations
 - [x] Add static fixtures for counts and recent activity
-- [x] Build responsive Users, Submissions, PDF Management, and Settings screens
-- [x] Add reusable responsive Admin tables with search, pagination, and CSV
-      export for demonstration records
-      from typed static fixtures
+- [x] Show four Dashboard stat cards (Total profiles, Pending, Male users,
+      Female users), 2-per-row on mobile and 4-per-row at `xl`
+- [x] Build a responsive, merged Users screen (profiles + submission preview)
+      and a Settings screen with a merged Activity Logs section
+- [x] Add reusable responsive Admin tables with a filters-before-search
+      toolbar row, pagination, and CSV export for demonstration records from
+      typed static fixtures
 - [x] Ensure no form on these demonstration screens claims that data was saved
 - [x] Reset all interactive demonstration state on refresh
+- [x] Remove eyebrow labels and page-level subheadings from Admin page
+      headings; align each page's icon and title vertically
 
-### 4.2 Functional Request Builder
+### 4.2 Document Templates and Request Creation
 
-- [x] Build `/admin/requests/new`
-- [x] Add/remove required document rows
-- [x] Validate document label length and uniqueness
+- [x] Build `/admin/templates` for creating, editing, and deleting reusable
+      document-template checklists (in-memory, resets on refresh)
+- [x] Add/remove required document rows within a template
+- [x] Validate document label length and uniqueness within a template
 - [x] Choose `SINGLE` or `FRONT_BACK` per document
 - [x] Reorder documents with dnd-kit
 - [x] Provide keyboard and touch-friendly Up/Down alternatives
-- [x] Choose expiry from one to six hours
-- [x] Show a live request summary
-- [x] Require at least one valid document before link generation
+- [x] Build `/admin/requests/new` to select an existing template and an
+      expiry (1–6 hours) only; no inline document authoring here
+- [x] Show a live request summary derived from the selected template
+- [x] Prompt to create a template first when none exist
 - [x] Do not request or encode User PII
 
 ### 4.3 Link Generation and Sharing
@@ -178,9 +190,17 @@ current page memory.
 - [x] Render documents in Admin-defined order
 - [x] Render one capture target for `SINGLE`
 - [x] Render separate Front and Back targets for `FRONT_BACK`
-- [x] Show completed/remaining progress
+- [x] Show completed/remaining progress, counted per document (a
+      Front+Back document counts as one, not two)
+- [x] Show a live orange countdown pill (white text) for the link's remaining
+      time next to the completion percentage
+- [x] Collect Basic Details (Full Name ≤40 words, Age 15–90, Gender, Phone,
+      Permanent/Residence Address with a "same as permanent address"
+      checkbox) locally, with Age and Gender always in the same row and
+      specific inline validation errors
 - [x] Show thumbnail, Retake, and Remove actions
-- [x] Disable Generate Documents until every required side is accepted
+- [x] Disable Generate Documents until every required side is accepted and
+      Basic Details are valid
 - [x] Keep the primary action reachable on small screens
 
 ### 5.3 Camera Permission and Fallback

@@ -106,27 +106,40 @@ All state screens retain the shared DocumentCollector and MBWays brand lockup.
 ### 4.1 Admin Panel (mobile-first and desktop-enhanced)
 
 - [x] **Landing and Admin Sign-in Preview** — MBWays-branded entry with an
-      explicitly local-only, non-authenticating Phase 1 form.
+      explicitly local-only, non-authenticating Phase 1 form. The sign-in
+      page has its own `<header>` bar (logo + theme toggle) matching every
+      other page.
 - [x] **Dashboard** — four at-a-glance stat cards (Total profiles, Pending
       with a hover explanation, Male users, Female users) computed from
-      typed static fixtures.
+      typed static fixtures, shown 2-per-row on mobile and 4-per-row at `xl`.
 - [x] **Admin Shell** — desktop sidebar, sticky top bar, responsive navigation
-      sheet, in-memory Light/Dark switch, and Phase 1 Logout-to-preview action.
-      Settings and Logs are ordered at the bottom of navigation.
-- [x] **Create Request** — select document requirements and expiry without adding PII to the link.
-- [x] **Document Templates** — select documents required for this user; drag-and-drop ordering; toggle Single vs Front+Back per document.
-- [x] **Document Requests / Link Generation** — set expiry (max 6h), generate link, share options (Copy / WhatsApp / Email).
+      sheet, in-memory Light/Dark switch, and a primary-orange, white-text
+      Phase 1 Logout-to-preview action. The top bar no longer shows a
+      page-title/breadcrumb; it only contains navigation, the theme switch,
+      and Logout.
+- [x] **Templates** — a dedicated screen for building reusable document
+      checklists: name, add/remove document rows, drag-and-drop reordering,
+      and toggle Single vs Front+Back per document. This is now the only
+      place the document-builder UI lives.
+- [x] **Create Request** — select an existing template and an expiry (no PII
+      added to the link); links to Templates when none exist yet.
 - [x] **Share Request** — copy link, QR code, native share, WhatsApp, and email.
 - [x] **Users / Profiles** — a single responsive table merges profile
-      records and their submission preview. Status and gender filters, search,
-      pagination, and CSV export are available. Per-row actions provide View
-      submission (Eye), Update profile (Pencil), and Delete profile (Trash),
-      replacing the separate Submissions and PDF Management pages from
-      earlier iterations.
-- [x] **Logs** — demonstration activity log with search, pagination, and CSV
-      export.
-- [x] **Settings** — demonstration UI, full-width content matching other Admin
-      pages, values reset on refresh.
+      records and their submission preview. Status and gender filters render
+      in the same toolbar row as the search input (filters first), followed
+      by pagination and CSV export. Per-row actions provide View submission
+      (Eye), Update profile (Pencil, with Age 15–90 and Full name ≤40-word
+      validation), and Delete profile (Trash).
+- [x] **Settings** — demonstration UI, full-width content matching other
+      Admin pages, no page-level subheading, values reset on refresh. Includes
+      a merged "Activity logs" section (the former standalone Logs page) with
+      search, pagination, and CSV export.
+
+Every Admin page heading now shows only an icon (vertically centered with
+the title) and, where relevant, the "Phase 1 demonstration" badge — the
+eyebrow labels "Admin workspace", "Functional Phase 1 workflow", "People",
+and "Workspace" have been removed, along with the Create Request and
+Settings page-level subheadings.
 
 ### 4.2 User Upload Flow (simple, mobile-first)
 
@@ -134,14 +147,19 @@ All state screens retain the shared DocumentCollector and MBWays brand lockup.
 - [x] **Basic Details** — the User enters Full Name, Age, Gender, Phone,
       Permanent Address, and Residence Address (with a "same as permanent
       address" checkbox) directly in the browser, with no explanatory
-      subheading beneath the section title. These details are never encoded
-      in the link, never uploaded, and exist only in current-page memory
-      alongside captures.
-- [x] **Document Upload List** — list of required documents with capture
-      buttons (Front/Back where applicable) and a progress indicator that
-      counts completed documents (a front+back document counts as one, not
-      two). Only single-capture documents show a "One image · one A4 page"
-      subheading; front/back documents show no subheading.
+      subheading beneath the section title. Age and Gender always render in
+      the same row regardless of screen width. Full name is limited to 40
+      words and Age to 15–90 years, each with a specific inline error. These
+      details are never encoded in the link, never uploaded, and exist only
+      in current-page memory alongside captures.
+- [x] **Document Upload List** — an "Upload documents" heading (matching the
+      "Basic details" section style) precedes the list of required documents
+      with capture buttons (Front/Back where applicable) and a progress
+      indicator that counts completed documents (a front+back document
+      counts as one, not two), shown alongside a live orange countdown pill
+      (white text) for the link's remaining time. Only single-capture
+      documents show a "One image · one A4 page" subheading; front/back
+      documents show no subheading.
 - [x] **Camera Capture Screen** — live preview with a document-tracking edge
       overlay (red/green reflects real detected-document state, not lighting
       alone), automatic capture once the document is detected and held
@@ -153,6 +171,18 @@ All state screens retain the shared DocumentCollector and MBWays brand lockup.
 - [x] **Success / Download Screen** — Documents Ready message + Download and supported Share actions.
 - [x] **Expired Link Screen** — static message, no interactive upload elements.
 - [x] **Locked/Already-Submitted Screen** — current-tab state only in Phase 1; preserve generated download actions while memory remains. The link accepts a single submission per tab session.
+
+### 4.3 Public Marketing & Legal
+
+- [x] **Home** — MBWays-branded landing page; footer links to Privacy Policy,
+      Terms of Service, and Contact Us.
+- [x] **Privacy Policy** (`/privacy`) — explains the Phase 1 no-backend,
+      no-storage contract and MBWays contact details.
+- [x] **Terms of Service** (`/terms`) — Phase 1 scope/limitations, acceptable
+      use, and MBWays intellectual-property notice.
+- [x] **Contact Us** (`/contact`) — MBWays email, office hours, and address.
+- All three share a `LegalPage` layout with the same header (logo + theme
+  toggle) and footer as the rest of the site.
 
 ---
 

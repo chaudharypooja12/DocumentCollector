@@ -30,12 +30,16 @@ reactivation are introduced in Phase 2.
 
 The complete frontend implementation is available under `src/`:
 
-- `/` — MBWays-branded product landing page;
+- `/` — MBWays-branded product landing page (footer links to Privacy, Terms, Contact);
 - `/admin/login` — local-only Admin sign-in UI preview (no authentication or
   credential storage in Phase 1);
 - `/admin` — responsive demonstration dashboard and management screens;
-- `/admin/requests/new` — functional request builder and link/QR sharing;
-- `/u#request=<payload>` — no-login capture, review, local PDF, and download flow.
+- `/admin/templates` — build, edit, and delete reusable document-template checklists;
+- `/admin/requests/new` — select a template and expiry, then generate the link/QR;
+- `/admin/users` — merged profile/submission demonstration table;
+- `/admin/settings` — workspace preferences and activity-log demonstration;
+- `/u#request=<payload>` — no-login capture, review, local PDF, and download flow;
+- `/privacy`, `/terms`, `/contact` — public legal and contact pages.
 
 OpenCV.js is pinned under `public/opencv/` and loaded only when the camera
 workflow starts. Captures are normalized and PDFs are generated entirely in the

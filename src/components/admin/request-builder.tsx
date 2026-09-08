@@ -1,51 +1,24 @@
 "use client";
 
-import {
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  ArrowDown,
-  ArrowUp,
   Check,
   Copy,
-  GripVertical,
+  LayoutTemplate,
   Mail,
-  Plus,
   RefreshCw,
   Send,
   Share2,
-  Trash2,
 } from "lucide-react";
+import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useRef, useState } from "react";
-import {
-  Controller,
-  useFieldArray,
-  useForm,
-  useWatch,
-  type Control,
-  type FieldErrors,
-  type UseFormRegister,
-} from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { InlineAlert } from "@/components/ui/inline-alert";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -56,212 +29,42 @@ import {
 import {
   buildRequestUrl,
   createRequestPayload,
-  MAX_DOCUMENTS,
   MAX_QR_VALUE_LENGTH,
   RequestLinkError,
-  type DocumentType,
 } from "@/lib/request-link";
+import { useTemplates } from "@/providers/templates-provider";
 
-const documentSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string().trim().min(1, "Enter a document name").max(80),
-  type: z.enum(["SINGLE", "FRONT_BACK"]),
+const requestSchema = z.object({
+  templateId: z.string().min(1, "Choose a document template"),
+  expiryHours: z.number().int().min(1).max(6),
 });
-
-const requestSchema = z
-  .object({
-    documents: z.array(documentSchema).min(1).max(MAX_DOCUMENTS),
-    expiryHours: z.number().int().min(1).max(6),
-  })
-  .superRefine((data, context) => {
-    const names = new Set<string>();
-    data.documents.forEach((document, index) => {
-      const name = document.name.trim().toLocaleLowerCase();
-      if (names.has(name)) {
-        context.addIssue({
-          code: "custom",
-          message: "Document names must be unique",
-          path: ["documents", index, "name"],
-        });
-      }
-      names.add(name);
-    });
-  });
 
 type RequestForm = z.infer<typeof requestSchema>;
 
-function newDocument(name = ""): RequestForm["documents"][number] {
-  return { id: crypto.randomUUID(), name, type: "SINGLE" };
-}
-
-function SortableDocument({
-  id,
-  index,
-  count,
-  control,
-  register,
-  errors,
-  onMove,
-  onRemove,
-}: {
-  id: string;
-  index: number;
-  count: number;
-  control: Control<RequestForm>;
-  register: UseFormRegister<RequestForm>;
-  errors: FieldErrors<RequestForm>;
-  onMove: (from: number, to: number) => void;
-  onRemove: () => void;
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`rounded-2xl border border-border bg-muted/35 p-4 ${
-        isDragging ? "relative z-10 border-primary/60 shadow-xl" : ""
-      }`}
-    >
-      <div className="grid gap-3 sm:grid-cols-[44px_1fr_180px_auto] sm:items-start">
-        <button
-          type="button"
-          className="hidden size-11 cursor-grab items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground sm:inline-flex"
-          aria-label={`Drag document ${index + 1}`}
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical className="size-5" />
-        </button>
-        <label>
-          <span className="mb-2 block text-xs font-semibold text-muted-foreground">
-            Document {index + 1}
-          </span>
-          <Input
-            placeholder="e.g. Passport"
-            {...register(`documents.${index}.name`)}
-            aria-invalid={Boolean(errors.documents?.[index]?.name)}
-          />
-          {errors.documents?.[index]?.name?.message ? (
-            <span className="mt-1 block text-xs text-destructive">
-              {errors.documents[index]?.name?.message}
-            </span>
-          ) : null}
-        </label>
-        <label>
-          <span className="mb-2 block text-xs font-semibold text-muted-foreground">
-            Capture type
-          </span>
-          <Controller
-            control={control}
-            name={`documents.${index}.type`}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="min-h-11 rounded-xl">
-                  <SelectValue aria-label={field.value} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="SINGLE">Single image</SelectItem>
-                  <SelectItem value="FRONT_BACK">Front + back</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </label>
-        <div className="flex items-end gap-1 sm:pt-6">
-          <button
-            type="button"
-            onClick={() => onMove(index, index - 1)}
-            disabled={index === 0}
-            className="inline-flex size-11 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-25"
-            aria-label={`Move document ${index + 1} up`}
-          >
-            <ArrowUp className="size-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => onMove(index, index + 1)}
-            disabled={index === count - 1}
-            className="inline-flex size-11 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-25"
-            aria-label={`Move document ${index + 1} down`}
-          >
-            <ArrowDown className="size-4" />
-          </button>
-          <button
-            type="button"
-            onClick={onRemove}
-            disabled={count === 1}
-            className="inline-flex size-11 items-center justify-center rounded-xl text-destructive hover:bg-destructive/10 disabled:opacity-25"
-            aria-label={`Remove document ${index + 1}`}
-          >
-            <Trash2 className="size-4" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function RequestBuilder() {
+  const { templates } = useTemplates();
   const [generatedUrl, setGeneratedUrl] = useState("");
   const [feedback, setFeedback] = useState("");
   const [generationError, setGenerationError] = useState("");
-  const {
-    control,
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<RequestForm>({
+  const { control, handleSubmit, watch } = useForm<RequestForm>({
     resolver: zodResolver(requestSchema),
     defaultValues: {
-      documents: [
-        {
-          id: "00000000-0000-4000-8000-000000000001",
-          name: "Passport",
-          type: "FRONT_BACK" as DocumentType,
-        },
-        {
-          id: "00000000-0000-4000-8000-000000000002",
-          name: "Photograph",
-          type: "SINGLE" as DocumentType,
-        },
-      ],
+      templateId: templates[0]?.id ?? "",
       expiryHours: 3,
     },
   });
-  const { fields, append, remove, move } = useFieldArray({
-    control,
-    name: "documents",
-    keyName: "fieldKey",
-  });
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
+  const templateId = watch("templateId");
+  const expiryHours = watch("expiryHours");
+  const selectedTemplate = templates.find(
+    (template) => template.id === templateId,
   );
-  const values = useWatch({ control });
-  const watchedDocuments = values.documents ?? [];
-  const configurationKey = JSON.stringify({
-    documents: watchedDocuments.map(({ id, name, type }) => ({
-      id,
-      name,
-      type,
-    })),
-    expiryHours: values.expiryHours,
-  });
+  const totalCaptures =
+    selectedTemplate?.documents.reduce(
+      (sum, document) => sum + (document.type === "FRONT_BACK" ? 2 : 1),
+      0,
+    ) ?? 0;
+  const configurationKey = JSON.stringify({ templateId, expiryHours });
   const previousConfigurationKey = useRef(configurationKey);
-  const totalCaptures = watchedDocuments.reduce(
-    (sum, document) => sum + (document.type === "FRONT_BACK" ? 2 : 1),
-    0,
-  );
 
   useEffect(() => {
     if (previousConfigurationKey.current === configurationKey) return;
@@ -272,26 +75,27 @@ export function RequestBuilder() {
     setGenerationError("");
   }, [configurationKey]);
 
-  function reorder(event: DragEndEvent) {
-    if (!event.over || event.active.id === event.over.id) return;
-    const from = fields.findIndex((field) => field.id === event.active.id);
-    const to = fields.findIndex((field) => field.id === event.over?.id);
-    if (from >= 0 && to >= 0) move(from, to);
-  }
-
   const generate = handleSubmit((data) => {
     setGeneratedUrl("");
     setFeedback("");
     setGenerationError("");
+    const template = templates.find((item) => item.id === data.templateId);
+    if (!template) {
+      setGenerationError("Choose a document template to continue.");
+      return;
+    }
     try {
-      const payload = createRequestPayload(data.documents, data.expiryHours);
+      const payload = createRequestPayload(
+        template.documents,
+        data.expiryHours,
+      );
       setGeneratedUrl(buildRequestUrl(window.location.origin, payload));
       setFeedback("A new temporary link was generated.");
     } catch (error) {
       setGenerationError(
         error instanceof RequestLinkError && error.code === "TOO_LARGE"
-          ? "This checklist is too large for a temporary link. Shorten document names or remove documents and try again."
-          : "The temporary link could not be generated. Review the checklist and try again.",
+          ? "This checklist is too large for a temporary link. Use a shorter template and try again."
+          : "The temporary link could not be generated. Review the template and try again.",
       );
     }
   });
@@ -314,61 +118,60 @@ export function RequestBuilder() {
     setFeedback("Share sheet opened.");
   }
 
+  if (templates.length === 0) {
+    return (
+      <InlineAlert tone="warning">
+        No document templates exist yet.{" "}
+        <Link href="/admin/templates" className="font-semibold underline">
+          Create a template
+        </Link>{" "}
+        first, then return here to generate a request.
+      </InlineAlert>
+    );
+  }
+
   return (
     <div className="grid gap-6 xl:grid-cols-[1.45fr_.8fr]">
       <Card>
         <form onSubmit={generate} className="space-y-5">
           <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-bold">Required documents</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Add labels only. Never include a person&apos;s name or contact
-                details.
-              </p>
-            </div>
-            <span className="text-xs text-muted-foreground">
-              {fields.length}/{MAX_DOCUMENTS}
-            </span>
+            <h2 className="text-lg font-bold">Document template</h2>
+            <Button asChild variant="link" size="sm" className="px-0">
+              <Link href="/admin/templates">
+                <LayoutTemplate className="size-4" /> Manage templates
+              </Link>
+            </Button>
           </div>
 
-          <DndContext
-            id="request-document-order"
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={reorder}
-          >
-            <SortableContext
-              items={fields.map((field) => field.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-3">
-                {fields.map((field, index) => (
-                  <SortableDocument
-                    key={field.id}
-                    id={field.id}
-                    index={index}
-                    count={fields.length}
-                    control={control}
-                    register={register}
-                    errors={errors}
-                    onMove={(from, to) => {
-                      if (to >= 0 && to < fields.length) move(from, to);
-                    }}
-                    onRemove={() => remove(index)}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
+          <Controller
+            control={control}
+            name="templateId"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="min-h-11 rounded-xl">
+                  <SelectValue placeholder="Choose a template" />
+                </SelectTrigger>
+                <SelectContent>
+                  {templates.map((template) => (
+                    <SelectItem key={template.id} value={template.id}>
+                      {template.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
 
-          <Button
-            type="button"
-            variant="secondary"
-            disabled={fields.length >= MAX_DOCUMENTS}
-            onClick={() => append(newDocument())}
-          >
-            <Plus className="size-4" /> Add document
-          </Button>
+          {selectedTemplate ? (
+            <div className="flex flex-wrap gap-2">
+              {selectedTemplate.documents.map((document) => (
+                <Badge key={document.id} tone="neutral">
+                  {document.name}
+                  {document.type === "FRONT_BACK" ? " (Front + Back)" : ""}
+                </Badge>
+              ))}
+            </div>
+          ) : null}
 
           <div className="border-t border-border pt-5">
             <label className="block max-w-xs">
@@ -419,7 +222,9 @@ export function RequestBuilder() {
           <dl className="mt-5 space-y-3 text-sm">
             <div className="flex justify-between gap-3">
               <dt className="text-muted-foreground">Documents</dt>
-              <dd className="font-semibold">{watchedDocuments.length}</dd>
+              <dd className="font-semibold">
+                {selectedTemplate?.documents.length ?? 0}
+              </dd>
             </div>
             <div className="flex justify-between gap-3">
               <dt className="text-muted-foreground">Captures required</dt>
@@ -427,7 +232,7 @@ export function RequestBuilder() {
             </div>
             <div className="flex justify-between gap-3">
               <dt className="text-muted-foreground">Expires after</dt>
-              <dd className="font-semibold">{values.expiryHours ?? 3} hours</dd>
+              <dd className="font-semibold">{expiryHours ?? 3} hours</dd>
             </div>
           </dl>
           <div className="mt-5 rounded-xl border border-success/20 bg-success/5 p-4 text-xs leading-5 text-muted-foreground">

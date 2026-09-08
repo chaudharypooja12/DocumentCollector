@@ -40,11 +40,7 @@ describe("theme and Admin shell", () => {
       "href",
       "/admin/login",
     );
-    expect(
-      screen
-        .getAllByText("Dashboard")
-        .some((element) => element.closest("header")),
-    ).toBe(true);
+    expect(screen.getByRole("banner")).toBeInTheDocument();
 
     await user.click(
       screen.getByRole("button", { name: "Switch to dark theme" }),

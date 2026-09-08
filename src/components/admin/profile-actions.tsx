@@ -34,6 +34,23 @@ function statusTone(status: DemoProfile["status"]) {
       : "neutral";
 }
 
+const MAX_NAME_WORDS = 40;
+
+function validateProfileDraft(draft: DemoProfile) {
+  const errors: Partial<Record<"fullName" | "age", string>> = {};
+  const trimmedName = draft.fullName.trim();
+  const wordCount = trimmedName.split(/\s+/).filter(Boolean).length;
+  if (!trimmedName) {
+    errors.fullName = "Enter a full name.";
+  } else if (wordCount > MAX_NAME_WORDS) {
+    errors.fullName = `Full name must be at most ${MAX_NAME_WORDS} words.`;
+  }
+  if (!Number.isFinite(draft.age) || draft.age < 15 || draft.age > 90) {
+    errors.age = "Age must be between 15 and 90 years.";
+  }
+  return errors;
+}
+
 export function ViewProfileDialog({ profile }: { profile: DemoProfile }) {
   return (
     <Dialog>
@@ -129,9 +146,15 @@ export function EditProfileDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState(profile);
+  const [errors, setErrors] = useState<ReturnType<typeof validateProfileDraft>>(
+    {},
+  );
 
   function openWithProfile(nextOpen: boolean) {
-    if (nextOpen) setDraft(profile);
+    if (nextOpen) {
+      setDraft(profile);
+      setErrors({});
+    }
     setOpen(nextOpen);
   }
 
@@ -176,6 +199,11 @@ export function EditProfileDialog({
           className="space-y-4"
           onSubmit={(event) => {
             event.preventDefault();
+            const nextErrors = validateProfileDraft(draft);
+            if (Object.keys(nextErrors).length > 0) {
+              setErrors(nextErrors);
+              return;
+            }
             onSave(draft);
             setOpen(false);
           }}
@@ -189,8 +217,14 @@ export function EditProfileDialog({
               onChange={(event) =>
                 updateField("fullName", event.target.value)
               }
+              aria-invalid={Boolean(errors.fullName)}
               required
             />
+            {errors.fullName ? (
+              <span className="mt-1 block text-xs text-destructive">
+                {errors.fullName}
+              </span>
+            ) : null}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -198,15 +232,21 @@ export function EditProfileDialog({
               <Input
                 id={`edit-age-${profile.id}`}
                 type="number"
-                min={0}
-                max={120}
+                min={15}
+                max={90}
                 className="mt-2"
                 value={draft.age}
                 onChange={(event) =>
                   updateField("age", Number(event.target.value))
                 }
+                aria-invalid={Boolean(errors.age)}
                 required
               />
+              {errors.age ? (
+                <span className="mt-1 block text-xs text-destructive">
+                  {errors.age}
+                </span>
+              ) : null}
             </div>
             <div>
               <Label htmlFor={`edit-gender-${profile.id}`}>Gender</Label>

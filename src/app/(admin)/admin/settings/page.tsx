@@ -2,17 +2,31 @@
 
 import { Settings as SettingsIcon, RotateCcw, Save } from "lucide-react";
 import { useState } from "react";
+import { DataTable, type DataTableColumn } from "@/components/admin/data-table";
 import { PageHeading } from "@/components/admin/page-heading";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { InlineAlert } from "@/components/ui/inline-alert";
 import { Label } from "@/components/ui/label";
+import { demoLogs, type DemoLogEntry } from "@/data/admin-fixtures";
 
 const defaults = {
   displayName: "MBWays Admin",
   replyEmail: "info@mbways.com",
 };
+
+const logColumns: DataTableColumn<DemoLogEntry>[] = [
+  {
+    id: "event",
+    header: "Event",
+    value: (log) => log.event,
+    cell: (log) => <span className="font-semibold">{log.event}</span>,
+  },
+  { id: "actor", header: "Actor", value: (log) => log.actor },
+  { id: "details", header: "Details", value: (log) => log.details },
+  { id: "timestamp", header: "Timestamp", value: (log) => log.timestamp },
+];
 
 export default function SettingsPage() {
   const [values, setValues] = useState(defaults);
@@ -20,21 +34,9 @@ export default function SettingsPage() {
 
   return (
     <>
-      <PageHeading
-        eyebrow="Workspace"
-        title="Settings"
-        description="Explore the planned settings interface. Changes exist only until this page is refreshed and cannot alter MBWays ownership."
-        icon={SettingsIcon}
-        demo
-      />
+      <PageHeading title="Settings" icon={SettingsIcon} demo />
       <Card>
-        <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/12 text-primary">
-          <SettingsIcon className="size-5" aria-hidden="true" />
-        </div>
-        <h2 className="mt-5 text-lg font-bold">Workspace preferences</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          These fields preview the intended Admin settings experience.
-        </p>
+        <h2 className="text-lg font-bold">Workspace preferences</h2>
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -101,6 +103,16 @@ export default function SettingsPage() {
           </div>
         </form>
       </Card>
+
+      <h2 className="mt-8 mb-4 text-lg font-bold">Activity logs</h2>
+      <DataTable
+        caption="Demonstration activity log"
+        columns={logColumns}
+        rows={demoLogs}
+        rowKey={(log) => log.id}
+        searchPlaceholder="Search logs"
+        exportFileName="documentcollector-demo-logs.csv"
+      />
     </>
   );
 }

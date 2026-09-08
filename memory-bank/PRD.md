@@ -85,7 +85,9 @@ Basic Details (Full Name, Age, Gender, Phone, Permanent Address, Residence
 Address) are entered by the User directly in the browser after the link opens.
 They are never encoded in the link, never uploaded, and exist only in
 current-page memory alongside captures — the PII-free link contract above is
-unaffected.
+unaffected. Full name must be at most 40 words and Age must be between 15
+and 90 years; both are validated locally with a specific inline error message
+when out of range.
 
 The link accepts exactly one submission. After the User generates documents,
 the current tab locks against further edits; Phase 1 cannot yet enforce this
@@ -128,11 +130,15 @@ persistent Admin user records begin in Phase 2.
   `/admin/login`; it validates locally, transmits/stores no credentials, and
   does not claim to protect routes. Real authentication begins in Phase 2.
 - The main functional Phase 1 Admin workflow is a mobile-responsive request
-  builder that selects document requirements, expiry, and generates a link.
-- Dashboard, Users (merged Profiles/Submissions view), Logs, and Settings are
-  complete responsive UI demonstrations backed only by static fixtures or
-  current-page memory. They do not claim to show real saved records.
-- Phase 2 adds the single authenticated Admin and persistent records.
+  builder that selects a reusable document template and expiry, then
+  generates a link.
+- Templates are built and managed on a dedicated Templates screen; Dashboard,
+  Users (merged Profiles/Submissions view), and Settings (including merged
+  Activity Logs) are complete responsive UI demonstrations backed only by
+  static fixtures or current-page memory. They do not claim to show real
+  saved records.
+- Phase 2 adds the single authenticated Admin and persistent records
+  (including persistent document templates).
 
 ### Admin Modules
 
@@ -140,10 +146,10 @@ persistent Admin user records begin in Phase 2.
 Admin Panel
 │
 ├── Dashboard
-├── Create Request
+├── Templates (document checklist builder)
+├── Create Request (select template + expiry, generate link)
 ├── Users (Profiles + Submissions preview, per-row View/Update/Delete)
-├── Settings
-└── Logs
+└── Settings (including Activity Logs)
 ```
 
 ---
@@ -513,14 +519,19 @@ See `../AGENT.md` for the full, enforceable instruction set. In short:
 
 - [x] MBWays logo and `Powered by MBWays` identity across shared Admin and public layouts
 - [x] Responsive Admin UI with no Phase 1 authentication
-- [x] Request builder with no stored User record or PII in the link
-- [x] Document selection & drag-and-drop ordering
+- [x] Reusable document-template builder (Templates page) with drag-and-drop
+      ordering, moved out of request creation
+- [x] Request builder selects a template and expiry only; no stored User
+      record or PII in the link
+- [x] Document selection & drag-and-drop ordering (in Templates)
 - [x] Single document configuration
 - [x] Front + Back configuration
-- [x] Temporary link (max 6-hour validity, single submission per link)
+- [x] Temporary link (max 6-hour validity, single submission per link) with a
+      live expiry countdown pill shown to the User
 - [x] QR, clipboard, Web Share, WhatsApp, and email sharing
-- [x] In-browser Basic Details entry (Full Name, Age, Gender, Phone,
-      Permanent/Residence Address) held only in current-page memory
+- [x] In-browser Basic Details entry (Full Name ≤40 words, Age 15–90, Gender,
+      Phone, Permanent/Residence Address) held only in current-page memory,
+      with inline validation errors
 - [x] Camera capture with positioning box (red/green states)
 - [x] Retake/Edit before submission
 - [x] Local document generation
@@ -529,8 +540,10 @@ See `../AGENT.md` for the full, enforceable instruction set. In short:
 - [x] User combined PDF download and supported file sharing
 - [x] Admin Users page merges profile and submission-preview demonstrations
       with per-row View/Update/Delete actions
-- [x] Reusable Admin data table with search, pagination, and CSV export
-- [x] Admin Logs demonstration screen
+- [x] Reusable Admin data table with filters-before-search toolbar, pagination,
+      and CSV export
+- [x] Admin activity log demonstration merged into Settings
+- [x] Public Privacy Policy, Terms of Service, and Contact Us pages
 - [x] In-memory current-tab lock after local generation
 - [x] Zero persistence audit: no backend, DB, upload, browser storage, or PII in links
 - [x] Glassmorphism UI (Next.js + TypeScript + Tailwind CSS)

@@ -69,6 +69,16 @@ The unauthenticated, token-based flow the User experiences: landing/state resolu
   single-capture documents). The per-slot Capture button now uses the primary
   MBWays orange gradient with white text instead of the neutral secondary
   style.
+- 2026-09-08: Age and Gender fields in the Basic Details form now always
+  render in the same row (a non-responsive `grid-cols-2` block nested inside
+  the responsive form grid), not just at the `sm` breakpoint. Added a live
+  expiry countdown pill (`ExpiryCountdown`, updates every second from
+  `request.expiresAt`) next to the completion percentage in the progress
+  card, using the primary orange background with white text. Added an
+  "Upload documents" heading above the document capture list, matching the
+  "Basic details" section heading style. Added validation: Age must be
+  between 15 and 90 years; Full name must be at most 40 words; both surface
+  a specific inline error message instead of a generic one.
 
 ## Next Steps
 

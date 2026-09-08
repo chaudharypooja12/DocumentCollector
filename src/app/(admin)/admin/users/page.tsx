@@ -112,42 +112,7 @@ export default function UsersPage() {
 
   return (
     <>
-      <PageHeading eyebrow="People" title="Users" icon={UserRound} demo />
-
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <Select
-          value={statusFilter}
-          onValueChange={(value) =>
-            setStatusFilter(value as ProfileStatus | "All")
-          }
-        >
-          <SelectTrigger className="min-h-11 w-full rounded-xl sm:w-48">
-            <SelectValue aria-label="Status filter" />
-          </SelectTrigger>
-          <SelectContent>
-            {statusFilters.map((status) => (
-              <SelectItem key={status} value={status}>
-                {status === "All" ? "All statuses" : status}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={genderFilter}
-          onValueChange={(value) => setGenderFilter(value as Gender | "All")}
-        >
-          <SelectTrigger className="min-h-11 w-full rounded-xl sm:w-48">
-            <SelectValue aria-label="Gender filter" />
-          </SelectTrigger>
-          <SelectContent>
-            {genderFilters.map((gender) => (
-              <SelectItem key={gender} value={gender}>
-                {gender === "All" ? "All genders" : gender}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <PageHeading title="Users" icon={UserRound} demo />
 
       <DataTable
         caption="Profiles"
@@ -156,6 +121,44 @@ export default function UsersPage() {
         rowKey={(profile) => profile.id}
         searchPlaceholder="Search profiles"
         exportFileName="documentcollector-demo-profiles.csv"
+        filters={
+          <>
+            <Select
+              value={statusFilter}
+              onValueChange={(value) =>
+                setStatusFilter(value as ProfileStatus | "All")
+              }
+            >
+              <SelectTrigger className="min-h-11 w-full rounded-xl sm:w-44">
+                <SelectValue aria-label="Status filter" />
+              </SelectTrigger>
+              <SelectContent>
+                {statusFilters.map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {status === "All" ? "All statuses" : status}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={genderFilter}
+              onValueChange={(value) =>
+                setGenderFilter(value as Gender | "All")
+              }
+            >
+              <SelectTrigger className="min-h-11 w-full rounded-xl sm:w-44">
+                <SelectValue aria-label="Gender filter" />
+              </SelectTrigger>
+              <SelectContent>
+                {genderFilters.map((gender) => (
+                  <SelectItem key={gender} value={gender}>
+                    {gender === "All" ? "All genders" : gender}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </>
+        }
       />
 
       <ReactivationDemo />

@@ -6,63 +6,97 @@
 
 ## Purpose
 
-All Admin-facing functionality: dashboard stats, profile/submission review and management, document template configuration, link generation/sharing, settings, activity logs.
+All Admin-facing functionality: dashboard stats, document template
+management, request creation, profile/submission review and management, and
+workspace settings (including activity logs).
 
 ## Current Implementation Status
 
 - Phase 1 implemented under `src/app/(admin)/admin/`,
-  `src/components/admin/`, `src/components/ui/`, and `src/data/`.
+  `src/components/admin/`, `src/components/ui/`, `src/providers/`, and
+  `src/data/`.
 - The MBWays landing page routes to a local-only Admin sign-in preview. It
   validates input in memory but deliberately does not authenticate, transmit, or
-  store credentials; secure access control remains Phase 2.
-- Dashboard, Users (merged Profiles + Submissions preview), Settings, Logs,
-  request creation, link/QR sharing, oversized-link guidance, and same-link
-  reactivation demonstration are implemented.
+  store credentials; secure access control remains Phase 2. The sign-in page
+  now has its own `<header>` bar (logo + theme toggle) matching every other
+  page instead of an absolutely positioned toggle with no visible header.
+- Dashboard, Templates, Create Request, Users (merged Profiles + Submissions
+  preview), and Settings (including merged Activity Logs) are implemented.
 - The responsive shell includes a desktop sidebar, sticky top bar, mobile
   navigation sheet, Light-default in-memory theme control, clear structural
-  borders, and Logout back to the local sign-in preview. Settings and Logs are
-  ordered at the bottom of the navigation list.
+  borders, and Logout back to the local sign-in preview. The top bar no
+  longer shows a page-title/breadcrumb ("Dashboard · DocumentCollector ·
+  Powered by MBWays"); it only contains navigation, theme toggle, and Logout.
+  Navigation order is: Dashboard, Templates, Create request, Users, Settings.
+- Page headings across every Admin page (Dashboard, Templates, Create
+  Request, Users, Settings) no longer show an eyebrow label ("Admin
+  workspace", "Functional Phase 1 workflow", "People", "Workspace") or an
+  explanatory subheading; only the icon, title, and (where relevant) the
+  "Phase 1 demonstration" badge remain, vertically centered against the icon.
 
 ## Key Screens / Components
 
 - **Dashboard**: four stat cards only — Total profiles (with a View link to
   Users), Pending (hover reveals "Links Created but data not received"), Male
-  users, and Female users — computed from typed static fixtures.
+  users, and Female users — computed from typed static fixtures. The stat
+  grid uses 2 columns on mobile (`grid-cols-2`) and 4 columns at `xl`.
+- **Templates** (`/admin/templates`, new): Admin can create, edit, and delete
+  reusable document-template checklists (name + ordered documents with
+  Single/Front+Back capture type) via `TemplateFormDialog`/
+  `DeleteTemplateDialog`, backed by `src/providers/templates-provider.tsx`
+  (in-memory `useState`, seeded with one default "Passport & Photograph"
+  template). This is the only place the document-builder UI
+  (add/remove/reorder documents, drag-and-drop, per-document capture type)
+  exists; it was moved out of the request-creation flow.
+- **Create Request** (`/admin/requests/new`): `RequestBuilder` now only picks
+  an existing template from a Select and an expiry (1–6 hours), previews the
+  template's documents as read-only badges, then generates the temporary
+  link/QR/share panel exactly as before. If no templates exist, it shows an
+  inline prompt linking to `/admin/templates`. The "Add labels only. Never
+  include a person's name or contact details." subheading no longer appears
+  here since document authoring lives on the Templates page.
 - **Users**: a single merged page replacing the former separate Submissions
-  and PDF Management pages. Status and gender Select filters sit above a
-  responsive data table with search, pagination, and CSV export. Each row's
-  Actions column provides View submission (Eye, opens a Dialog with profile
-  details and demonstration document downloads), Update profile (Pencil,
-  opens an editable Dialog including a "same as permanent address" checkbox),
-  and Delete profile (Trash, opens a confirmation Dialog). All mutations are
-  in-memory `useState` only and reset on refresh.
+  and PDF Management pages. Status and gender Select filters render in the
+  same toolbar row as the table's search input (filters first, then search,
+  then the Export as CSV button, via the `DataTable` `filters` prop). Each
+  row's Actions column provides View submission (Eye, opens a Dialog with
+  profile details and demonstration document downloads), Update profile
+  (Pencil, opens an editable Dialog including a "same as permanent address"
+  checkbox), and Delete profile (Trash, opens a confirmation Dialog). The
+  Update dialog validates Age (15–90) and Full name (at most 40 words) before
+  saving, showing inline errors. All mutations are in-memory `useState` only
+  and reset on refresh.
 - **Settings**: demonstration preferences form spanning the full page width
   (a two-column field grid inside a single full-width `Card`, matching every
-  other Admin page); values reset on refresh.
-- **Logs**: demonstration activity log fixtures with search, pagination, and
-  CSV export.
-- A functional Create Request flow with document configuration, expiry,
-  self-contained link generation, QR when the link fits QR capacity, and share
-  actions that remain available for longer valid links.
+  other Admin page), with no page-level or card-level subheading. Below it, an
+  "Activity logs" section renders the same demonstration log fixtures that
+  previously lived on a standalone `/admin/logs` page (now removed) using the
+  shared `DataTable`.
 - Reusable shadcn components provide buttons, cards, fields, selects,
   checkboxes, dialogs, badges, alerts, sheets, menus, separators, tooltips,
   skeletons, progress, and tables. `Input` and the `Select` trigger use a
   themed inset "hollow" shadow (`.field-shadow`) instead of a raised shadow so
   empty fields read as containers waiting for input.
 - No Admin content page constrains its primary `Card` with a `max-w-*` class;
-  every page (Dashboard, Create Request, Users, Settings, Logs) fills the
-  full `page-shell` content width for visual consistency.
+  every page fills the full `page-shell` content width for visual
+  consistency.
 - The reusable Admin data table (`src/components/admin/data-table.tsx`)
   supports per-column `searchable`/`exportable` flags so an Actions column can
-  be excluded from search matching and CSV export.
+  be excluded from search matching and CSV export, and an optional `filters`
+  slot rendered before the search input in the same toolbar row.
 - All scrollable surfaces use a themed scrollbar (MBWays orange thumb on a
   muted track) defined once in `src/app/globals.css`.
+- The Logout control uses the primary MBWays orange button style (white
+  text) instead of a neutral outline, matching the "fill theme color, white
+  text" direction used elsewhere (e.g. the capture button).
 
 ## Data It Owns / Reads
 
-- Phase 1: current-page request-builder state and typed static fixtures only.
-- Phase 2: `admins`, `users`, `document_template_items`, `links`,
-  `submissions`, and `generated_pdfs`.
+- Phase 1: current-page request-builder state, in-memory document templates
+  (`src/providers/templates-provider.tsx`), and typed static fixtures only.
+- Phase 2: `admins`, `users`, `document_template_items` (persisted version of
+  the Phase 1 in-memory templates), `links`, `submissions`, and
+  `generated_pdfs`.
 
 ## Dependencies
 
@@ -73,8 +107,9 @@ All Admin-facing functionality: dashboard stats, profile/submission review and m
 ## Known Issues
 
 - Phase 1 cannot receive real User captures or Basic Details, persist Admin
-  changes, or reactivate a link on another device. The Users page View/Update/
-  Delete actions operate only on in-memory static fixtures.
+  changes (including templates), or reactivate a link on another device. The
+  Users page View/Update/Delete actions and the Templates CRUD actions all
+  operate only on in-memory state that resets on refresh.
 - Vercel project connection and physical-device acceptance remain external.
 
 ## Decisions Log
@@ -99,6 +134,23 @@ All Admin-facing functionality: dashboard stats, profile/submission review and m
   Dashboard to four stat cards and removed static "recent activity"/"private
   by design" cards in favor of the dedicated Logs page. Reordered navigation
   so Settings and Logs sit at the bottom.
+- 2026-09-08: Added an in-memory document-template feature
+  (`templates-provider.tsx`, `template-builder.tsx`, `/admin/templates`) and
+  moved the entire document-builder UI (add/reorder/remove documents,
+  per-document capture type) out of the request-creation flow and into
+  Template create/edit dialogs; Create Request now only selects a template
+  and expiry. Merged the standalone Logs page into Settings and removed the
+  separate route/nav item. Removed the Admin top bar's page-title/breadcrumb
+  text entirely. Removed eyebrow labels ("Admin workspace", "Functional
+  Phase 1 workflow", "People", "Workspace") and page-level subheadings from
+  Dashboard, Create Request, Users, and Settings, aligning each page's icon
+  and title vertically. Changed the Dashboard stat grid to 2 columns on
+  mobile. Changed Logout to the primary orange/white button style. Moved
+  each Admin table's filter controls into the same toolbar row as the search
+  input, before the search box. Added Age (15–90) and Full name (≤40 words)
+  validation with inline errors to the Users "Update profile" dialog. Gave
+  the local-only Admin sign-in page a proper `<header>` bar instead of an
+  absolutely positioned theme toggle with no visible header bar.
 
 ## Next Steps
 

@@ -46,9 +46,24 @@ import {
   type CaptureTargetDescriptor,
 } from "@/features/user-upload/capture-store";
 
+const MAX_NAME_WORDS = 40;
+
+const nameSchema = z
+  .string()
+  .trim()
+  .min(1, "Enter your full name")
+  .refine(
+    (value) => value.split(/\s+/).filter(Boolean).length <= MAX_NAME_WORDS,
+    `Full name must be at most ${MAX_NAME_WORDS} words.`,
+  );
+
 const profileDetailsSchema = z.object({
-  fullName: z.string().trim().min(1).max(120),
-  age: z.number().int().min(1).max(120),
+  fullName: nameSchema,
+  age: z
+    .number()
+    .int()
+    .min(15, "Age must be at least 15 years.")
+    .max(90, "Age must be at most 90 years."),
   gender: z.enum(["Male", "Female"]),
   phone: z.string().trim().min(6).max(20),
   permanentAddress: z.string().trim().min(1).max(200),
@@ -102,6 +117,41 @@ function UserHeader() {
         </div>
       </div>
     </header>
+  );
+}
+
+function formatCountdown(remainingMs: number) {
+  const totalSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return hours > 0
+    ? `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+    : `${pad(minutes)}:${pad(seconds)}`;
+}
+
+/** Small orange pill showing a live countdown to the request's expiry. */
+function ExpiryCountdown({ expiresAt }: { expiresAt: string }) {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  const remainingMs = Date.parse(expiresAt) - now;
+  const expired = remainingMs <= 0;
+
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full bg-primary px-2.5 py-1 text-xs font-semibold text-primary-foreground"
+      role="timer"
+      aria-label={expired ? "Link expired" : `Time remaining ${formatCountdown(remainingMs)}`}
+    >
+      <Clock3 className="size-3.5" aria-hidden="true" />
+      {expired ? "Expired" : formatCountdown(remainingMs)}
+    </span>
   );
 }
 
@@ -243,16 +293,24 @@ function Checklist() {
       <main className="page-shell pb-32 pt-7 sm:pt-10">
         <div className="mx-auto max-w-3xl">
           <Card className="mb-5">
-            <Progress
-              value={(completed / required) * 100}
-              label={`${completed} of ${required} documents complete`}
-            />
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+              <span className="text-xs text-muted-foreground">
+                {completed} of {required} documents complete
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">
+                  {Math.round((completed / required) * 100)}%
+                </span>
+                <ExpiryCountdown expiresAt={request.expiresAt} />
+              </div>
+            </div>
+            <Progress value={(completed / required) * 100} />
           </Card>
 
           <Card className="mb-5">
             <h2 className="text-lg font-bold">Basic details</h2>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <label className="block">
+              <label className="block sm:col-span-2">
                 <span className="mb-2 block text-sm font-semibold">
                   Full name
                 </span>
@@ -263,52 +321,56 @@ function Checklist() {
                 />
                 {profileErrors.fullName ? (
                   <span className="mt-1 block text-xs text-destructive">
-                    Enter your full name
+                    {profileErrors.fullName.message}
                   </span>
                 ) : null}
               </label>
-              <label className="block">
-                <span className="mb-2 block text-sm font-semibold">Age</span>
-                <Input
-                  type="number"
-                  min={1}
-                  max={120}
-                  placeholder="e.g. 28"
-                  {...registerProfile("age", { valueAsNumber: true })}
-                  aria-invalid={Boolean(profileErrors.age)}
-                />
-                {profileErrors.age ? (
-                  <span className="mt-1 block text-xs text-destructive">
-                    Enter a valid age
+              <div className="grid grid-cols-2 gap-4 sm:col-span-2">
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold">
+                    Age
                   </span>
-                ) : null}
-              </label>
-              <label className="block">
-                <span className="mb-2 block text-sm font-semibold">
-                  Gender
-                </span>
-                <Controller
-                  control={profileControl}
-                  name="gender"
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="min-h-11 rounded-xl">
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Male">Male</SelectItem>
-                        <SelectItem value="Female">Female</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {profileErrors.gender ? (
-                  <span className="mt-1 block text-xs text-destructive">
-                    Select a gender
+                  <Input
+                    type="number"
+                    min={15}
+                    max={90}
+                    placeholder="e.g. 28"
+                    {...registerProfile("age", { valueAsNumber: true })}
+                    aria-invalid={Boolean(profileErrors.age)}
+                  />
+                  {profileErrors.age ? (
+                    <span className="mt-1 block text-xs text-destructive">
+                      {profileErrors.age.message}
+                    </span>
+                  ) : null}
+                </label>
+                <label className="block">
+                  <span className="mb-2 block text-sm font-semibold">
+                    Gender
                   </span>
-                ) : null}
-              </label>
-              <label className="block">
+                  <Controller
+                    control={profileControl}
+                    name="gender"
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="min-h-11 rounded-xl">
+                          <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Male">Male</SelectItem>
+                          <SelectItem value="Female">Female</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {profileErrors.gender ? (
+                    <span className="mt-1 block text-xs text-destructive">
+                      Select a gender
+                    </span>
+                  ) : null}
+                </label>
+              </div>
+              <label className="block sm:col-span-2">
                 <span className="mb-2 block text-sm font-semibold">
                   Phone number
                 </span>
@@ -376,6 +438,7 @@ function Checklist() {
             </div>
           </Card>
 
+          <h2 className="mb-4 text-lg font-bold">Upload documents</h2>
           <div className="space-y-4">
             {request.documents.map((document, index) => (
               <Card key={document.id}>

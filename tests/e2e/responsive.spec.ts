@@ -5,11 +5,14 @@ const routes = [
   "/",
   "/admin/login",
   "/admin",
+  "/admin/templates",
   "/admin/requests/new",
   "/admin/users",
   "/admin/settings",
-  "/admin/logs",
   "/u#request=invalid",
+  "/privacy",
+  "/terms",
+  "/contact",
 ];
 
 test("core screens avoid horizontal overflow across the viewport matrix", async ({

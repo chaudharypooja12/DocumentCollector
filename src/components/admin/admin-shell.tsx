@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 import {
   FileStack,
   LayoutDashboard,
+  LayoutTemplate,
   LogOut,
   Menu,
-  ScrollText,
   Settings,
   UserRound,
 } from "lucide-react";
@@ -27,19 +27,11 @@ import { cn } from "@/lib/utils";
 
 const navigation = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/templates", label: "Templates", icon: LayoutTemplate },
   { href: "/admin/requests/new", label: "Create request", icon: FileStack },
   { href: "/admin/users", label: "Users", icon: UserRound },
   { href: "/admin/settings", label: "Settings", icon: Settings },
-  { href: "/admin/logs", label: "Logs", icon: ScrollText },
 ];
-
-function getPageTitle(pathname: string) {
-  return (
-    navigation.find(({ href }) =>
-      href === "/admin" ? pathname === href : pathname.startsWith(href),
-    )?.label ?? "Admin workspace"
-  );
-}
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -119,17 +111,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
             </Sheet>
           </div>
 
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold">
-              {getPageTitle(pathname)}
-            </p>
-            <p className="hidden text-xs text-muted-foreground sm:block">
-              DocumentCollector · Powered by MBWays
-            </p>
-          </div>
+          <div className="min-w-0 flex-1" />
 
           <ThemeToggle />
-          <Button asChild variant="outline">
+          <Button asChild>
             <Link href="/admin/login" aria-label="Logout">
               <LogOut aria-hidden="true" />
               <span className="hidden sm:inline">Logout</span>

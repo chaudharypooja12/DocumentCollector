@@ -153,8 +153,19 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="page-shell flex flex-col gap-3 py-7 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+      <footer className="page-shell flex flex-col gap-4 py-7 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
         <p>DocumentCollector — Powered by MBWays</p>
+        <nav aria-label="Legal" className="flex flex-wrap items-center gap-4">
+          <Link href="/privacy" className="hover:text-foreground">
+            Privacy Policy
+          </Link>
+          <Link href="/terms" className="hover:text-foreground">
+            Terms of Service
+          </Link>
+          <Link href="/contact" className="hover:text-foreground">
+            Contact Us
+          </Link>
+        </nav>
         <p>Opening Pathways to Opportunities.</p>
       </footer>
     </div>

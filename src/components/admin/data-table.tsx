@@ -34,6 +34,9 @@ type DataTableProps<Row> = {
   searchPlaceholder?: string;
   exportFileName: string;
   pageSize?: number;
+  /** Optional filter controls (e.g. Select menus) rendered before the search
+   * input in the same toolbar row. */
+  filters?: ReactNode;
 };
 
 function escapeCsv(value: string | number) {
@@ -49,6 +52,7 @@ export function DataTable<Row>({
   searchPlaceholder = "Search records",
   exportFileName,
   pageSize = 5,
+  filters,
 }: DataTableProps<Row>) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -107,7 +111,8 @@ export function DataTable<Row>({
 
   return (
     <Card className="overflow-hidden p-0">
-      <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:flex-wrap sm:items-center">
+        {filters}
         <div className="relative w-full sm:max-w-sm">
           <Search
             className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
@@ -127,7 +132,7 @@ export function DataTable<Row>({
           variant="secondary"
           onClick={exportCsv}
           disabled={filteredRows.length === 0}
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto sm:ml-auto"
         >
           <Download aria-hidden="true" />
           Export as CSV
