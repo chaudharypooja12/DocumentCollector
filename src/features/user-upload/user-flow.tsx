@@ -242,40 +242,15 @@ function Checklist() {
     <>
       <main className="page-shell pb-32 pt-7 sm:pt-10">
         <div className="mx-auto max-w-3xl">
-          <div className="mb-7">
-            <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">
-              Document request
-            </p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight">
-              Capture your documents
-            </h1>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              Follow the checklist below. Your images are processed locally and
-              never uploaded.
-            </p>
-          </div>
-
           <Card className="mb-5">
             <Progress
               value={(completed / required) * 100}
-              label={`${completed} of ${required} captures complete`}
+              label={`${completed} of ${required} documents complete`}
             />
-            <InlineAlert
-              tone="success"
-              className="mt-4 flex items-start gap-3 text-xs"
-            >
-              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success" />
-              This link accepts a single submission. Refreshing or closing
-              this page permanently clears all details and captures.
-            </InlineAlert>
           </Card>
 
           <Card className="mb-5">
             <h2 className="text-lg font-bold">Basic details</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Entered on this device only. These details are never uploaded
-              or saved.
-            </p>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <label className="block">
                 <span className="mb-2 block text-sm font-semibold">
@@ -410,11 +385,11 @@ function Checklist() {
                   </span>
                   <div>
                     <h2 className="font-bold">{document.name}</h2>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {document.type === "SINGLE"
-                        ? "One image · one A4 page"
-                        : "Front and back · one shared A4 page"}
-                    </p>
+                    {document.type === "SINGLE" ? (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        One image · one A4 page
+                      </p>
+                    ) : null}
                   </div>
                 </div>
                 <div

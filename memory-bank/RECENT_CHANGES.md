@@ -16,6 +16,13 @@ Entry format:
 
 ---
 
+## 2026-09-08 — User capture flow simplified and per-document progress fixed
+
+- Module(s): user-upload, document-capture
+- Summary: Removed redundant copy from the public capture screen: the "Capture your documents"/"Follow the checklist below" heading, the single-submission reminder alert, the "Entered on this device only" Basic Details subheading, and the "Front and back · one shared A4 page" subheading (single-capture documents keep "One image · one A4 page"). Fixed the progress bar/footer counting bug where a front+back document counted as 2 toward the total instead of 1 — `completed`/`required` in `capture-store.tsx` now count fully-captured documents, not individual capture sides, so requesting 2 documents shows "X of 2" instead of "X of 3". Changed the per-slot Capture button to the primary MBWays orange gradient with white text instead of the neutral secondary style. Updated the affected Playwright flow for the camera dialog's auto-advance-without-closing behavior and fixed a pre-existing `getByLabel` ambiguity between the Permanent Address field and the "same as permanent address" checkbox.
+- Files touched: `src/features/user-upload/user-flow.tsx`, `src/features/user-upload/capture-store.tsx`, `src/components/capture/capture-slot.tsx`, `tests/e2e/user-flow.spec.ts`, and affected `memory-bank/**` files
+- Follow-ups: none.
+
 ## 2026-09-08 — Settings full-width layout and hollow input shadows
 
 - Module(s): admin

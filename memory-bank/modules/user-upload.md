@@ -59,6 +59,16 @@ The unauthenticated, token-based flow the User experiences: landing/state resolu
   profile features.
 - 2026-09-07: Phase 1 opens `/u#request=<payload>` directly with no login,
   keeps all files in current-page memory, and generates PDFs on-device.
+- 2026-09-08: Progress now counts per-document completion (each document, not
+  each capture side) so a front+back document counts as 1 of N rather than 2,
+  matching what the User requested. Removed redundant page copy: the
+  "Capture your documents"/"Follow the checklist below" heading, the
+  single-submission reminder alert, the "Entered on this device only"
+  subheading under Basic Details, and the "Front and back · one shared A4
+  page" subheading (the "One image · one A4 page" subheading remains for
+  single-capture documents). The per-slot Capture button now uses the primary
+  MBWays orange gradient with white text instead of the neutral secondary
+  style.
 
 ## Next Steps
 

@@ -133,10 +133,15 @@ All state screens retain the shared DocumentCollector and MBWays brand lockup.
 - [x] **Link Landing / Loading** — decodes and validates the URL-fragment request, then opens the document checklist automatically.
 - [x] **Basic Details** — the User enters Full Name, Age, Gender, Phone,
       Permanent Address, and Residence Address (with a "same as permanent
-      address" checkbox) directly in the browser. These details are never
-      encoded in the link, never uploaded, and exist only in current-page
-      memory alongside captures.
-- [x] **Document Upload List** — list of required documents with capture buttons (Front/Back where applicable), progress indicators.
+      address" checkbox) directly in the browser, with no explanatory
+      subheading beneath the section title. These details are never encoded
+      in the link, never uploaded, and exist only in current-page memory
+      alongside captures.
+- [x] **Document Upload List** — list of required documents with capture
+      buttons (Front/Back where applicable) and a progress indicator that
+      counts completed documents (a front+back document counts as one, not
+      two). Only single-capture documents show a "One image · one A4 page"
+      subheading; front/back documents show no subheading.
 - [x] **Camera Capture Screen** — live preview with a document-tracking edge
       overlay (red/green reflects real detected-document state, not lighting
       alone), automatic capture once the document is detected and held

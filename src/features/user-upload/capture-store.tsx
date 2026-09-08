@@ -165,15 +165,17 @@ export function CaptureProvider({
     dispatch({ type: "CLEAR_CAPTURES" });
   }, []);
 
-  const required = useMemo(
+  const required = request.documents.length;
+  const completed = useMemo(
     () =>
-      request.documents.reduce(
-        (total, document) => total + (document.type === "FRONT_BACK" ? 2 : 1),
-        0,
-      ),
-    [request.documents],
+      request.documents.filter((document) =>
+        document.type === "SINGLE"
+          ? Boolean(state.captures[keyFor(document.id, "SINGLE")])
+          : Boolean(state.captures[keyFor(document.id, "FRONT")]) &&
+            Boolean(state.captures[keyFor(document.id, "BACK")]),
+      ).length,
+    [request.documents, state.captures],
   );
-  const completed = Object.keys(state.captures).length;
 
   const value = useMemo<CaptureContextValue>(
     () => ({

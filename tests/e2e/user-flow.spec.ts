@@ -25,7 +25,7 @@ test("Admin link opens the no-login capture and PDF flow", async ({ page }) => {
 
   await page.goto(requestUrl!);
   await expect(
-    page.getByRole("heading", { name: "Capture your documents" }),
+    page.getByRole("heading", { name: "Basic details" }),
   ).toBeVisible();
   await expect(page.getByText(/login|sign up/iu)).toHaveCount(0);
 
@@ -35,7 +35,7 @@ test("Admin link opens the no-login capture and PDF flow", async ({ page }) => {
   await page.getByRole("option", { name: "Female" }).click();
   await page.getByLabel("Phone number").fill("+91 98765 43210");
   await page
-    .getByLabel("Permanent address")
+    .getByLabel("Permanent address", { exact: true })
     .fill("12 MG Road, Pune, Maharashtra");
   await page
     .getByRole("checkbox", { name: /same as my permanent address/iu })
@@ -44,6 +44,10 @@ test("Admin link opens the no-login capture and PDF flow", async ({ page }) => {
   const captureButtons = page.getByRole("button", {
     name: /^Capture (document|front|back)$/iu,
   });
+  // The camera dialog now auto-advances to the next required side (e.g.
+  // front -> back of the same document) without closing, so a new "Capture"
+  // button only reappears once the dialog closes for a fully captured
+  // document group.
   while ((await captureButtons.count()) > 0) {
     await captureButtons.first().click();
     await page.locator('input[type="file"]').setInputFiles({
@@ -52,6 +56,14 @@ test("Admin link opens the no-login capture and PDF flow", async ({ page }) => {
       buffer: image,
     });
     await page.getByRole("button", { name: "Use photo" }).click();
+    while ((await page.getByRole("dialog").count()) > 0) {
+      await page.locator('input[type="file"]').setInputFiles({
+        name: "document.png",
+        mimeType: "image/png",
+        buffer: image,
+      });
+      await page.getByRole("button", { name: "Use photo" }).click();
+    }
   }
 
   await page.getByRole("button", { name: "Generate documents" }).click();
