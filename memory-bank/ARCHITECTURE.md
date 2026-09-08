@@ -155,7 +155,7 @@ Admin selects document requirements and expiry (1-6h)
    -> Admin shares by Copy / QR / Web Share / WhatsApp / Email
 ```
 
-### 4.2 Phase 1 User Capture and Local PDF
+### 4.2 Phase 1 User Capture, Mock Payment, and Local PDF
 
 ```
 User opens /u#request=<payload>
@@ -163,7 +163,9 @@ User opens /u#request=<payload>
    -> Document checklist opens automatically; no login
    -> User grants camera permission or selects the file fallback
    -> Browser processes captures into in-memory Blobs
-   -> User confirms generation
+   -> Version 1: User confirms generation
+   -> Version 2: User completes a clearly labeled no-charge mock checkout
+   -> Mock cancellation/failure preserves current-tab captures for retry
    -> Browser creates combined and individual PDFs with pdf-lib
    -> Current tab enters in-memory SUBMITTED state
    -> User downloads or shares PDFs
@@ -171,6 +173,10 @@ User opens /u#request=<payload>
 
 Closing or refreshing clears the session. Admin does not receive the captures in
 Phase 1.
+
+The Phase 1 Admin payment lifecycle page uses independent fixtures to preview
+1–24 hour renewal, token rotation, repricing, retained uploads, and deletion. It
+does not synchronize with or authoritatively control the public flow.
 
 ### 4.3 Phase 2 Persistent Flow
 
@@ -182,7 +188,7 @@ Admin creates request -> server stores request and issues token
    -> User opens token -> server resolves state
    -> Captures upload to private Storage
    -> Server locks submission and generates authoritative PDFs
-   -> Admin can reactivate the same token for correction
+   -> Admin can extend the token or rotate it and revoke the old token
 ```
 
 ---
@@ -233,7 +239,7 @@ Admin creates request -> server stores request and issues token
 | WhatsApp share (`wa.me` link)                  | 1     | Manual link sharing               |
 | Email share (`mailto:` or transactional email) | 1–2   | Manual/automated link sharing     |
 | Supabase                                       | 2     | DB, Auth, Storage, Edge Functions |
-| Payment Gateway (TBD — e.g., Razorpay/Stripe)  | 3     | Paid feature billing              |
+| Razorpay behind a gateway-neutral adapter      | 3     | One-time request payments          |
 
 ---
 

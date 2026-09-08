@@ -3,15 +3,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AlertTriangle,
+  Ban,
   Clock3,
+  CreditCard,
   Download,
   FileCheck2,
   LoaderCircle,
   LockKeyhole,
   ShieldCheck,
   Share2,
+  XCircle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { BrandLockup } from "@/components/shared/brand-lockup";
@@ -24,6 +27,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { InlineAlert } from "@/components/ui/inline-alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import {
   Select,
@@ -35,9 +46,11 @@ import {
 import {
   decodeRequestPayload,
   getEncodedRequestFromHash,
+  hasDemoPayment,
   RequestLinkError,
   type Phase1RequestPayload,
 } from "@/lib/request-link";
+import { formatDemoMoney } from "@/lib/payment-demo";
 import { COMPLETE_PDF_NAME, createCombinedPdf } from "@/lib/pdf";
 import {
   CaptureProvider,
@@ -126,6 +139,12 @@ function Checklist() {
   const [confirming, setConfirming] = useState(false);
   const [pdf, setPdf] = useState<{ blob: Blob; url: string } | null>(null);
   const [generationError, setGenerationError] = useState("");
+  const [remainingMs, setRemainingMs] = useState(
+    Math.max(0, Date.parse(request.expiresAt) - Date.now()),
+  );
+  const verificationTimerRef = useRef<number | null>(null);
+  const paidRequest = hasDemoPayment(request);
+  const payment = paidRequest ? request.payment : null;
   const {
     register: registerProfile,
     control: profileControl,
@@ -164,6 +183,32 @@ function Checklist() {
     [pdf],
   );
 
+  useEffect(
+    () => () => {
+      if (verificationTimerRef.current !== null) {
+        window.clearTimeout(verificationTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const updateExpiry = () => {
+      const nextRemaining = Math.max(
+        0,
+        Date.parse(request.expiresAt) - Date.now(),
+      );
+      setRemainingMs(nextRemaining);
+      if (nextRemaining === 0 && status !== "SUBMITTED") {
+        setConfirming(false);
+        setStatus("EXPIRED");
+      }
+    };
+    updateExpiry();
+    const interval = window.setInterval(updateExpiry, 1000);
+    return () => window.clearInterval(interval);
+  }, [request.expiresAt, setStatus, status]);
+
   async function generate() {
     setConfirming(false);
     setGenerationError("");
@@ -177,8 +222,29 @@ function Checklist() {
       setGenerationError(
         "The PDF could not be generated. Check the captures and try again.",
       );
-      setStatus("COLLECTING");
+      setStatus(paidRequest ? "PAID" : "COLLECTING");
     }
+  }
+
+  function cancelCheckout() {
+    setStatus("PAYMENT_CANCELLED");
+  }
+
+  function failCheckout() {
+    setStatus("PAYMENT_FAILED");
+  }
+
+  function succeedCheckout() {
+    setStatus("VERIFYING");
+    verificationTimerRef.current = window.setTimeout(() => {
+      verificationTimerRef.current = null;
+      if (Date.now() >= Date.parse(request.expiresAt)) {
+        setStatus("EXPIRED");
+        return;
+      }
+      setStatus("PAID");
+      void generate();
+    }, 700);
   }
 
   async function sharePdf() {
@@ -234,14 +300,32 @@ function Checklist() {
             <LockKeyhole className="mt-0.5 size-5 shrink-0 text-warning" />
             <p className="text-xs leading-5 text-muted-foreground">
               This tab is now locked against edits. Phase 1 does not persist the
-              lock after refresh; authoritative locking and same-link
-              reactivation begin in Phase 2.
+              lock or payment after refresh; authoritative verification and
+              renewal begin in the backend phases.
             </p>
           </InlineAlert>
         </Card>
       </main>
     );
   }
+
+  if (status === "EXPIRED") {
+    return (
+      <StateCard
+        icon={<Clock3 className="size-7" />}
+        title="This link has expired"
+        description="Your current-page captures cannot be paid for now. In production, an administrator can extend or replace the link while retaining private uploads."
+      />
+    );
+  }
+
+  const paymentMessage =
+    status === "PAYMENT_CANCELLED"
+      ? "Demo checkout was cancelled. Your captures are still available in this tab, and you can retry before expiry."
+      : status === "PAYMENT_FAILED"
+        ? "Demo payment was declined. No money was charged; review and retry before expiry."
+        : "";
+  const remainingMinutes = Math.max(1, Math.ceil(remainingMs / 60_000));
 
   return (
     <>
@@ -259,6 +343,16 @@ function Checklist() {
               never uploaded.
             </p>
           </div>
+
+          {payment ? (
+            <InlineAlert tone="warning" className="mb-5">
+              Demo payment — no money will be charged. This request costs{" "}
+              <strong>
+                {formatDemoMoney(payment.amountMinor, payment.currency)}
+              </strong>{" "}
+              for {payment.countryCode === "IN" ? "India" : "UAE / Dubai"}.
+            </InlineAlert>
+          ) : null}
 
           <Card className="mb-5">
             <Progress
@@ -464,6 +558,11 @@ function Checklist() {
               {generationError}
             </p>
           ) : null}
+          {paymentMessage ? (
+            <InlineAlert tone="warning" className="mt-5">
+              {paymentMessage}
+            </InlineAlert>
+          ) : null}
         </div>
       </main>
 
@@ -472,7 +571,9 @@ function Checklist() {
           <div className="hidden sm:block">
             <p className="text-sm font-semibold">
               {isComplete
-                ? "Ready to generate"
+                ? payment
+                  ? `Ready for demo payment · ${remainingMinutes} min left`
+                  : "Ready to generate"
                 : `${required - completed} remaining`}
             </p>
             <p className="text-xs text-muted-foreground">
@@ -482,17 +583,33 @@ function Checklist() {
           <Button
             className="w-full sm:ml-auto sm:w-auto"
             disabled={!isComplete}
-            loading={status === "GENERATING"}
+            loading={status === "GENERATING" || status === "VERIFYING"}
             onClick={() => {
-              void handleProfileSubmit(() => setConfirming(true))();
+              if (status === "PAID" && generationError) {
+                void generate();
+                return;
+              }
+              void handleProfileSubmit(() => {
+                setStatus(payment ? "READY_FOR_PAYMENT" : "COLLECTING");
+                setConfirming(true);
+              })();
             }}
           >
-            {status === "GENERATING" ? (
+            {status === "GENERATING" || status === "VERIFYING" ? (
               <LoaderCircle className="size-4 animate-spin" />
+            ) : payment ? (
+              <CreditCard className="size-4" />
             ) : (
               <FileCheck2 className="size-4" />
             )}
-            Generate documents
+            {status === "PAID" && generationError
+              ? "Retry PDF generation"
+              : payment
+                ? status === "PAYMENT_CANCELLED" ||
+                  status === "PAYMENT_FAILED"
+                  ? "Retry demo payment"
+                  : `Continue to pay ${formatDemoMoney(payment.amountMinor, payment.currency)}`
+                : "Generate documents"}
           </Button>
         </div>
       </div>
@@ -527,22 +644,84 @@ function Checklist() {
             className="max-w-md"
           >
             <h2 id="generation-title" className="text-xl font-bold">
-              Generate and lock this tab?
+              {payment ? "Review demo payment" : "Generate and lock this tab?"}
             </h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              The PDF is created locally. After generation, your details and
-              captures cannot be changed in this tab, and nothing is sent to
-              MBWays.
+              {payment
+                ? `Your captures are ready. Continue to a no-charge mock checkout for ${formatDemoMoney(payment.amountMinor, payment.currency)}. PDF download and sharing unlock only after simulated success.`
+                : "The PDF is created locally. After generation, your details and captures cannot be changed in this tab, and nothing is sent to MBWays."}
             </p>
+            {payment ? (
+              <InlineAlert tone="warning" className="mt-4">
+                Demo payment — no money will be charged and no payment details
+                are collected.
+              </InlineAlert>
+            ) : null}
             <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button variant="secondary" onClick={() => setConfirming(false)}>
                 Keep editing
               </Button>
-              <Button onClick={generate}>Generate PDF</Button>
+              <Button
+                onClick={() => {
+                  if (payment) {
+                    setConfirming(false);
+                    setStatus("CHECKOUT_OPEN");
+                    return;
+                  }
+                  void generate();
+                }}
+              >
+                {payment ? "Open mock checkout" : "Generate PDF"}
+              </Button>
             </div>
           </Card>
         </div>
       ) : null}
+
+      <Dialog
+        open={status === "CHECKOUT_OPEN"}
+        onOpenChange={(open) => {
+          if (!open && status === "CHECKOUT_OPEN") cancelCheckout();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <div className="mb-3 flex items-center gap-3">
+              <span className="rounded-xl bg-primary/10 p-2.5 text-primary">
+                <CreditCard className="size-5" />
+              </span>
+              <span className="text-xs font-semibold tracking-[0.16em] text-primary uppercase">
+                Mock hosted checkout
+              </span>
+            </div>
+            <DialogTitle>
+              {payment
+                ? `Pay ${formatDemoMoney(payment.amountMinor, payment.currency)}`
+                : "Demo payment"}
+            </DialogTitle>
+            <DialogDescription>
+              Choose an outcome to test the customer experience. No card, bank,
+              wallet, or UPI information is requested.
+            </DialogDescription>
+          </DialogHeader>
+          <InlineAlert tone="warning">
+            Demo payment — no money will be charged.
+          </InlineAlert>
+          <div className="grid gap-3">
+            <Button type="button" onClick={succeedCheckout}>
+              <FileCheck2 className="size-4" /> Simulate successful payment
+            </Button>
+            <Button type="button" variant="danger" onClick={failCheckout}>
+              <XCircle className="size-4" /> Simulate declined payment
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="secondary" onClick={cancelCheckout}>
+              <Ban className="size-4" /> Cancel checkout
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

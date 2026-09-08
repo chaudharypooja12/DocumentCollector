@@ -20,7 +20,10 @@ Phase 1 is a frontend-only implementation:
 - the link opens the document checklist directly on a phone with no login;
 - camera captures, processed images, and PDFs remain in current-page memory;
 - no backend, database, authentication, upload, or browser persistence is used;
-- the User downloads or shares the locally generated PDF;
+- India/INR and UAE/AED payment outcomes are clearly labeled no-charge UI
+  simulations with no provider SDK, API, key, or payment credential;
+- the User downloads or shares the locally generated PDF only after mock success
+  on version-2 links;
 - refresh or close clears the session.
 
 Persistent Admin records, uploads, authoritative expiry/locking, and
@@ -35,7 +38,9 @@ The complete frontend implementation is available under `src/`:
   credential storage in Phase 1);
 - `/admin` — responsive demonstration dashboard and management screens;
 - `/admin/requests/new` — functional request builder and link/QR sharing;
-- `/u#request=<payload>` — no-login capture, review, local PDF, and download flow.
+- `/admin/payments/demo` — standalone renewal and payment lifecycle fixtures;
+- `/u#request=<payload>` — no-login capture, mock payment, local PDF, and
+  download flow.
 
 OpenCV.js is pinned under `public/opencv/` and loaded only when the camera
 workflow starts. Captures are normalized and PDFs are generated entirely in the
@@ -44,8 +49,8 @@ browser.
 ## Core Flow
 
 ```
-Admin → Configure Required Documents → Generate Temporary Link / QR
-   → User Opens Link → Captures Documents → Generates PDF
+Admin → Configure Required Documents + Country Price → Generate Link / QR
+   → User Opens Link → Captures Documents → Completes Mock Payment
    → Browser Generates A4 PDF Locally → User Downloads / Shares
    → Current Tab Locks (Persistent Lock/Reactivation in Phase 2)
 ```
@@ -56,7 +61,7 @@ Admin → Configure Required Documents → Generate Temporary Link / QR
 | ------------------ | ----------------------------------------------------------------------------------------- |
 | Phase 1 — Frontend | Next.js 16, React 19, TypeScript 5, Tailwind CSS 4, shadcn/ui, OpenCV.js, pdf-lib, Vercel |
 | Phase 2 — Backend  | Supabase (Database, Storage, Auth, Edge Functions), REST/RPC                              |
-| Phase 3 — Payment  | Payment gateway integration (TBD)                                                         |
+| Phase 3 — Payment  | Replace the no-charge India/UAE UI prototype with Razorpay-backed request payments       |
 
 ## Deployment
 

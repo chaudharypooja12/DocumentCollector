@@ -2,6 +2,15 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { RequestBuilder } from "@/components/admin/request-builder";
+import { PaymentDemoProvider } from "@/providers/payment-demo-provider";
+
+function renderBuilder() {
+  return render(
+    <PaymentDemoProvider>
+      <RequestBuilder />
+    </PaymentDemoProvider>,
+  );
+}
 
 describe("RequestBuilder", () => {
   beforeEach(() => {
@@ -14,7 +23,7 @@ describe("RequestBuilder", () => {
 
   it("adds documents and generates a PII-free request URL", async () => {
     const user = userEvent.setup();
-    render(<RequestBuilder />);
+    renderBuilder();
 
     expect(screen.getAllByPlaceholderText("e.g. Passport")).toHaveLength(2);
     await user.click(screen.getByRole("button", { name: "Add document" }));
@@ -37,7 +46,7 @@ describe("RequestBuilder", () => {
 
   it("supports touch and keyboard-friendly move controls", async () => {
     const user = userEvent.setup();
-    render(<RequestBuilder />);
+    renderBuilder();
 
     expect(screen.getAllByPlaceholderText("e.g. Passport")[0]).toHaveValue(
       "Passport",
@@ -54,9 +63,27 @@ describe("RequestBuilder", () => {
     );
   });
 
+  it("snapshots the UAE demo price into a new request", async () => {
+    const user = userEvent.setup();
+    renderBuilder();
+
+    await user.click(screen.getByRole("combobox", { name: "Billing country" }));
+    await user.click(
+      screen.getByRole("option", {
+        name: "United Arab Emirates (Dubai)",
+      }),
+    );
+
+    expect(screen.getByText("AED 20.00")).toBeVisible();
+    await user.click(
+      screen.getByRole("button", { name: "Generate temporary link" }),
+    );
+    expect(await screen.findByText(/\/u#request=/u)).toBeVisible();
+  });
+
   it("removes a generated link when its request configuration changes", async () => {
     const user = userEvent.setup();
-    render(<RequestBuilder />);
+    renderBuilder();
 
     await user.click(
       screen.getByRole("button", { name: "Generate temporary link" }),
@@ -79,7 +106,7 @@ describe("RequestBuilder", () => {
     { timeout: 15000 },
     async () => {
       const user = userEvent.setup();
-      render(<RequestBuilder />);
+      renderBuilder();
 
       for (let index = 2; index < 20; index += 1) {
         await user.click(screen.getByRole("button", { name: "Add document" }));

@@ -13,6 +13,10 @@ const prohibitedPatterns = [
   /firebase/,
   /appwrite/,
   /createTRPC/,
+  /from\s+["']razorpay["']/,
+  /checkout\.razorpay\.com/,
+  /api\.razorpay\.com/,
+  /rzp_(?:live|test)_/,
 ];
 
 function sourceFiles(directory: string): string[] {

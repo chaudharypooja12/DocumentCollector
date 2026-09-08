@@ -1,24 +1,25 @@
 # Phase 3 — Payment Gateway
 
-**Scope:** Introduce payment processing for paid features/plans. Not included in Phase 1 or Phase 2 per `PRD.md` §22, §28.
-**Status:** Not started — requirements below are a planning-level checklist to be refined once paid-feature scope is finalized.
+**Scope:** Replace the Phase 1 mock-payment UI with secure one-time payment per
+document request.
+**Status:** Not started — Phase 1 contains UI simulation only.
 **Related docs:** `PRD.md` §22, `ARCHITECTURE.md` §8
 
 ---
 
 ## 1. Requirements Gathering
 
-- [ ] Define which features/limits become paid (e.g., number of users beyond a free tier, storage retention duration, priority PDF processing, additional admin seats)
-- [ ] Define pricing model (one-time, subscription/monthly, usage-based, credits)
-- [ ] Define currency/region support requirements (based on target markets)
+- [x] Define paid action: one-time payment after upload and before PDF access
+- [x] Define initial markets: India/INR and UAE/AED
+- [x] Define initial provider direction: Razorpay behind a gateway-neutral adapter
 - [ ] Document the finalized paid-feature list back into `PRD.md` (update MVP/Phase 3 scope section)
 
 ---
 
 ## 2. Payment Gateway Selection
 
-- [ ] Evaluate candidate providers (e.g., Razorpay, Stripe, PayU) against: supported regions/currencies, fee structure, webhook reliability, compliance support
-- [ ] Select provider and record decision + reasoning in `ARCHITECTURE.md` §9 decision log
+- [x] Select Razorpay as the first provider direction for an Indian GST business
+- [ ] Confirm international-payment activation, AED presentment, fees, settlement, and export documentation with Razorpay
 - [ ] Set up sandbox/test account
 - [ ] Set up production account (business verification/KYC as required by provider)
 
@@ -26,9 +27,8 @@
 
 ## 3. Data Model Extensions
 
-- [ ] Add `plans` table (plan name, price, billing interval, feature limits)
-- [ ] Add `subscriptions` (or `billing_accounts`) table linked to `admins`
-- [ ] Add `payments` / `invoices` table (transaction records, status, provider reference id)
+- [ ] Add country pricing and immutable request price revisions
+- [ ] Add payment attempts/events with provider references and idempotency keys
 - [ ] Add `admin_id` scoping consistent with existing single-admin schema, structured to extend to multi-admin later
 - [ ] Migration scripts + RLS policies for all new tables
 
@@ -36,10 +36,10 @@
 
 ## 4. Checkout & Billing UI
 
-- [ ] Pricing/plans page (Admin-facing)
+- [ ] Replace Admin demo pricing with persistent country pricing
 - [ ] Checkout flow (redirect or embedded, per provider's recommended integration)
 - [ ] Payment success/failure screens
-- [ ] Admin billing dashboard: current plan, usage vs. limits, invoice history, payment method management
+- [ ] Add Admin request payment, refund, and reconciliation status
 
 ---
 
@@ -49,8 +49,8 @@
 - [ ] Webhook endpoint to receive payment confirmation events
 - [ ] Webhook signature verification (security-critical)
 - [ ] Idempotent webhook handling (avoid double-processing on retries)
-- [ ] Update `subscriptions`/`payments` records on confirmed payment
-- [ ] Enforce plan limits in application logic (e.g., block user creation beyond free-tier cap unless subscribed)
+- [ ] Update request/payment records on confirmed payment
+- [ ] Generate and expose PDFs only after authoritative payment confirmation
 
 ---
 

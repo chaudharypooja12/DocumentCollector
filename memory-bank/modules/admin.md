@@ -16,8 +16,8 @@ All Admin-facing functionality: dashboard stats, profile/submission review and m
   validates input in memory but deliberately does not authenticate, transmit, or
   store credentials; secure access control remains Phase 2.
 - Dashboard, Users (merged Profiles + Submissions preview), Settings, Logs,
-  request creation, link/QR sharing, oversized-link guidance, and same-link
-  reactivation demonstration are implemented.
+  request creation, link/QR sharing, oversized-link guidance, in-memory
+  India/UAE pricing, and payment lifecycle demonstrations are implemented.
 - The responsive shell includes a desktop sidebar, sticky top bar, mobile
   navigation sheet, Light-default in-memory theme control, clear structural
   borders, and Logout back to the local sign-in preview. Settings and Logs are
@@ -37,11 +37,15 @@ All Admin-facing functionality: dashboard stats, profile/submission review and m
   and Delete profile (Trash, opens a confirmation Dialog). All mutations are
   in-memory `useState` only and reset on refresh.
 - **Settings**: demonstration preferences form; values reset on refresh.
+- **Payment demo**: deterministic fixture scenarios for awaiting/cancelled/
+  expired/late/superseded/duplicate payment states, 1–24 hour extension, token
+  rotation, original/latest repricing, retained-upload counts, and confirmed
+  deletion.
 - **Logs**: demonstration activity log fixtures with search, pagination, and
   CSV export.
 - A functional Create Request flow with document configuration, expiry,
-  self-contained link generation, QR when the link fits QR capacity, and share
-  actions that remain available for longer valid links.
+  billing-country selection, snapshotted INR/AED demo pricing, self-contained
+  version-2 link generation, QR when the link fits capacity, and share actions.
 - Reusable shadcn components provide buttons, cards, fields, selects,
   checkboxes, dialogs, badges, alerts, sheets, menus, separators, tooltips,
   skeletons, progress, and tables.
@@ -54,6 +58,8 @@ All Admin-facing functionality: dashboard stats, profile/submission review and m
 ## Data It Owns / Reads
 
 - Phase 1: current-page request-builder state and typed static fixtures only.
+- Phase 1 payment settings live in an Admin-layout React context and reset on
+  refresh; lifecycle records are fixtures only.
 - Phase 2: `admins`, `users`, `document_template_items`, `links`,
   `submissions`, and `generated_pdfs`.
 
@@ -68,6 +74,8 @@ All Admin-facing functionality: dashboard stats, profile/submission review and m
 - Phase 1 cannot receive real User captures or Basic Details, persist Admin
   changes, or reactivate a link on another device. The Users page View/Update/
   Delete actions operate only on in-memory static fixtures.
+- Payment UI performs no real gateway request, charge, verification, refund, or
+  cross-tab synchronization.
 - Vercel project connection and physical-device acceptance remain external.
 
 ## Decisions Log
@@ -92,6 +100,9 @@ All Admin-facing functionality: dashboard stats, profile/submission review and m
   Dashboard to four stat cards and removed static "recent activity"/"private
   by design" cards in favor of the dedicated Logs page. Reordered navigation
   so Settings and Logs sit at the bottom.
+- 2026-09-07: Added a no-charge Phase 1 payment prototype for India/INR and
+  UAE/AED plus a standalone lifecycle simulator. All settings and actions remain
+  in memory; production Razorpay behavior is deferred to Phase 3.
 
 ## Next Steps
 

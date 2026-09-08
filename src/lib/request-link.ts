@@ -1,4 +1,8 @@
 import { z } from "zod";
+import {
+  demoPaymentConfigSchema,
+  type DemoPaymentConfig,
+} from "@/lib/payment-demo";
 
 export const MAX_DOCUMENTS = 20;
 export const MAX_LINK_LENGTH = 7000;
@@ -14,13 +18,25 @@ export type RequestDocument = {
   sortOrder: number;
 };
 
-export type Phase1RequestPayload = {
-  version: 1;
+type RequestPayloadBase = {
   requestId: string;
   createdAt: string;
   expiresAt: string;
   documents: RequestDocument[];
 };
+
+export type Phase1RequestPayloadV1 = RequestPayloadBase & {
+  version: 1;
+};
+
+export type Phase1RequestPayloadV2 = RequestPayloadBase & {
+  version: 2;
+  payment: DemoPaymentConfig;
+};
+
+export type Phase1RequestPayload =
+  | Phase1RequestPayloadV1
+  | Phase1RequestPayloadV2;
 
 export type RequestLinkErrorCode =
   | "MALFORMED"
@@ -51,13 +67,32 @@ const documentSchema = z.object({
     .max(MAX_DOCUMENTS - 1),
 });
 
-const payloadSchema = z.object({
-  version: z.literal(1),
+const payloadBaseSchema = {
   requestId: z.string().uuid(),
   createdAt: z.iso.datetime(),
   expiresAt: z.iso.datetime(),
   documents: z.array(documentSchema).min(1).max(MAX_DOCUMENTS),
-});
+};
+
+const payloadV1Schema = z
+  .object({
+    version: z.literal(1),
+    ...payloadBaseSchema,
+  })
+  .strict();
+
+const payloadV2Schema = z
+  .object({
+    version: z.literal(2),
+    ...payloadBaseSchema,
+    payment: demoPaymentConfigSchema,
+  })
+  .strict();
+
+const payloadSchema = z.discriminatedUnion("version", [
+  payloadV1Schema,
+  payloadV2Schema,
+]);
 
 function assertDocumentSet(documents: RequestDocument[]) {
   const ids = new Set<string>();
@@ -95,7 +130,8 @@ function parsePayload(value: unknown): Phase1RequestPayload {
     typeof value === "object" &&
     value !== null &&
     "version" in value &&
-    value.version !== 1
+    value.version !== 1 &&
+    value.version !== 2
   ) {
     throw new RequestLinkError(
       "UNSUPPORTED_VERSION",
@@ -154,7 +190,7 @@ export function createRequestPayload(
   documents: Array<Pick<RequestDocument, "id" | "name" | "type">>,
   expiryHours: number,
   now = new Date(),
-): Phase1RequestPayload {
+): Phase1RequestPayloadV1 {
   if (!Number.isInteger(expiryHours) || expiryHours < 1 || expiryHours > 6) {
     throw new RequestLinkError(
       "INVALID_EXPIRY",
@@ -178,7 +214,51 @@ export function createRequestPayload(
     documents: ordered,
   });
   assertExpiry(payload);
+  if (payload.version !== 1) {
+    throw new RequestLinkError("MALFORMED", "Request data is invalid.");
+  }
   return payload;
+}
+
+export function createPaidRequestPayload(
+  documents: Array<Pick<RequestDocument, "id" | "name" | "type">>,
+  expiryHours: number,
+  payment: DemoPaymentConfig,
+  now = new Date(),
+): Phase1RequestPayloadV2 {
+  if (!Number.isInteger(expiryHours) || expiryHours < 1 || expiryHours > 6) {
+    throw new RequestLinkError(
+      "INVALID_EXPIRY",
+      "Expiry must be between one and six hours.",
+    );
+  }
+
+  const ordered = documents.map((document, sortOrder) => ({
+    ...document,
+    name: document.name.trim(),
+    sortOrder,
+  }));
+  const payload = parsePayload({
+    version: 2,
+    requestId: crypto.randomUUID(),
+    createdAt: now.toISOString(),
+    expiresAt: new Date(
+      now.getTime() + expiryHours * 60 * 60 * 1000,
+    ).toISOString(),
+    documents: ordered,
+    payment,
+  });
+  assertExpiry(payload);
+  if (payload.version !== 2) {
+    throw new RequestLinkError("MALFORMED", "Payment data is missing.");
+  }
+  return payload;
+}
+
+export function hasDemoPayment(
+  payload: Phase1RequestPayload,
+): payload is Phase1RequestPayloadV2 {
+  return payload.version === 2;
 }
 
 function assertExpiry(payload: Phase1RequestPayload, now?: Date) {

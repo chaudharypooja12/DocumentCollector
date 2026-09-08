@@ -1,6 +1,6 @@
 # Phase 1 - Frontend-Only Working UI
 
-**Status:** Implementation complete and locally verified; Vercel connection and
+**Status:** Payment UI prototype implemented and lint/build verified; Vercel connection and
 physical-device acceptance checks remain external follow-ups
 **Primary device:** Mobile phone
 **Stack:** Next.js 16, React 19, TypeScript 5, Tailwind CSS 4,
@@ -26,10 +26,16 @@ Phase 1 intentionally has:
   cache for product data;
 - no authoritative cross-device expiry, submission lock, history, or
   reactivation.
+- no real payment provider, checkout, charge, webhook, settlement, or payment
+  credential collection.
 
 The Admin-generated URL carries only non-sensitive document configuration and
 expiry in its fragment. Captures and generated files exist only in the User's
 current page memory.
+
+Phase 1 may simulate India/UAE pricing and payment outcomes entirely in memory
+for UI testing. Every such surface is labeled as a no-charge demo. Real Razorpay
+integration remains Phase 3.
 
 ## 1. Project Setup and Quality Gates
 
@@ -80,7 +86,9 @@ current page memory.
 - [x] Revoke replaced/discarded object URLs
 - [x] Do not use localStorage, sessionStorage, IndexedDB, or cookies
 - [x] Do not add a service worker that caches request/capture/result pages
-- [x] Do not include name, phone, email, country, or image data in generated URLs
+- [x] Do not include User name, phone, email, address, image, or payment
+      credentials in generated URLs; version 2 may include Admin-selected billing
+      country and price configuration
 - [x] Do not log request payloads, filenames, images, PDFs, or PII
 - [x] Display a privacy notice: files stay on this device and are not uploaded
 - [x] Add a refresh/close warning after the first accepted capture
@@ -159,6 +167,19 @@ current page memory.
 - [x] Add WhatsApp and email share links
 - [x] Add Regenerate Link to create a new payload from the current form
 - [x] Unit test Unicode names, ordering, expiry, malformed data, and size limits
+
+### 4.4 Payment UI Prototype
+
+- [x] Configure in-memory India/INR and UAE/AED demo prices
+- [x] Snapshot the selected demo price into a PII-free version-2 request link
+- [x] Keep version-1 request links compatible with the existing free flow
+- [x] Add a no-charge mock hosted-checkout experience after document capture
+- [x] Retain current-page captures after mock cancellation or failure
+- [x] Gate PDF generation, submission success, download, and sharing on mock
+      payment success
+- [x] Add a standalone Admin lifecycle demo for 1–24 hour renewal, same-token
+      extension, token rotation, repricing, retained uploads, and deletion
+- [x] Keep all mock settings and state in memory and clear them on refresh
 
 ## 5. Public Link and User Flow
 
@@ -289,6 +310,9 @@ current page memory.
 - [x] E2E: Admin creates link -> User opens link -> captures/selects files ->
       generates and downloads PDF
 - [x] E2E: mobile Chromium and mobile WebKit viewport projects
+- [x] Add payment prototype unit, component, privacy, and E2E coverage
+- [ ] Execute the added payment test suites (not run in this task per the
+      requested lint-and-build-only validation scope)
 
 ### Real device
 
@@ -321,6 +345,9 @@ paths pass locally.
 - [x] Confirm OpenCV is capture-route-lazy and locally hosted
 - [x] Confirm lint, type-check, unit tests, and build pass
 - [x] Confirm Playwright Phase 1 journey passes
+- [x] Confirm the payment prototype passes lint and production build
+- [ ] Run the added payment unit/component/E2E suites (intentionally not executed
+      in this task)
 - [x] Run a privacy check: no document bytes leave the browser
 - [x] Update all affected module files
 - [x] Update `RECENT_CHANGES.md`
@@ -335,6 +362,6 @@ paths pass locally.
 - Uploads and private storage
 - Admin receipt/review/download of User documents
 - Persistent submission history
-- Same-token Admin reactivation
+- Authoritative same-token extension and new-token rotation/revocation
 - Server-side PDF generation
 - Audit events, monitoring, and rate limiting

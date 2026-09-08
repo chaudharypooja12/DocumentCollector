@@ -59,7 +59,7 @@ Entry point for all agent and contributor tasks. Read this file first.
 
 | Phase                     | Status                                                                                      |
 | ------------------------- | ------------------------------------------------------------------------------------------- |
-| Phase 1 — Frontend        | Implementation complete and locally verified; Vercel and physical-device acceptance pending |
+| Phase 1 — Frontend        | Payment UI prototype implemented; Vercel and physical-device acceptance pending                |
 | Phase 2 — Backend         | Not started                                                                                 |
 | Phase 3 — Payment Gateway | Not started                                                                                 |
 
@@ -71,12 +71,14 @@ Entry point for all agent and contributor tasks. Read this file first.
   or browser persistence.
 - Phase 1 links carry only non-sensitive request configuration; captures and
   PDFs remain in current-page memory on the User device.
-- Link expiry must never exceed six hours and must be server-authoritative in production.
+- Initial link expiry must never exceed six hours. Admin renewal may add 1–24
+  hours and must be server-authoritative in production.
 - Phase 1 locks only the current tab; Phase 2/production must keep a submitted
   link locked until an Admin explicitly reactivates the same token.
 - Front and back images share one A4 page; each single document gets its own page.
-- Reactivation reuses the existing token.
+- Reactivation may extend the existing token or rotate it and revoke the old one.
 - Privileged secrets must never be shipped to the client.
-- Payment work is out of scope until Phase 3.
+- Phase 1 may include clearly labeled in-memory payment UI simulations. Real
+  payment processing remains out of scope until Phase 3.
 
 > Admin decides which documents are required; the user captures only those documents through a temporary link; the system validates, formats, and combines them into A4 PDFs, then locks the link after submission.

@@ -337,7 +337,9 @@ Submit Again
 Link Locked
 ```
 
-No new link is ever generated — the Admin reactivates the **existing** link.
+The Admin may extend the existing link or issue a new token that revokes the old
+one. Phase 1 demonstrates both actions only as local UI state; Phase 2 must
+enforce either action authoritatively.
 
 Reactivation is a complete UI demonstration in Phase 1 but cannot affect a link
 on another device without shared state. Functional persistent reactivation is a
@@ -417,7 +419,7 @@ Admin can manually share the generated link. Initial implementation supports:
 | ------- | ------------------------------------------------------------------------------------------------------------------------- |
 | Phase 1 | Frontend-only — Next.js, React, TypeScript, Tailwind CSS, self-contained links, in-memory capture, on-device PDFs, Vercel |
 | Phase 2 | Backend — Supabase (DB, Storage, Auth, REST/RPC APIs)                                                                     |
-| Phase 3 | Payment Gateway & paid features                                                                                           |
+| Phase 3 | Real one-time request payments and payment gateway integration                                                            |
 
 ---
 
@@ -546,7 +548,8 @@ See `../AGENT.md` for the full, enforceable instruction set. In short:
 
 ### Phase 3 (Later)
 
-- [ ] Payment Gateway & paid features
+- [ ] Replace the Phase 1 no-charge India/UAE payment UI with Razorpay-backed
+      one-time request payments
 
 ---
 
@@ -557,7 +560,7 @@ See `../AGENT.md` for the full, enforceable instruction set. In short:
 - Cross-device submission state, authoritative lock, and real reactivation
 - Multi-tenant / multi-organization admin architecture
 - End-user login/profile/account
-- Payment processing (Phase 3 only)
+- Real payment processing (Phase 3 only; Phase 1 contains no-charge UI simulation)
 - Native mobile apps (web-based, mobile-responsive only)
 - Automated OCR/data-extraction from documents (beyond corner/edge detection for capture)
 

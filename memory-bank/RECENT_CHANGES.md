@@ -16,6 +16,30 @@ Entry format:
 
 ---
 
+## 2026-09-07 — India/UAE mock payment UI implemented
+
+- Module(s): admin, user-upload, link-management, payment planning
+- Summary: Added an explicitly no-charge, frontend-only payment prototype for
+  India/INR and UAE/AED. Admin settings now hold country prices in memory, paid
+  version-2 request links snapshot the selected country/currency/integer amount,
+  and the User flow collects documents before offering deterministic mock
+  success, decline, and cancellation outcomes. Cancel/failure preserves captures
+  for same-tab retry; mock success exclusively unlocks local PDF generation,
+  submission success, download, and sharing. Added a standalone Admin lifecycle
+  fixture page for 1–24 hour extension, token rotation, original/latest
+  repricing, retained uploads, deletion, late payment, superseded attempts, and
+  duplicate-refund states. Version-1 links remain compatible, no payment
+  credentials/provider SDK/API/persistence were added, and privacy guards plus
+  payment-focused automated coverage were updated.
+- Files touched: `src/lib/payment-demo.ts`, `src/lib/request-link.ts`,
+  `src/providers/payment-demo-provider.tsx`, Admin settings/request/payment-demo
+  surfaces, `src/features/user-upload/**`, affected tests, `README.md`,
+  `AGENT.md`, and affected `memory-bank/**` files
+- Follow-ups: The added payment tests were not executed per the requested
+  lint-and-build-only validation scope. Real Razorpay orders, signed webhooks,
+  persistent uploads, authoritative expiry/revocation, payment reconciliation,
+  and INR settlement remain Phase 2/3 work.
+
 ## 2026-09-07 — Admin dashboard/Users redesign and User Basic Details
 
 - Module(s): admin, user-upload, project setup
