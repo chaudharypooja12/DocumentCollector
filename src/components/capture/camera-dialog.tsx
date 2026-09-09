@@ -84,6 +84,15 @@ export function CameraDialog({
   const [message, setMessage] = useState("");
   const [autoCaptured, setAutoCaptured] = useState(false);
   const [visionAvailable, setVisionAvailable] = useState(false);
+  const [visionSlow, setVisionSlow] = useState(false);
+  const visionTimeoutRef = useRef<number | null>(null);
+
+  const clearVisionTimeout = useCallback(() => {
+    if (visionTimeoutRef.current !== null) {
+      window.clearTimeout(visionTimeoutRef.current);
+      visionTimeoutRef.current = null;
+    }
+  }, []);
 
   const stopCamera = useCallback(() => {
     cameraRequestRef.current += 1;
@@ -121,15 +130,23 @@ export function CameraDialog({
       }
       if (requestId !== cameraRequestRef.current) return;
       setStarting(false);
+      clearVisionTimeout();
+      setVisionSlow(false);
+      visionTimeoutRef.current = window.setTimeout(() => {
+        if (requestId !== cameraRequestRef.current) return;
+        setVisionSlow(true);
+      }, 8000);
       void loadOpenCv()
         .then((cv) => {
           if (requestId !== cameraRequestRef.current) return;
           openCvRef.current = cv;
           setVisionAvailable(true);
+          clearVisionTimeout();
         })
         .catch(() => {
           if (requestId !== cameraRequestRef.current) return;
           setVisionAvailable(false);
+          clearVisionTimeout();
         });
     } catch (caught) {
       if (requestId !== cameraRequestRef.current) return;
@@ -145,13 +162,14 @@ export function CameraDialog({
       );
       setStarting(false);
     }
-  }, [stopCamera]);
+  }, [stopCamera, clearVisionTimeout]);
 
   useEffect(() => {
     const start = window.setTimeout(() => void startCamera(), 0);
     return () => {
       window.clearTimeout(start);
       stopCamera();
+      clearVisionTimeout();
     };
     // Intentionally runs once per mount only: the camera stream is reused
     // across auto-advanced targets within the same scanning session.
@@ -539,8 +557,9 @@ export function CameraDialog({
             </Button>
             {!visionAvailable && !starting && !error ? (
               <p className="text-center text-xs text-white/45 sm:col-span-3">
-                Computer-vision guidance is still loading. You may continue with
-                manual capture.
+                {visionSlow
+                  ? "Computer-vision guidance could not start on this device. Use manual capture."
+                  : "Computer-vision guidance is still loading. You may continue with manual capture."}
               </p>
             ) : null}
             {message ? (

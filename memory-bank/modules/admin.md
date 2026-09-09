@@ -44,12 +44,18 @@ workspace settings (including activity logs).
   grid uses 2 columns on mobile (`grid-cols-2`) and 4 columns at `xl`.
 - **Templates** (`/admin/templates`, new): Admin can create, edit, and delete
   reusable document-template checklists (name + ordered documents with
-  Single/Front+Back capture type) via `TemplateFormDialog`/
-  `DeleteTemplateDialog`, backed by `src/providers/templates-provider.tsx`
-  (in-memory `useState`, seeded with one default "Passport & Photograph"
-  template). This is the only place the document-builder UI
-  (add/remove/reorder documents, drag-and-drop, per-document capture type)
-  exists; it was moved out of the request-creation flow.
+  Single-side/Front+Back-side/Upload-PDF capture type) via
+  `TemplateFormDialog`/`DeleteTemplateDialog`, backed by
+  `src/providers/templates-provider.tsx` (in-memory `useState`, seeded with
+  one default "Passport & Photograph" template). Templates render as rows in
+  a `DataTable` (name, documents as badges, count, and an Actions column with
+  Edit/Delete icon buttons) instead of a card grid. The builder dialog is
+  wider (`w-[min(94vw,48rem)] max-w-3xl`) with a single scrollable region for
+  the document list, a mobile-safe action-button row (Delete/Move up/down no
+  longer overlap), and Save/Cancel in one responsive row. This is the only
+  place the document-builder UI (add/remove/reorder documents, drag-and-drop,
+  per-document capture type) exists; it was moved out of the request-creation
+  flow.
 - **Create Request** (`/admin/requests/new`): `RequestBuilder` picks an
   existing template from a Select, a billing country (India/UAE, using live
   demo pricing from `usePaymentDemo()`), and an expiry (1–6 hours), previews
@@ -77,16 +83,18 @@ workspace settings (including activity logs).
   reset on refresh.
 - **Settings**: demonstration preferences form spanning the full page width
   (a two-column field grid inside a single full-width `Card`, matching every
-  other Admin page), with no page-level or card-level subheading. A second
-  full-width Payment demo Card lets the Admin edit India/UAE prices and
-  enabled status. Below it, an "Activity logs" section renders the same
-  demonstration log fixtures that previously lived on a standalone
-  `/admin/logs` page (now removed) using the shared `DataTable`.
+  other Admin page), with no page-level or card-level subheading and no
+  "fixed MBWays identity" notice card. A second full-width Payment demo Card
+  (no subheading) lets the Admin edit India/UAE prices and enabled status.
+  Below it, an "Activity logs" section renders the same demonstration log
+  fixtures that previously lived on a standalone `/admin/logs` page (now
+  removed) using the shared `DataTable`.
 - Reusable shadcn components provide buttons, cards, fields, selects,
   checkboxes, dialogs, badges, alerts, sheets, menus, separators, tooltips,
   skeletons, progress, and tables. `Input` and the `Select` trigger use a
   themed inset "hollow" shadow (`.field-shadow`) instead of a raised shadow so
-  empty fields read as containers waiting for input.
+  empty fields read as containers waiting for input. Every `Dialog`'s close
+  (X) button uses a destructive red background with a white icon.
 - No Admin content page constrains its primary `Card` with a `max-w-*` class;
   every page fills the full `page-shell` content width for visual
   consistency.
@@ -184,6 +192,18 @@ workspace settings (including activity logs).
   Payment demo Card and the merged Activity logs section; the Users "Update
   profile" dialog keeps both the Payment detail row and the Age/name
   validation.
+- 2026-09-09: Reworked the Templates page to use the shared `DataTable`
+  (with an Actions column) instead of a card grid, widened and fixed the
+  mobile layout of the template builder dialog (single scroll region,
+  non-overlapping action buttons, one-row responsive Save/Cancel), removed
+  its subheading, and added a third document capture type — "Upload PDF"
+  (`PDF_UPLOAD`) — alongside Single side and Front + back side, threaded
+  through `request-link.ts`, `capture-store.tsx`, `capture-slot.tsx`,
+  `user-flow.tsx`, and `pdf.ts` (which now copies an uploaded PDF's pages
+  directly into the combined output). Styled every Dialog's close button
+  with a destructive red background and white icon. Removed the fixed
+  "MBWays logo/identity" notice card and the Payment demo Card's subheading
+  from Settings.
 
 ## Next Steps
 

@@ -68,6 +68,10 @@ detection, perspective correction, crop, resize, A4 prep).
   fallback.
 - The live overlay assumes a roughly rectangular document; extreme skew or
   partially visible pages may still require manual capture.
+- OpenCV's WASM runtime can still take several seconds to compile on
+  low-power devices before edge detection activates; a "guidance is still
+  loading" message covers this window, escalating to an explicit failure
+  message after 8s if it never resolves.
 
 ## Decisions Log
 
@@ -82,6 +86,15 @@ detection, perspective correction, crop, resize, A4 prep).
   camera. Manual capture and file selection remain as explicit fallbacks with
   their existing review step. No change to the Phase 1 no-upload/no-persistence
   contract — everything still runs and clears in the User's page memory.
+- 2026-09-09: Fixed a bug where automatic edge detection never activated in
+  production: the app's Content-Security-Policy `connect-src 'self'`
+  (`next.config.ts`) blocked the `fetch()` OpenCV.js's WASM runtime makes to
+  its own embedded `data:` URI, so `window.cv` never resolved and the guide
+  border stayed on the generic brightness heuristic forever. Added `data:` to
+  `connect-src`. Also added an 8-second vision-load timeout in
+  `camera-dialog.tsx` that swaps the "still loading" message for an explicit
+  "could not start on this device" message so users are not told indefinitely
+  that CV guidance is loading when it has actually failed.
 
 ## Next Steps
 

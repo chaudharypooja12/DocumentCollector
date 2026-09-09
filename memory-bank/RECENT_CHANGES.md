@@ -16,6 +16,20 @@ Entry format:
 
 ---
 
+## 2026-09-09 — Fixed automatic document-edge detection (CSP blocked OpenCV WASM)
+
+- Module(s): document-capture
+- Summary: Automatic CamScanner-style edge detection never activated in the deployed app: the Content-Security-Policy `connect-src 'self'` (`next.config.ts`) blocked the `fetch()` that OpenCV.js's WASM runtime makes to its own embedded `data:` URI, so `window.cv` never resolved and the live guide border stayed on the generic brightness/detail heuristic (never turning green or auto-capturing). Added `data:` to `connect-src`. Also added an 8-second vision-load timeout in `camera-dialog.tsx` so the UI shows an explicit "could not start on this device" message instead of an indefinite "still loading" message when OpenCV genuinely fails to initialize. Verified the fix removes the CSP violation via a Playwright/Chromium check against the real `public/opencv/opencv.js` bundle.
+- Files touched: `next.config.ts`, `src/components/capture/camera-dialog.tsx`, `memory-bank/modules/document-capture.md`
+- Follow-ups: Verify on real Android Chrome/iOS Safari devices per the existing physical-device-matrix follow-up.
+
+## 2026-09-09 — Templates page UX fixes, PDF upload document type, dialog styling
+
+- Module(s): admin, document-capture
+- Summary: Reworked the Templates page (`/admin/templates`) to list templates in the shared `DataTable` (name, documents, count, Actions column with Edit/Delete icon buttons) instead of a card grid; removed its subheading. Widened the Template create/edit dialog (`w-[min(94vw,48rem)] max-w-3xl`) and fixed its mobile layout so Delete/Move-up/down buttons no longer overlap, collapsed it to a single scrollable region, and made Save/Cancel render in one responsive row. Added a third document capture type, "Upload PDF" (`PDF_UPLOAD`), alongside Single side and Front + back side — implemented end-to-end via `request-link.ts` (new type + `documentTypeLabel` helper), `capture-store.tsx`/`capture-slot.tsx` (native file-picker upload UI and completeness/ordering logic), `user-flow.tsx`, and `pdf.ts` (copies the uploaded PDF's pages directly into the combined output instead of drawing an image). Styled every `Dialog`'s close (X) button with a destructive red background and white icon, applied globally. Removed the "MBWays logo/identity is fixed" notice card and the Payment demo Card's subheading from Settings.
+- Files touched: `src/app/(admin)/admin/{templates/page,settings/page}.tsx`, `src/components/admin/{payment-demo-settings,request-builder,template-builder}.tsx`, `src/components/ui/dialog.tsx`, `src/components/capture/capture-slot.tsx`, `src/features/user-upload/{capture-store,user-flow}.tsx`, `src/lib/{pdf,request-link}.ts`
+- Follow-ups: none.
+
 ## 2026-09-08 — Document templates, Admin UI simplification, and legal pages
 
 - Module(s): admin, user-upload, project setup
